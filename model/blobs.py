@@ -1,6 +1,7 @@
 import numpy as np
+from .model import Model
 
-class Blob:
+class Blob(Model):
 	def __init__(self, id, amplitude, blob_shape, width_x, width_y, v_x, v_y, pos_x, pos_y, t_init ):
 		seld,id = id
 		self.amplitude = amplitude
