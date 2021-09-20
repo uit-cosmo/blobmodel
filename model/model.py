@@ -26,12 +26,12 @@ class Model:
                     vy_dist='deg' 
                 ):
 
-        __amp = np.ones(num_blobs)#np.random.exponential(scale=1.0, size=num_blobs)
-        __width = np.ones(num_blobs)*0.1#np.random.exponential(scale=1.0, size=num_blobs)
+        __amp = np.random.exponential(scale=1.0, size=num_blobs)
+        __width = np.random.exponential(scale=1.0, size=num_blobs)
         __posx = np.zeros(num_blobs)
         __posy = np.random.uniform(low=0.0, high=self.Ly, size=num_blobs)
-        __vx = np.ones(num_blobs)
-        __vy = np.zeros(num_blobs)
+        __vx = np.random.gamma(shape=1.0, scale=1.0, size=num_blobs)
+        __vy = np.random.normal(loc=0.0, scale=1.0, size=num_blobs)
         __t_init = np.random.uniform(low=0, high=self.T, size=num_blobs)
 
         # sort blobs by __t_init

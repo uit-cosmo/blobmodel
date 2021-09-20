@@ -2,7 +2,7 @@ from model import Model, Blob
 import numpy as np
 import matplotlib.pyplot as plt
 
-tmp = Model(Nx=100, Ny=100, Lx=1, Ly=1, dt=0.1, T=10)
+tmp = Model(Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=20)
 
 # blob = Blob(1, 'gauss', 1,1,1,1,1,1,1,1)
 
@@ -15,7 +15,7 @@ tmp = Model(Nx=100, Ny=100, Lx=1, Ly=1, dt=0.1, T=10)
 # plt.show()
 
 
-tmp.sample_blobs(num_blobs=10)
+tmp.sample_blobs(num_blobs=200)
 
 
 tmp.show_model(interval=100)
