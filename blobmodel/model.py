@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import xarray as xr
+from tqdm import tqdm
 
 class Model:
     def __init__(self, Nx, Ny, Lx, Ly, dt, T, periodic_y=True):
@@ -64,7 +65,7 @@ class Model:
         cax = div.append_axes('right', '5%', '5%')
 
         frames = []
-        for t in self.t:
+        for t in tqdm(self.t,desc="Creating frames for animation"):
             curVals = np.zeros(shape=(self.Ny, self.Nx))
             for b in self.__blobs:
                 curVals  += b.discretize_blob(x=self.x, y=self.y, t=t)
@@ -89,15 +90,15 @@ class Model:
         ani = FuncAnimation(fig, animate, frames=self.t.size,interval=interval)
         plt.show()
 
-    def set_diagnostics(self):
-        raise NotImplementedError(self.__class__.__name__ + '.set_diagnostics')
-
     def integrate(self,file_name='2d_blobs.nc'):
         __xx, __yy, __tt = np.meshgrid(self.y, self.x, self.t)
         output =  np.zeros(shape=(self.Nx, self.Ny, self.t.size))
 
-        for b in self.__blobs:
+        for b in tqdm(self.__blobs,desc="Summing up Blobs"):
             output += b.discretize_blob(x=__xx, y=__yy, t=__tt)
+            if(self.periodic_y):
+                    output  += b.discretize_blob(x=__xx, y=__yy, t=__tt)
+                    output  += b.discretize_blob(x=__xx, y=__yy, t=__tt)
 
         ds = xr.Dataset(
             data_vars=dict(

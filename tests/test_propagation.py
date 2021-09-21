@@ -57,8 +57,6 @@ def animate(i):
     vmin     = np.min(arr)
     im.set_data(arr)
     im.set_clim(vmin, vmax)
-    # In this version you don't have to do anything to the colorbar,
-    # it updates itself when the mappable it watches (im) changes
 
 ani = FuncAnimation(fig, animate, frames=100,interval=10)
 
