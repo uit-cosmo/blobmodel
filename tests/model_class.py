@@ -1,8 +1,8 @@
-from model import Model, Blob
+from blobmodel import Model, Blob
 import numpy as np
 import matplotlib.pyplot as plt
 
-tmp = Model(Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=2)
+tmp = Model(Nx=100, Ny=5, Lx=10, Ly=10, dt=0.1, T=200)
 
 # blob = Blob(1, 'gauss', 1,1,1,1,1,5,5,0)
 

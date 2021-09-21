@@ -65,7 +65,7 @@ class Model:
 
         frames = []
         for t in self.t:
-            curVals = np.zeros(shape=(self.Nx, self.Ny))
+            curVals = np.zeros(shape=(self.Ny, self.Nx))
             for b in self.__blobs:
                 curVals  += b.discretize_blob(x=self.x, y=self.y, t=t)
                 if(self.periodic_y):
@@ -93,8 +93,8 @@ class Model:
         raise NotImplementedError(self.__class__.__name__ + '.set_diagnostics')
 
     def integrate(self,file_name='2d_blobs.nc'):
-        __xx, __yy, __tt = np.meshgrid(self.x, self.y, self.t)
-        output =  np.zeros(shape=(self.Ny, self.Nx, self.t.size))
+        __xx, __yy, __tt = np.meshgrid(self.y, self.x, self.t)
+        output =  np.zeros(shape=(self.Nx, self.Ny, self.t.size))
 
         for b in self.__blobs:
             output += b.discretize_blob(x=__xx, y=__yy, t=__tt)
