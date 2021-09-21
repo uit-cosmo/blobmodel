@@ -5,7 +5,7 @@ from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 class Model:
-    def __init__(self, Nx, Ny, Lx, Ly, dt, T):
+    def __init__(self, Nx, Ny, Lx, Ly, dt, T, periodic_y=True):
         self.Nx = Nx
         self.Ny = Ny
         self.Lx = Lx
@@ -14,6 +14,7 @@ class Model:
         self.T = T
         self.__blobs = []
         self.__dissipation = 'None'
+        self.periodic_y = periodic_y
         self.x = np.linspace(0, self.Lx, num=self.Nx)
         self.y = np.linspace(0, self.Ly, num=self.Ny).reshape(-1, 1)
         self.t = np.arange(0, self.T, self.dt)
@@ -66,6 +67,9 @@ class Model:
             curVals = np.zeros(shape=(self.Nx, self.Ny))
             for b in self.__blobs:
                 curVals  += b.discretize_blob(x=self.x, y=self.y, t=t)
+                if(self.periodic_y):
+                    curVals  += b.discretize_blob(x=self.x, y=self.y-self.Ly, t=t)
+                    curVals  += b.discretize_blob(x=self.x, y=self.y+self.Ly, t=t)
             frames.append(curVals)
 
         cv0 = frames[0]

@@ -13,9 +13,9 @@ T = np.linspace(start=0.0,stop=10.0, num = 50)
 amp = 1.0
 delta_x = 0.50
 delta_y = 1.0
-x0 = 1.0
+x0 = 5.0
 y0 = 1.0
-v_x = 1
+v_x = 0
 v_y = 1
 t_init = 1
 
@@ -25,7 +25,11 @@ n = amp * np.exp(-((xx-x0 -v_x*tt)**2/(2*delta_x**2)))*np.exp(-((yy-x0 -v_y*tt)*
 
 def f_exp(x,y,t):
     return amp * np.exp(-((x-x0 -v_x*t)**2/(2*delta_x**2)))\
-        *np.exp(-((y-x0 -v_y*t)**2/(2*delta_y**2)))* np.heaviside(t-t_init, 1)
+        *np.exp(-((y-y0 -v_y*t)**2/(2*delta_y**2)))* np.heaviside(t-t_init, 1) \
+        + amp * np.exp(-((x-x0 -v_x*t)**2/(2*delta_x**2)))\
+        *np.exp(-(((y + 10)-y0 -v_y*t)**2/(2*delta_y**2)))* np.heaviside(t-t_init, 1) \
+        + amp * np.exp(-((x-x0 -v_x*t)**2/(2*delta_x**2)))\
+        *np.exp(-(((y - 10)-y0 -v_y*t)**2/(2*delta_y**2)))* np.heaviside(t-t_init, 1)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -59,15 +63,3 @@ def animate(i):
 ani = FuncAnimation(fig, animate, frames=100,interval=10)
 
 plt.show()
-# def animate(i):
-#     cb.remove()
-#     plt.cla()
-#     plt.contourf(X,Y,n[:,:,i],64)
-#     cb = plt.colorbar()
-
-# ani = FuncAnimation(plt.gcf(), animate, frames=50,interval=100)
-
-# #plt.contourf(X,Y,n[:,:,5],64)
-# #plt.axis('equal')
-# plt.show()
-
