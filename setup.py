@@ -1,7 +1,7 @@
 import os
 from setuptools import setup
 
-name = '2d_porpagating_blobs'
+name = 'blobmodel'
 
 with open('README.md') as f:
     long_description = f.read()
@@ -17,7 +17,7 @@ setup(name=name,
       author_email='gregor.decristoforo@uit.no',
       license='GPL',
       version='1.0',
-      packages=['model'],
+      packages=['blobmodel'],
       python_requires='>=3.5',
       #install_requires=['xarray>=0.11.2',
       #                  'scipy>=1.2.0',

@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import xarray as xr
 
 class Model:
     def __init__(self, Nx, Ny, Lx, Ly, dt, T, periodic_y=True):
@@ -91,5 +92,23 @@ class Model:
     def set_diagnostics(self):
         raise NotImplementedError(self.__class__.__name__ + '.set_diagnostics')
 
-    def integrate(self):
-        raise NotImplementedError(self.__class__.__name__ + '.integrate')
+    def integrate(self,file_name='2d_blobs.nc'):
+        __xx, __yy, __tt = np.meshgrid(self.x, self.y, self.t)
+        output =  np.zeros(shape=(self.Ny, self.Nx, self.t.size))
+
+        for b in self.__blobs:
+            output += b.discretize_blob(x=__xx, y=__yy, t=__tt)
+
+        ds = xr.Dataset(
+            data_vars=dict(
+            n = (['x', 'y', 't'], output),
+            ),
+            coords=dict(
+                x = (['x'], np.linspace(0, self.Lx, num=self.Nx)), 
+                y = (['y'], np.linspace(0, self.Ly, num=self.Ny)),
+                t = (['t'], np.arange(0, self.T, self.dt)),
+            ),
+            attrs=dict(description="2D porpagating blobs."),
+        )
+
+        ds.to_netcdf(file_name)
