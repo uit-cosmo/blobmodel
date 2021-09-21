@@ -19,5 +19,9 @@ class Blob():
 			return self.amplitude * np.exp(-((x-self.pos_x -self.v_x*(t-self.t_init))**2/(2*self.width_x**2)))\
                 *np.exp(-((y-self.pos_y -self.v_y*(t-self.t_init))**2/(2*self.width_y**2)))\
                 *np.heaviside(t-self.t_init, 1)
+		if(self.blob_shape == 'exp'):
+			return self.amplitude * np.exp( x - self.pos_x -self.v_x*(t-self.t_init))\
+                *np.exp(-((y-self.pos_y -self.v_y*(t-self.t_init))**2/(2*self.width_y**2)))\
+                *np.heaviside(t-self.t_init, 1)*np.heaviside(-1.*(x - self.pos_x -self.v_x*(t-self.t_init)), 1)
 		else:
-			raise NotImplementedError(self.__class__.__name__ + '.Non gaussian blobs not implemented')
+			raise NotImplementedError(self.__class__.__name__ + '.blob shape not implemented')

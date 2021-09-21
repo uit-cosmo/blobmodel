@@ -7,7 +7,7 @@ import xarray as xr
 from tqdm import tqdm
 
 class Model:
-    def __init__(self, Nx, Ny, Lx, Ly, dt, T, periodic_y=True):
+    def __init__(self, Nx, Ny, Lx, Ly, dt, T, periodic_y=True, blob_shape='gauss'):
         self.Nx = Nx
         self.Ny = Ny
         self.Lx = Lx
@@ -17,8 +17,9 @@ class Model:
         self.__blobs = []
         self.__dissipation = 'None'
         self.periodic_y = periodic_y
+        self.blob_shape = blob_shape
         self.x = np.linspace(0, self.Lx, num=self.Nx)
-        self.y = np.linspace(0, self.Ly, num=self.Ny).reshape(-1, 1)
+        self.y = np.linspace(0, self.Ly, num=self.Ny)
         self.t = np.arange(0, self.T, self.dt)
 
     def sample_blobs(self, 
@@ -42,7 +43,7 @@ class Model:
 
         for i in range(num_blobs):
             self.__blobs.append(Blob(id = i,
-                        blob_shape='gauss',
+                        blob_shape=self.blob_shape,
                         amplitude=__amp[i],
                         width_x=__width[i],
                         width_y = __width[i],
@@ -65,13 +66,16 @@ class Model:
         cax = div.append_axes('right', '5%', '5%')
 
         frames = []
+        
+        __xx, __yy = np.meshgrid(self.x, self.y)
+
         for t in tqdm(self.t,desc="Creating frames for animation"):
             curVals = np.zeros(shape=(self.Ny, self.Nx))
             for b in self.__blobs:
-                curVals  += b.discretize_blob(x=self.x, y=self.y, t=t)
+                curVals  += b.discretize_blob(x=__xx, y=__yy, t=t)
                 if(self.periodic_y):
-                    curVals  += b.discretize_blob(x=self.x, y=self.y-self.Ly, t=t)
-                    curVals  += b.discretize_blob(x=self.x, y=self.y+self.Ly, t=t)
+                    curVals  += b.discretize_blob(x=__xx, y=__yy-self.Ly, t=t)
+                    curVals  += b.discretize_blob(x=__xx, y=__yy+self.Ly, t=t)
             frames.append(curVals)
 
         cv0 = frames[0]
@@ -91,18 +95,18 @@ class Model:
         plt.show()
 
     def integrate(self,file_name='2d_blobs.nc'):
-        __xx, __yy, __tt = np.meshgrid(self.y, self.x, self.t)
-        output =  np.zeros(shape=(self.Nx, self.Ny, self.t.size))
-
+        __xx, __yy, __tt = np.meshgrid(self.x, self.y, self.t)
+        output =  np.zeros(shape=(self.Ny, self.Nx, self.t.size))
+        
         for b in tqdm(self.__blobs,desc="Summing up Blobs"):
             output += b.discretize_blob(x=__xx, y=__yy, t=__tt)
             if(self.periodic_y):
-                    output  += b.discretize_blob(x=__xx, y=__yy, t=__tt)
-                    output  += b.discretize_blob(x=__xx, y=__yy, t=__tt)
+                    output  += b.discretize_blob(x=__xx, y=__yy-self.Ly, t=__tt)
+                    output  += b.discretize_blob(x=__xx, y=__yy+self.Ly, t=__tt)
 
         ds = xr.Dataset(
             data_vars=dict(
-            n = (['x', 'y', 't'], output),
+            n = (['y','x', 't'], output),
             ),
             coords=dict(
                 x = (['x'], np.linspace(0, self.Lx, num=self.Nx)), 
