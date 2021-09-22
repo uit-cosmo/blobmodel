@@ -10,7 +10,7 @@ class Model:
     '''
     2D Model of propagating blobs 
     '''
-    def __init__(self, Nx, Ny, Lx, Ly, dt, T, periodic_y=True, blob_shape='gauss'):
+    def __init__(self, Nx, Ny, Lx, Ly, dt, T, periodic_y=True, blob_shape='gauss', t_drain=10):
         '''
         Attributes
         ----------
@@ -27,6 +27,8 @@ class Model:
             !!!!
         blob_shape: str, optional
             see Blob dataclass for available shapes
+        t_drain: float, optional
+            drain time for blobs 
         '''
         self.Nx = Nx
         self.Ny = Ny
@@ -38,6 +40,7 @@ class Model:
         self.__dissipation = 'None'
         self.periodic_y = periodic_y
         self.blob_shape = blob_shape
+        self.t_drain = t_drain
         self.x = np.linspace(0, self.Lx, num=self.Nx)
         self.y = np.linspace(0, self.Ly, num=self.Ny)
         self.t = np.arange(0, self.T, self.dt)
@@ -114,7 +117,8 @@ class Model:
                         v_y=__vy[i],
                         pos_x=__posx[i],
                         pos_y = __posy[i],
-                        t_init=__t_init[i]
+                        t_init=__t_init[i],
+                        t_drain= self.t_drain
                         ))
 
 
