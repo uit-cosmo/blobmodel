@@ -3,6 +3,9 @@ import numpy as np
 
 @dataclass
 class Blob():
+	'''
+	A single blob 
+	'''
 	id: int
 	blob_shape: str
 	amplitude: float
@@ -15,6 +18,12 @@ class Blob():
 	t_init: float
 
 	def discretize_blob(self,x, y, t):
+		''' 
+		Discretize blob on grid
+		The following blob shapes are implemented:
+			gauss: 2D gaussian function
+			exp: one sided exponential in x and gaussian in y
+		'''
 		if(self.blob_shape == 'gauss'):
 			return self.amplitude * np.exp(-((x-self.pos_x -self.v_x*(t-self.t_init))**2/(2*self.width_x**2)))\
                 *np.exp(-((y-self.pos_y -self.v_y*(t-self.t_init))**2/(2*self.width_y**2)))\

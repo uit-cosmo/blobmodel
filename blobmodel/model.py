@@ -7,7 +7,27 @@ import xarray as xr
 from tqdm import tqdm
 
 class Model:
+    '''
+    2D Model of propagating blobs 
+    '''
     def __init__(self, Nx, Ny, Lx, Ly, dt, T, periodic_y=True, blob_shape='gauss'):
+        '''
+        Attributes
+        ----------
+        Nx: int, grid points in x
+        Ny: int, grid points in y
+        Lx: float, length of grid in x
+        Ly: float, length of grid in y
+        dt: float, time step 
+        T: float, time length 
+        periodic_y: bool, optional
+            allow periodicity in y-direction 
+            !!!!
+            discuss implementation of periodicity
+            !!!!
+        blob_shape: str, optional
+            see Blob dataclass for available shapes
+        '''
         self.Nx = Nx
         self.Ny = Ny
         self.Lx = Lx
@@ -33,16 +53,52 @@ class Model:
                     num_blobs, 
                     A_dist='exp', 
                     W_dist='exp', 
-                    vx_dist='deg', 
-                    vy_dist='deg' 
+                    vx_dist='gamma', 
+                    vy_dist='normal' 
                 ):
+        '''
+        Choose appropriate distribution functions for blob parameters
 
-        __amp = np.random.exponential(scale=1.0, size=num_blobs)
-        __width = np.random.exponential(scale=1.0, size=num_blobs)
+        Parameters
+        ----------
+        num_blobs: int, number of blobs
+        A_dist: str, optional
+            distribution of blob amplitudes
+        W_dist: str, optional
+            distribution of blob widths
+        vx_dist: str, optinal
+            distribution of blob velocities in x-dimension
+        vy_dist: str, optinal
+            distribution of blob velocities in y-dimension
+        
+        !!!
+        discuss normalization 
+        !!!
+        '''
+        def choose_distribution(dist_type):
+            if dist_type == 'exp':
+                return np.random.exponential(scale=1.0, size=num_blobs)
+            elif dist_type == 'gamma':
+                return np.random.gamma(shape=1.0, scale=1.0, size=num_blobs)
+            elif dist_type == 'normal':
+                return np.random.normal(loc=0.0, scale=1.0, size=num_blobs)
+            elif dist_type == 'uniform':
+                return np.random.uniform(low=0.0, high=self.Ly, size=num_blobs)
+            elif dist_type == 'deg':
+                return np.ones(num_blobs)
+            elif dist_type == 'zeros':
+                return np.zeros(num_blobs)
+            else:
+                raise NotImplementedError(self.__class__.__name__ + '.distribution function not implemented')
+
+        __amp = choose_distribution(A_dist)
+        __width = choose_distribution(W_dist)
+        __vx = choose_distribution(vx_dist)
+        __vy = choose_distribution(vy_dist)
+
+        # following parameters are fixed
         __posx = np.zeros(num_blobs)
         __posy = np.random.uniform(low=0.0, high=self.Ly, size=num_blobs)
-        __vx = np.random.gamma(shape=1.0, scale=1.0, size=num_blobs)
-        __vy = np.random.normal(loc=0.0, scale=1.0, size=num_blobs)
         __t_init = np.random.uniform(low=0, high=self.T, size=num_blobs)
 
         # sort blobs by __t_init
@@ -66,6 +122,14 @@ class Model:
         raise NotImplementedError(self.__class__.__name__ + '.set_dissipation')
 
     def show_model(self, interval=100):
+        '''
+        show animation of Model
+
+        Parameters
+        ----------
+        interval: int, optional
+            time interval between frames in ms
+        '''
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
@@ -102,6 +166,15 @@ class Model:
         plt.show()
 
     def integrate(self,file_name='2d_blobs.nc'):
+        '''
+        Integrate Model over time and write out data as xarray dataset
+
+        Parameters
+        ----------
+        file_name: str, optional
+            file name for .nc file containing data as xarray dataset
+        '''
+
         __xx, __yy, __tt = np.meshgrid(self.x, self.y, self.t)
         output =  np.zeros(shape=(self.Ny, self.Nx, self.t.size))
         
