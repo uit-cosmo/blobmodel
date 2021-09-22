@@ -148,7 +148,7 @@ class Model:
                         t_drain= self.t_drain
                         ))
 
-    def show_model(self, interval=100):
+    def show_model(self, interval=100, save = False, gif_name = '2d_blobs.gif', fps = 10):
         '''
         show animation of Model
 
@@ -156,6 +156,12 @@ class Model:
         ----------
         interval: int, optional
             time interval between frames in ms
+        save: bool, optional
+            if True save animation as gif
+        gif_name: str, optional
+            set name for gif
+        fps: int, optional
+            set fps for gif
         '''
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -190,6 +196,8 @@ class Model:
             tx.set_text(f't = {i*self.dt:.2f}')
         
         ani = FuncAnimation(fig, animate, frames=self.t.size,interval=interval)
+        if save:
+            ani.save(gif_name, writer='ffmpeg', fps=fps)
         plt.show()
 
     def integrate(self,file_name='2d_blobs.nc'):
