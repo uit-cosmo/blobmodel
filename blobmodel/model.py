@@ -22,6 +22,13 @@ class Model:
         self.y = np.linspace(0, self.Ly, num=self.Ny)
         self.t = np.arange(0, self.T, self.dt)
 
+    def __str__(self):
+        '''
+        string representation of Model 
+        '''
+        return f'2d Blob Model with  Nx:{self.Nx},  Ny:{self.Ny}, Lx:{self.Lx}, Ly:{self.Ly}, '\
+             +f'dt:{self.dt}, T:{self.T}, y-periodicity:{self.periodic_y} and blob shape:{self.blob_shape}'
+
     def sample_blobs(self, 
                     num_blobs, 
                     A_dist='exp', 
@@ -113,7 +120,7 @@ class Model:
                 y = (['y'], np.linspace(0, self.Ly, num=self.Ny)),
                 t = (['t'], np.arange(0, self.T, self.dt)),
             ),
-            attrs=dict(description="2D porpagating blobs."),
+            attrs=dict(description="2D propagating blobs."),
         )
 
         ds.to_netcdf(file_name)
