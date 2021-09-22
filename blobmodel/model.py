@@ -93,17 +93,29 @@ class Model:
             distribution of blob velocities in x-dimension
         vy_dist: str, optinal
             distribution of blob velocities in y-dimension
-        
-        The following distributions are implemented:
-            exp: exponential distribution with scale parameter
-            gamma: gamma distribution with shape and scale parameter
-            normal: normal distribution with loc and scale parameter
-            uniform: uniorm distribution with low and high parameter
-            ray: rayleight distribution with scale parameter
-            deg: array on ones 
-            zeros: array of zeros
+        *_scale: float, optional
+            scale parameter for exp, gamma, normal and rayleigh distributions
+        *_shape: float, optional
+            shape paremeter for gamma distribution
+        *_loc:float, optional
+            location parameter for normal distribution
+        *_low: float, optional
+            lower boundary for uniform distribution
+        *_high: float, optional
+            upper boundary for uniform distribution
         '''
+
         def choose_distribution(dist_type, scale, shape, loc, low, high):
+            '''
+            The following distributions are implemented:
+                exp: exponential distribution with scale parameter
+                gamma: gamma distribution with shape and scale parameter
+                normal: normal distribution with loc and scale parameter
+                uniform: uniorm distribution with low and high parameter
+                ray: rayleight distribution with scale parameter
+                deg: array on ones 
+                zeros: array of zeros
+            '''
             if dist_type == 'exp':
                 return np.random.exponential(scale=scale, size=num_blobs)
             elif dist_type == 'gamma':
@@ -111,7 +123,7 @@ class Model:
             elif dist_type == 'normal':
                 return np.random.normal(loc=loc, scale=scale, size=num_blobs)
             elif dist_type == 'uniform':
-                return np.random.uniform(low=low, high=self.Ly, size=num_blobs)
+                return np.random.uniform(low=low, high=high, size=num_blobs)
             elif dist_type == 'ray':
                 return np.random.rayleigh(scale=scale, size=num_blobs)
             elif dist_type == 'deg':
@@ -126,7 +138,7 @@ class Model:
         __vx = choose_distribution(vx_dist, vx_scale, vx_shape, vx_loc, vx_low, vx_high)
         __vy = choose_distribution(vy_dist, vy_scale, vy_shape, vy_loc, vy_low, vy_high)
 
-        # following parameters are fixed
+        # the following parameters are fixed
         __posx = np.zeros(num_blobs)
         __posy = np.random.uniform(low=0.0, high=self.Ly, size=num_blobs)
         __t_init = np.random.uniform(low=0, high=self.T, size=num_blobs)
