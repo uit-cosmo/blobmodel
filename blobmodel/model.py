@@ -57,7 +57,27 @@ class Model:
                     A_dist='exp', 
                     W_dist='exp', 
                     vx_dist='gamma', 
-                    vy_dist='normal' 
+                    vy_dist='normal',
+                    A_scale = 1.0,
+                    W_scale = 1.0,
+                    vx_scale = 1.0,
+                    vy_scale = 1.0,
+                    A_shape = 1.0,
+                    W_shape = 1.0,
+                    vx_shape = 1.0,
+                    vy_shape = 1.0,
+                    A_loc = 0.0,
+                    W_loc = 0.0, 
+                    vx_loc = 0.0, 
+                    vy_loc = 0.0,
+                    A_low = 0.0, 
+                    W_low = 0.0, 
+                    vx_low = 0.0, 
+                    vy_low = 0.0, 
+                    A_high = 1.0, 
+                    W_high = 1.0, 
+                    vx_high = 1.0, 
+                    vy_high = 1.0
                 ):
         '''
         Choose appropriate distribution functions for blob parameters
@@ -74,19 +94,26 @@ class Model:
         vy_dist: str, optinal
             distribution of blob velocities in y-dimension
         
-        !!!
-        discuss normalization 
-        !!!
+        The following distributions are implemented:
+            exp: exponential distribution with scale parameter
+            gamma: gamma distribution with shape and scale parameter
+            normal: normal distribution with loc and scale parameter
+            uniform: uniorm distribution with low and high parameter
+            ray: rayleight distribution with scale parameter
+            deg: array on ones 
+            zeros: array of zeros
         '''
-        def choose_distribution(dist_type):
+        def choose_distribution(dist_type, scale, shape, loc, low, high):
             if dist_type == 'exp':
-                return np.random.exponential(scale=1.0, size=num_blobs)
+                return np.random.exponential(scale=scale, size=num_blobs)
             elif dist_type == 'gamma':
-                return np.random.gamma(shape=1.0, scale=1.0, size=num_blobs)
+                return np.random.gamma(shape=shape, scale=scale, size=num_blobs)
             elif dist_type == 'normal':
-                return np.random.normal(loc=0.0, scale=1.0, size=num_blobs)
+                return np.random.normal(loc=loc, scale=scale, size=num_blobs)
             elif dist_type == 'uniform':
-                return np.random.uniform(low=0.0, high=self.Ly, size=num_blobs)
+                return np.random.uniform(low=low, high=self.Ly, size=num_blobs)
+            elif dist_type == 'ray':
+                return np.random.rayleigh(scale=scale, size=num_blobs)
             elif dist_type == 'deg':
                 return np.ones(num_blobs)
             elif dist_type == 'zeros':
@@ -94,10 +121,10 @@ class Model:
             else:
                 raise NotImplementedError(self.__class__.__name__ + '.distribution function not implemented')
 
-        __amp = choose_distribution(A_dist)
-        __width = choose_distribution(W_dist)
-        __vx = choose_distribution(vx_dist)
-        __vy = choose_distribution(vy_dist)
+        __amp = choose_distribution(A_dist, A_scale, A_shape, A_loc, A_low, A_high)
+        __width = choose_distribution(W_dist, W_scale, W_shape, W_loc, W_low, W_high)
+        __vx = choose_distribution(vx_dist, vx_scale, vx_shape, vx_loc, vx_low, vx_high)
+        __vy = choose_distribution(vy_dist, vy_scale, vy_shape, vy_loc, vy_low, vy_high)
 
         # following parameters are fixed
         __posx = np.zeros(num_blobs)
@@ -120,10 +147,6 @@ class Model:
                         t_init=__t_init[i],
                         t_drain= self.t_drain
                         ))
-
-
-    def set_dissipation(self):
-        raise NotImplementedError(self.__class__.__name__ + '.set_dissipation')
 
     def show_model(self, interval=100):
         '''
