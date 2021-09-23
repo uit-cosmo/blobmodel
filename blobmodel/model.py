@@ -212,7 +212,7 @@ class Model:
             ani.save(gif_name, writer='ffmpeg', fps=fps)
         plt.show()
 
-    def integrate(self,file_name='2d_blobs.nc'):
+    def integrate(self,file_name='2d_blobs.nc', speed_up = False, truncation_Lx = 3):
         '''
         Integrate Model over time and write out data as xarray dataset
 
@@ -220,17 +220,34 @@ class Model:
         ----------
         file_name: str, optional
             file name for .nc file containing data as xarray dataset
+        speed_up: bool, optional
+            speeding up code by discretizing each single blob at smaller time window given by
+            t in (Blob.t_init, truncation_Lx*Lx/Blob.v_x + Blob.t_init)
+
+            !!!  this is only a good approximation for blob_shape='exp' !!!
+
+        truncation_Lx: float, optional
+            number of times blob propagate trhough length Lx before blob is denglected
+            only used if speed_up = True
         '''
 
         __xx, __yy, __tt = np.meshgrid(self.x, self.y, self.t)
         output =  np.zeros(shape=(self.Ny, self.Nx, self.t.size))
         
         for b in tqdm(self.__blobs,desc="Summing up Blobs"):
-            output += b.discretize_blob(x=__xx, y=__yy, t=__tt)
-            if(self.periodic_y):
+            if speed_up:
+                start = int(b.t_init/self.dt)
+                stop = int(truncation_Lx*self.Lx/(b.v_x*self.dt)) + start
+                #print(start,stop)
+                output[:,:,start:stop] += b.discretize_blob(x=__xx[:,:,start:stop], y=__yy[:,:,start:stop], t=__tt[:,:,start:stop])
+                if(self.periodic_y):
+                    output[:,:,start:stop] += b.discretize_blob(x=__xx[:,:,start:stop], y=__yy[:,:,start:stop]-self.Ly, t=__tt[:,:,start:stop])
+                    output[:,:,start:stop] += b.discretize_blob(x=__xx[:,:,start:stop], y=__yy[:,:,start:stop]+self.Ly, t=__tt[:,:,start:stop])
+            else:
+                output += b.discretize_blob(x=__xx, y=__yy, t=__tt)
+                if(self.periodic_y):
                     output  += b.discretize_blob(x=__xx, y=__yy-self.Ly, t=__tt)
                     output  += b.discretize_blob(x=__xx, y=__yy+self.Ly, t=__tt)
-
         ds = xr.Dataset(
             data_vars=dict(
             n = (['y','x', 't'], output),
