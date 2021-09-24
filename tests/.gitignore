@@ -134,3 +134,6 @@ dmypy.json
 # output file
 *.nc
 2d_blobs.nc
+
+#old test files
+test_propagation.py
