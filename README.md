@@ -1,9 +1,22 @@
 # 2d_propagating_blobs
-Two dimensional scrape-off layer model consisting of propagating blobs with random parameters.
+Two dimensional model of advecting and dissipating blobs.
+
+The code has been deveoped originally to model profiles in the scrape-off layer of fusion experiments but it can be used to model any 2d system consisting of advecting pulses. An example is shown below:
 
 ![Density evolution](example_gifs/2d_blobs.gif ) 
 
+
 <!---## Installation
+## Installation
+
+Dev install:
+```
+git clone https://github.com/gregordecristoforo/xblobs.git
+cd xblobs
+pip install -e .
+```
+
+
 
 ## Usage
 ```Python
@@ -19,3 +32,4 @@ tmp.show_model(interval=100, save = True)
 ```
 ## Contact
 If you have questions, suggestions or other comments you can contact me under gregor.decristoforo@uit.no--->
+
