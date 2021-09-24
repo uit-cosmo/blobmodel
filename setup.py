@@ -9,7 +9,7 @@ with open('README.md') as f:
 here = os.path.abspath(os.path.dirname(__file__))
 
 setup(name=name,
-      description='2d model for scrape-off layer',
+      description='2d model of propagating blobs with random parameters. ',
       #long_description=long_description,
       #long_description_content_type='text/markdown',
       url='https://github.com/gregordecristoforo/2d_propagating_blobs/',
