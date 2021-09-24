@@ -15,16 +15,20 @@ pip install -e .
 
 
 ## Usage
+Create the grid on which the blobs are discretized with using the `Model` class. The blobs are then seeded by the `sample_blobs` method. The blob parameters are sampled from distribution functions that are specified by the input parameters for `sample_blobs`. The `integrate()` method computes the output as an xarray dataset and writhes it out in a `netcdf` file. A simple example is shown below:
+
 ```Python
-from blobmodel import Model, Blob
+from blobmodel import Model
 
-tmp = Model(Nx=200, Ny=100, Lx=10, Ly=10, dt=0.1, T=20, blob_shape='gauss')
+bm = Model(Nx=200, Ny=100, Lx=10, Ly=10, dt=0.1, T=20, blob_shape='gauss')
 
-tmp.sample_blobs(num_blobs=100, vy_scale=0.33)
+bm.sample_blobs(num_blobs=100)
 
-#tmp.integrate()
-
-tmp.show_model(interval=100, save = True)
+bm.integrate()
+```
+Alternatively, the data can be shown as an animation using the `show_model` method:
+```Python
+bm.show_model(interval=100)
 ```
 
 ## Input parameters
