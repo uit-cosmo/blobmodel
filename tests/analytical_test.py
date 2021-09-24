@@ -2,7 +2,7 @@ from blobmodel import Model, Blob
 
 tmp = Model(Nx=100, Ny=1, Lx=10, Ly=0, dt=1, T=1000, blob_shape='exp', t_drain=2, periodic_y=False)
 tmp.sample_blobs(num_blobs=10000,A_dist='deg',W_dist='deg', vx_dist='deg',vy_dist='zeros')
-tmp.integrate(file_name='analytical_test.nc')
+tmp.integrate(file_name='analytical_test.nc',speed_up=True, truncation_Lx = 1)
 
 import xarray as xr
 import matplotlib.pyplot as plt
