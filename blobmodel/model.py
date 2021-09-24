@@ -10,7 +10,7 @@ class Model:
     '''
     2D Model of propagating blobs 
     '''
-    def __init__(self, Nx, Ny, Lx, Ly, dt, T, periodic_y=True, blob_shape='gauss', t_drain=10):
+    def __init__(self, Nx, Ny, Lx, Ly, dt, T, periodic_y=False, blob_shape='gauss', t_drain=10):
         '''
         Attributes
         ----------
@@ -238,7 +238,6 @@ class Model:
             if speed_up:
                 start = int(b.t_init/self.dt)
                 stop = int(truncation_Lx*self.Lx/(b.v_x*self.dt)) + start
-                #print(start,stop)
                 output[:,:,start:stop] += b.discretize_blob(x=__xx[:,:,start:stop], y=__yy[:,:,start:stop], t=__tt[:,:,start:stop])
                 if(self.periodic_y):
                     output[:,:,start:stop] += b.discretize_blob(x=__xx[:,:,start:stop], y=__yy[:,:,start:stop]-self.Ly, t=__tt[:,:,start:stop])
