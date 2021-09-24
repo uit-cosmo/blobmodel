@@ -103,6 +103,8 @@ class Model:
             lower boundary for uniform distribution
         *_high: float, optional
             upper boundary for uniform distribution
+
+        Note that * refers to either A, W, vx or vy
         '''
 
         def choose_distribution(dist_type, scale, shape, loc, low, high):
@@ -227,7 +229,7 @@ class Model:
             !!!  this is only a good approximation for blob_shape='exp' !!!
 
         truncation_Lx: float, optional
-            number of times blob propagate trhough length Lx before blob is denglected
+            number of times blob propagate through length Lx before blob is neglected
             only used if speed_up = True
         '''
 
