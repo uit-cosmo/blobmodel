@@ -2,7 +2,7 @@
 Two dimensional model of advecting and dissipating blobs.
 
 The code has been deveoped originally to model profiles in the scrape-off layer of fusion experiments but it can be used to model any 2d system consisting of advecting pulses. An example is shown below:
-![Density evolution](example_gifs/2d_blobs.gif ) 
+![Density evolution](readme_gifs/2d_blobs.gif ) 
 
 ## Installation
 
