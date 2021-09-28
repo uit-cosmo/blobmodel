@@ -10,7 +10,7 @@ if not os.path.isfile('./profile_comparison.nc'):
     tmp.integrate(file_name='profile_comparison.nc',speed_up=True, truncation_Lx = 1)
 
 
-def test_convergence_to_analytical_solution():
+def plot_convergence_to_analytical_solution():
     ds = xr.open_dataset('profile_comparison.nc')
     model_profile = ds.n.isel(y=0).mean(dim=('t'))
 
@@ -30,6 +30,6 @@ def test_convergence_to_analytical_solution():
     plt.legend()
     plt.show()
     
-test_convergence_to_analytical_solution()
+plot_convergence_to_analytical_solution()
 
 
