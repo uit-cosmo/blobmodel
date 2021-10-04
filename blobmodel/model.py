@@ -39,7 +39,6 @@ class Model:
         self.dt = dt
         self.T = T
         self.__blobs = []
-        self.__dissipation = 'None'
         self.periodic_y = periodic_y
         self.blob_shape = blob_shape
         self.t_drain = t_drain
@@ -58,7 +57,7 @@ class Model:
                      num_blobs,
                      A_dist='exp',
                      W_dist='exp',
-                     vx_dist='gamma',
+                     vx_dist='deg',
                      vy_dist='normal',
                      A_scale=1.0,
                      W_scale=1.0,
