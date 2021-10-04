@@ -28,7 +28,7 @@ class Blob():
         '''
         return self.amplitude\
             * self.__drain(t)\
-            * self.__x_shape(x, t, self.blob_shape)\
+            * self.__x_shape(x, t)\
             * self.__y_shape(y, t)\
             * self.__blob_arrival(t)
 
@@ -38,10 +38,10 @@ class Blob():
     def __blob_arrival(self, t):
         return np.heaviside(t-self.t_init, 1)
 
-    def __x_shape(self, x, t, blob_shape):
-        if blob_shape == 'gauss':
+    def __x_shape(self, x, t):
+        if self.blob_shape == 'gauss':
             return np.exp(-((x - self.__get_x_blob_pos(t))**2/(2*self.width_x**2)))
-        elif blob_shape == 'exp':
+        elif self.blob_shape == 'exp':
             return np.exp(x - self.__get_x_blob_pos(t))\
                 * np.heaviside(-1.*(x - self.__get_x_blob_pos(t)), 1)
         else:
