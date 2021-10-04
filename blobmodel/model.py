@@ -6,10 +6,12 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import xarray as xr
 from tqdm import tqdm
 
+
 class Model:
     '''
     2D Model of propagating blobs 
     '''
+
     def __init__(self, Nx, Ny, Lx, Ly, dt, T, periodic_y=False, blob_shape='gauss', t_drain=10):
         '''
         Attributes
@@ -50,35 +52,35 @@ class Model:
         string representation of Model 
         '''
         return f'2d Blob Model with  Nx:{self.Nx},  Ny:{self.Ny}, Lx:{self.Lx}, Ly:{self.Ly}, '\
-             +f'dt:{self.dt}, T:{self.T}, y-periodicity:{self.periodic_y} and blob shape:{self.blob_shape}'
+            + f'dt:{self.dt}, T:{self.T}, y-periodicity:{self.periodic_y} and blob shape:{self.blob_shape}'
 
-    def sample_blobs(self, 
-                    num_blobs, 
-                    A_dist='exp', 
-                    W_dist='exp', 
-                    vx_dist='gamma', 
-                    vy_dist='normal',
-                    A_scale = 1.0,
-                    W_scale = 1.0,
-                    vx_scale = 1.0,
-                    vy_scale = 1.0,
-                    A_shape = 1.0,
-                    W_shape = 1.0,
-                    vx_shape = 1.0,
-                    vy_shape = 1.0,
-                    A_loc = 0.0,
-                    W_loc = 0.0, 
-                    vx_loc = 0.0, 
-                    vy_loc = 0.0,
-                    A_low = 0.0, 
-                    W_low = 0.0, 
-                    vx_low = 0.0, 
-                    vy_low = 0.0, 
-                    A_high = 1.0, 
-                    W_high = 1.0, 
-                    vx_high = 1.0, 
-                    vy_high = 1.0
-                ):
+    def sample_blobs(self,
+                     num_blobs,
+                     A_dist='exp',
+                     W_dist='exp',
+                     vx_dist='gamma',
+                     vy_dist='normal',
+                     A_scale=1.0,
+                     W_scale=1.0,
+                     vx_scale=1.0,
+                     vy_scale=1.0,
+                     A_shape=1.0,
+                     W_shape=1.0,
+                     vx_shape=1.0,
+                     vy_shape=1.0,
+                     A_loc=0.0,
+                     W_loc=0.0,
+                     vx_loc=0.0,
+                     vy_loc=0.0,
+                     A_low=0.0,
+                     W_low=0.0,
+                     vx_low=0.0,
+                     vy_low=0.0,
+                     A_high=1.0,
+                     W_high=1.0,
+                     vx_high=1.0,
+                     vy_high=1.0
+                     ):
         '''
         Choose appropriate distribution functions for blob parameters
 
@@ -133,12 +135,17 @@ class Model:
             elif dist_type == 'zeros':
                 return np.zeros(num_blobs)
             else:
-                raise NotImplementedError(self.__class__.__name__ + '.distribution function not implemented')
+                raise NotImplementedError(
+                    self.__class__.__name__ + '.distribution function not implemented')
 
-        __amp = choose_distribution(A_dist, A_scale, A_shape, A_loc, A_low, A_high)
-        __width = choose_distribution(W_dist, W_scale, W_shape, W_loc, W_low, W_high)
-        __vx = choose_distribution(vx_dist, vx_scale, vx_shape, vx_loc, vx_low, vx_high)
-        __vy = choose_distribution(vy_dist, vy_scale, vy_shape, vy_loc, vy_low, vy_high)
+        __amp = choose_distribution(
+            A_dist, A_scale, A_shape, A_loc, A_low, A_high)
+        __width = choose_distribution(
+            W_dist, W_scale, W_shape, W_loc, W_low, W_high)
+        __vx = choose_distribution(
+            vx_dist, vx_scale, vx_shape, vx_loc, vx_low, vx_high)
+        __vy = choose_distribution(
+            vy_dist, vy_scale, vy_shape, vy_loc, vy_low, vy_high)
 
         # the following parameters are fixed
         __posx = np.zeros(num_blobs)
@@ -149,20 +156,20 @@ class Model:
         __t_init = np.sort(__t_init)
 
         for i in range(num_blobs):
-            self.__blobs.append(Blob(id = i,
-                        blob_shape=self.blob_shape,
-                        amplitude=__amp[i],
-                        width_x=__width[i],
-                        width_y = __width[i],
-                        v_x=__vx[i],
-                        v_y=__vy[i],
-                        pos_x=__posx[i],
-                        pos_y = __posy[i],
-                        t_init=__t_init[i],
-                        t_drain= self.t_drain
-                        ))
+            self.__blobs.append(Blob(id=i,
+                                     blob_shape=self.blob_shape,
+                                     amplitude=__amp[i],
+                                     width_x=__width[i],
+                                     width_y=__width[i],
+                                     v_x=__vx[i],
+                                     v_y=__vy[i],
+                                     pos_x=__posx[i],
+                                     pos_y=__posy[i],
+                                     t_init=__t_init[i],
+                                     t_drain=self.t_drain
+                                     ))
 
-    def show_model(self, interval=100, save = False, gif_name = '2d_blobs.gif', fps = 10):
+    def show_model(self, interval=100, save=False, gif_name='2d_blobs.gif', fps=10):
         '''
         show animation of Model
 
@@ -184,16 +191,16 @@ class Model:
         cax = div.append_axes('right', '5%', '5%')
 
         frames = []
-        
+
         __xx, __yy = np.meshgrid(self.x, self.y)
 
-        for t in tqdm(self.t,desc="Creating frames for animation"):
+        for t in tqdm(self.t, desc="Creating frames for animation"):
             curVals = np.zeros(shape=(self.Ny, self.Nx))
             for b in self.__blobs:
-                curVals  += b.discretize_blob(x=__xx, y=__yy, t=t)
+                curVals += b.discretize_blob(x=__xx, y=__yy, t=t)
                 if(self.periodic_y):
-                    curVals  += b.discretize_blob(x=__xx, y=__yy-self.Ly, t=t)
-                    curVals  += b.discretize_blob(x=__xx, y=__yy+self.Ly, t=t)
+                    curVals += b.discretize_blob(x=__xx, y=__yy-self.Ly, t=t)
+                    curVals += b.discretize_blob(x=__xx, y=__yy+self.Ly, t=t)
             frames.append(curVals)
 
         cv0 = frames[0]
@@ -208,13 +215,14 @@ class Model:
             im.set_data(arr)
             im.set_clim(vmin, vmax)
             tx.set_text(f't = {i*self.dt:.2f}')
-        
-        ani = FuncAnimation(fig, animate, frames=self.t.size,interval=interval)
+
+        ani = FuncAnimation(
+            fig, animate, frames=self.t.size, interval=interval)
         if save:
             ani.save(gif_name, writer='ffmpeg', fps=fps)
         plt.show()
 
-    def integrate(self,file_name='2d_blobs.nc', speed_up = False, truncation_Lx = 3):
+    def integrate(self, file_name='2d_blobs.nc', speed_up=False, truncation_Lx=3):
         '''
         Integrate Model over time and write out data as xarray dataset
 
@@ -234,29 +242,32 @@ class Model:
         '''
 
         __xx, __yy, __tt = np.meshgrid(self.x, self.y, self.t)
-        output =  np.zeros(shape=(self.Ny, self.Nx, self.t.size))
-        
-        for b in tqdm(self.__blobs,desc="Summing up Blobs"):
+        output = np.zeros(shape=(self.Ny, self.Nx, self.t.size))
+
+        for b in tqdm(self.__blobs, desc="Summing up Blobs"):
             if speed_up:
                 start = int(b.t_init/self.dt)
                 stop = int(truncation_Lx*self.Lx/(b.v_x*self.dt)) + start
-                output[:,:,start:stop] += b.discretize_blob(x=__xx[:,:,start:stop], y=__yy[:,:,start:stop], t=__tt[:,:,start:stop])
+                output[:, :, start:stop] += b.discretize_blob(
+                    x=__xx[:, :, start:stop], y=__yy[:, :, start:stop], t=__tt[:, :, start:stop])
                 if(self.periodic_y):
-                    output[:,:,start:stop] += b.discretize_blob(x=__xx[:,:,start:stop], y=__yy[:,:,start:stop]-self.Ly, t=__tt[:,:,start:stop])
-                    output[:,:,start:stop] += b.discretize_blob(x=__xx[:,:,start:stop], y=__yy[:,:,start:stop]+self.Ly, t=__tt[:,:,start:stop])
+                    output[:, :, start:stop] += b.discretize_blob(
+                        x=__xx[:, :, start:stop], y=__yy[:, :, start:stop]-self.Ly, t=__tt[:, :, start:stop])
+                    output[:, :, start:stop] += b.discretize_blob(
+                        x=__xx[:, :, start:stop], y=__yy[:, :, start:stop]+self.Ly, t=__tt[:, :, start:stop])
             else:
                 output += b.discretize_blob(x=__xx, y=__yy, t=__tt)
                 if(self.periodic_y):
-                    output  += b.discretize_blob(x=__xx, y=__yy-self.Ly, t=__tt)
-                    output  += b.discretize_blob(x=__xx, y=__yy+self.Ly, t=__tt)
+                    output += b.discretize_blob(x=__xx, y=__yy-self.Ly, t=__tt)
+                    output += b.discretize_blob(x=__xx, y=__yy+self.Ly, t=__tt)
         ds = xr.Dataset(
             data_vars=dict(
-            n = (['y','x', 't'], output),
+                n=(['y', 'x', 't'], output),
             ),
             coords=dict(
-                x = (['x'], np.linspace(0, self.Lx, num=self.Nx)), 
-                y = (['y'], np.linspace(0, self.Ly, num=self.Ny)),
-                t = (['t'], np.arange(0, self.T, self.dt)),
+                x=(['x'], np.linspace(0, self.Lx, num=self.Nx)),
+                y=(['y'], np.linspace(0, self.Ly, num=self.Ny)),
+                t=(['t'], np.arange(0, self.T, self.dt)),
             ),
             attrs=dict(description="2D propagating blobs."),
         )
