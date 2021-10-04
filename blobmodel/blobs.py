@@ -26,21 +26,11 @@ class Blob():
                 gauss: 2D gaussian function
                 exp: one sided exponential in x and gaussian in y
         '''
-        if(self.blob_shape == 'gauss'):
-            return self.amplitude\
-                * self.__drain(t)\
-                * self.__x_shape_gauss(x, t)\
-                * self.__y_shape_gauss(y, t)\
-                * self.__blob_arrival(t)
-        elif(self.blob_shape == 'exp'):
-            return self.amplitude\
-                * self.__drain(t)\
-                * self.__x_shape_exp(x, t)\
-                * self.__y_shape_gauss(y, t)\
-                * self.__blob_arrival(t)
-        else:
-            raise NotImplementedError(
-                self.__class__.__name__ + '.blob shape not implemented')
+        return self.amplitude\
+            * self.__drain(t)\
+            * self.__x_shape(x, t, self.blob_shape)\
+            * self.__y_shape(y, t)\
+            * self.__blob_arrival(t)
 
     def __drain(self, t):
         return np.exp(-(t-self.t_init)/self.t_drain)
@@ -48,14 +38,17 @@ class Blob():
     def __blob_arrival(self, t):
         return np.heaviside(t-self.t_init, 1)
 
-    def __x_shape_gauss(self, x, t):
-        return np.exp(-((x - self.__get_x_blob_pos(t))**2/(2*self.width_x**2)))
+    def __x_shape(self, x, t, blob_shape):
+        if blob_shape == 'gauss':
+            return np.exp(-((x - self.__get_x_blob_pos(t))**2/(2*self.width_x**2)))
+        elif blob_shape == 'exp':
+            return np.exp(x - self.__get_x_blob_pos(t))\
+                * np.heaviside(-1.*(x - self.__get_x_blob_pos(t)), 1)
+        else:
+            raise NotImplementedError(
+                self.__class__.__name__ + '.blob shape not implemented')
 
-    def __x_shape_exp(self, x, t):
-        return np.exp(x - self.__get_x_blob_pos(t))\
-            * np.heaviside(-1.*(x - self.__get_x_blob_pos(t)), 1)
-
-    def __y_shape_gauss(self, y, t):
+    def __y_shape(self, y, t):
         return np.exp(-((y-self.__get_y_blob_pos(t))**2/(2*self.width_y**2)))
 
     def __get_x_blob_pos(self, t):
