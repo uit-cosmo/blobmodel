@@ -134,3 +134,6 @@ dmypy.json
 
 # .gif files
 /examples/*gif
+
+# Editors
+.idea/

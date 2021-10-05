@@ -3,7 +3,7 @@ import numpy as np
 
 
 @dataclass
-class Blob():
+class Blob:
     '''
     A single blob
     '''
@@ -19,7 +19,7 @@ class Blob():
     t_init: float
     t_drain: float
 
-    def discretize_blob(self, x, y, t):
+    def discretize_blob(self, x, y, t, periodic_y=False, Ly=0):
         '''
         Discretize blob on grid
         The following blob shapes are implemented:
@@ -29,7 +29,7 @@ class Blob():
         return self.amplitude\
             * self.__drain(t)\
             * self.__x_shape(x, t)\
-            * self.__y_shape(y, t)\
+            * self.__y_shape(y, t, periodic_y, Ly)\
             * self.__blob_arrival(t)
 
     def __drain(self, t):
@@ -48,8 +48,14 @@ class Blob():
             raise NotImplementedError(
                 self.__class__.__name__ + '.blob shape not implemented')
 
-    def __y_shape(self, y, t):
-        return np.exp(-((y-self.__get_y_blob_pos(t))**2/(2*self.width_y**2)))
+    def __y_shape(self, y, t, periodic_y, Ly):
+        y_diffs = y - self.__get_y_blob_pos(t)
+        if periodic_y:
+            # The y_diff is centered in the simulation domain, if the difference is larger than half the domain,
+            # the previous is used.
+            y_diffs = y_diffs % Ly
+            y_diffs[y_diffs > np.max(y)/2] -= Ly
+        return np.exp(-(y_diffs**2/(2*self.width_y**2)))
 
     def __get_x_blob_pos(self, t):
         return self.pos_x + self.v_x*(t-self.t_init)

@@ -127,7 +127,7 @@ class Model:
             elif dist_type == 'ray':
                 return np.random.rayleigh(scale=scale, size=num_blobs)
             elif dist_type == 'deg':
-                return np.ones(num_blobs)
+                return scale * np.ones(num_blobs)
             elif dist_type == 'zeros':
                 return np.zeros(num_blobs)
             else:
@@ -193,10 +193,7 @@ class Model:
         for t in tqdm(self.t, desc="Creating frames for animation"):
             curVals = np.zeros(shape=(self.Ny, self.Nx))
             for b in self.__blobs:
-                curVals += b.discretize_blob(x=__xx, y=__yy, t=t)
-                if(self.periodic_y):
-                    curVals += b.discretize_blob(x=__xx, y=__yy-self.Ly, t=t)
-                    curVals += b.discretize_blob(x=__xx, y=__yy+self.Ly, t=t)
+                curVals += b.discretize_blob(x=__xx, y=__yy, t=t, periodic_y=self.periodic_y, Ly=self.Ly)
             frames.append(curVals)
 
         cv0 = frames[0]
@@ -245,17 +242,9 @@ class Model:
                 start = int(b.t_init/self.dt)
                 stop = int(truncation_Lx*self.Lx/(b.v_x*self.dt)) + start
                 output[:, :, start:stop] += b.discretize_blob(
-                    x=__xx[:, :, start:stop], y=__yy[:, :, start:stop], t=__tt[:, :, start:stop])
-                if(self.periodic_y):
-                    output[:, :, start:stop] += b.discretize_blob(
-                        x=__xx[:, :, start:stop], y=__yy[:, :, start:stop]-self.Ly, t=__tt[:, :, start:stop])
-                    output[:, :, start:stop] += b.discretize_blob(
-                        x=__xx[:, :, start:stop], y=__yy[:, :, start:stop]+self.Ly, t=__tt[:, :, start:stop])
+                    x=__xx[:, :, start:stop], y=__yy[:, :, start:stop], t=__tt[:, :, start:stop], periodic_y=self.periodic_y, Ly=self.Ly)
             else:
-                output += b.discretize_blob(x=__xx, y=__yy, t=__tt)
-                if(self.periodic_y):
-                    output += b.discretize_blob(x=__xx, y=__yy-self.Ly, t=__tt)
-                    output += b.discretize_blob(x=__xx, y=__yy+self.Ly, t=__tt)
+                output += b.discretize_blob(x=__xx, y=__yy, t=__tt, periodic_y=self.periodic_y, Ly=self.Ly)
         ds = xr.Dataset(
             data_vars=dict(
                 n=(['y', 'x', 't'], output),
