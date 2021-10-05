@@ -246,16 +246,8 @@ class Model:
                 stop = int(truncation_Lx*self.Lx/(b.v_x*self.dt)) + start
                 output[:, :, start:stop] += b.discretize_blob(
                     x=__xx[:, :, start:stop], y=__yy[:, :, start:stop], t=__tt[:, :, start:stop], periodic_y=self.periodic_y, Ly=self.Ly)
-                if self.periodic_y:
-                    output[:, :, start:stop] += b.discretize_blob(
-                        x=__xx[:, :, start:stop], y=__yy[:, :, start:stop]-self.Ly, t=__tt[:, :, start:stop], periodic_y=self.periodic_y, Ly=self.Ly)
-                    output[:, :, start:stop] += b.discretize_blob(
-                        x=__xx[:, :, start:stop], y=__yy[:, :, start:stop]+self.Ly, t=__tt[:, :, start:stop], periodic_y=self.periodic_y, Ly=self.Ly)
             else:
                 output += b.discretize_blob(x=__xx, y=__yy, t=__tt, periodic_y=self.periodic_y, Ly=self.Ly)
-                if self.periodic_y:
-                    output += b.discretize_blob(x=__xx, y=__yy-self.Ly, t=__tt, periodic_y=self.periodic_y, Ly=self.Ly)
-                    output += b.discretize_blob(x=__xx, y=__yy+self.Ly, t=__tt, periodic_y=self.periodic_y, Ly=self.Ly)
         ds = xr.Dataset(
             data_vars=dict(
                 n=(['y', 'x', 't'], output),

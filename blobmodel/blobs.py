@@ -49,13 +49,13 @@ class Blob:
                 self.__class__.__name__ + '.blob shape not implemented')
 
     def __y_shape(self, y, t, periodic_y, Ly):
-        centered_y_diffs = y
+        y_diffs = y - self.__get_y_blob_pos(t)
         if periodic_y:
             # The y_diff is centered in the simulation domain, if the difference is larger than half the domain,
             # the previous is used.
-            centered_y_diffs = (y - self.__get_y_blob_pos(t)) % Ly
-            centered_y_diffs[centered_y_diffs > np.max(y)/2] -= Ly
-        return np.exp(-(centered_y_diffs**2/(2*self.width_y**2)))
+            y_diffs = y_diffs % Ly
+            y_diffs[y_diffs > np.max(y)/2] -= Ly
+        return np.exp(-(y_diffs**2/(2*self.width_y**2)))
 
     def __get_x_blob_pos(self, t):
         return self.pos_x + self.v_x*(t-self.t_init)
