@@ -24,9 +24,6 @@ class Model:
         T: float, time length 
         periodic_y: bool, optional
             allow periodicity in y-direction 
-            !!!!
-            discuss implementation of periodicity
-            !!!!
         blob_shape: str, optional
             see Blob dataclass for available shapes
         t_drain: float, optional
@@ -90,9 +87,9 @@ class Model:
             distribution of blob amplitudes
         W_dist: str, optional
             distribution of blob widths
-        vx_dist: str, optinal
+        vx_dist: str, optional
             distribution of blob velocities in x-dimension
-        vy_dist: str, optinal
+        vy_dist: str, optional
             distribution of blob velocities in y-dimension
         *_scale: float, optional
             scale parameter for exp, gamma, normal and rayleigh distributions
