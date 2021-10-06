@@ -182,7 +182,6 @@ class Model:
         '''
         fig = plt.figure()
         ax = fig.add_subplot(111)
-
         div = make_axes_locatable(ax)
         cax = div.append_axes('right', '5%', '5%')
 
@@ -198,7 +197,7 @@ class Model:
 
         cv0 = frames[0]
         im = ax.imshow(cv0, origin='lower')
-        cb = fig.colorbar(im, cax=cax)
+        fig.colorbar(im, cax=cax)
         tx = ax.set_title('t = 0')
 
         def animate(i):
@@ -215,7 +214,7 @@ class Model:
             ani.save(gif_name, writer='ffmpeg', fps=fps)
         plt.show()
 
-    def integrate(self, file_name='2d_blobs.nc', speed_up=False, truncation_Lx=3):
+    def integrate(self, file_name=None, speed_up=False, truncation_Lx=3):
         '''
         Integrate Model over time and write out data as xarray dataset
 
@@ -232,6 +231,10 @@ class Model:
         truncation_Lx: float, optional
             number of times blob propagate through length Lx before blob is neglected
             only used if speed_up = True
+            
+        Returns
+        ----------
+            xarray dataset with result data
         '''
 
         __xx, __yy, __tt = np.meshgrid(self.x, self.y, self.t)
@@ -257,4 +260,13 @@ class Model:
             attrs=dict(description="2D propagating blobs."),
         )
 
-        ds.to_netcdf(file_name)
+        if file_name is not None:
+            ds.to_netcdf(file_name)
+
+        return ds
+
+    def get_blobs(self):
+        '''
+        Returns blobs list. Note that if Model.sample_blobs has not been called, the list will be empty
+        '''
+        return self.__blobs

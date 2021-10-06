@@ -1,9 +1,6 @@
 from blobmodel import Model
 import xarray as xr
-import matplotlib.pyplot as plt
 import numpy as np
-import os
-import pytest
 
 tmp = Model(Nx=100, Ny=1, Lx=10, Ly=0, dt=1, T=1000,
             blob_shape='exp', t_drain=2, periodic_y=False)
