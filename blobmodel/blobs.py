@@ -25,6 +25,10 @@ class Blob:
         The following blob shapes are implemented:
                 gauss: 2D gaussian function
                 exp: one sided exponential in x and gaussian in y
+
+                Returns
+                -------
+                discretized blob on 3d array with dimensions x,y and t : np.array
         '''
         return self.amplitude\
             * self.__drain(t)\
