@@ -21,7 +21,7 @@ def test_convergence_to_analytical_solution():
     t_loss = 2.0
     t_d = t_loss*t_p/(t_loss+t_p)
 
-    analytical_profile = t_d/t_w * amp * np.exp(-x/(v_p*t_loss))
+    analytical_profile = 1/np.sqrt(np.pi) * t_d/t_w * amp * np.exp(-x/(v_p*t_loss))
 
     error = np.mean(abs(model_profile.values - analytical_profile))
 

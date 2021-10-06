@@ -39,8 +39,8 @@ class Model:
         self.periodic_y = periodic_y
         self.blob_shape = blob_shape
         self.t_drain = t_drain
-        self.x = np.linspace(0, self.Lx, num=self.Nx)
-        self.y = np.linspace(0, self.Ly, num=self.Ny)
+        self.x = np.arange(0, self.Lx, self.Lx/self.Nx)
+        self.y = np.arange(0, self.Ly, self.Ly/self.Ny)
         self.t = np.arange(0, self.T, self.dt)
 
     def __str__(self):
@@ -253,8 +253,8 @@ class Model:
                 n=(['y', 'x', 't'], output),
             ),
             coords=dict(
-                x=(['x'], np.linspace(0, self.Lx, num=self.Nx)),
-                y=(['y'], np.linspace(0, self.Ly, num=self.Ny)),
+                x=(['x'], np.arange(0, self.Lx, self.Lx/self.Nx)),
+                y=(['y'], np.arange(0, self.Ly, self.Ly/self.Ny)),
                 t=(['t'], np.arange(0, self.T, self.dt)),
             ),
             attrs=dict(description="2D propagating blobs."),
