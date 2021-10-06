@@ -183,9 +183,6 @@ class Model:
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-        div = make_axes_locatable(ax)
-        cax = div.append_axes('right', '5%', '5%')
-
         frames = []
 
         __xx, __yy = np.meshgrid(self.x, self.y)
@@ -260,3 +257,9 @@ class Model:
             ds.to_netcdf(file_name)
 
         return ds
+
+    def get_blobs(self):
+        '''
+        Returns blobs list. Note that if Model.sample_blobs has not been called, the list will be empty
+        '''
+        return self.__blobs
