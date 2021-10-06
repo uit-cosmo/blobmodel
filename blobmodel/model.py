@@ -40,7 +40,11 @@ class Model:
         self.blob_shape = blob_shape
         self.t_drain = t_drain
         self.x = np.arange(0, self.Lx, self.Lx/self.Nx)
-        self.y = np.arange(0, self.Ly, self.Ly/self.Ny)
+        # For Ly == 0, model reduces to 1 spatial dimension
+        if self.Ly == 0:
+            self.y = 0
+        else:
+            self.y = np.arange(0, self.Ly, self.Ly/self.Ny)
         self.t = np.arange(0, self.T, self.dt)
 
     def __str__(self):
@@ -192,7 +196,8 @@ class Model:
         for t in tqdm(self.t, desc="Creating frames for animation"):
             curVals = np.zeros(shape=(self.Ny, self.Nx))
             for b in self.__blobs:
-                curVals += b.discretize_blob(x=__xx, y=__yy, t=t, periodic_y=self.periodic_y, Ly=self.Ly)
+                curVals += b.discretize_blob(x=__xx, y=__yy,
+                                             t=t, periodic_y=self.periodic_y, Ly=self.Ly)
             frames.append(curVals)
 
         cv0 = frames[0]
@@ -231,7 +236,7 @@ class Model:
         truncation_Lx: float, optional
             number of times blob propagate through length Lx before blob is neglected
             only used if speed_up = True
-            
+
         Returns
         ----------
             xarray dataset with result data
@@ -247,18 +252,31 @@ class Model:
                 output[:, :, start:stop] += b.discretize_blob(
                     x=__xx[:, :, start:stop], y=__yy[:, :, start:stop], t=__tt[:, :, start:stop], periodic_y=self.periodic_y, Ly=self.Ly)
             else:
-                output += b.discretize_blob(x=__xx, y=__yy, t=__tt, periodic_y=self.periodic_y, Ly=self.Ly)
-        ds = xr.Dataset(
-            data_vars=dict(
-                n=(['y', 'x', 't'], output),
-            ),
-            coords=dict(
-                x=(['x'], np.arange(0, self.Lx, self.Lx/self.Nx)),
-                y=(['y'], np.arange(0, self.Ly, self.Ly/self.Ny)),
-                t=(['t'], np.arange(0, self.T, self.dt)),
-            ),
-            attrs=dict(description="2D propagating blobs."),
-        )
+                output += b.discretize_blob(x=__xx, y=__yy,
+                                            t=__tt, periodic_y=self.periodic_y, Ly=self.Ly)
+        if self.Ly == 0:
+            ds = xr.Dataset(
+                data_vars=dict(
+                    n=(['y', 'x', 't'], output),
+                ),
+                coords=dict(
+                    x=(['x'], self.x),
+                    t=(['t'], self.t),
+                ),
+                attrs=dict(description="2D propagating blobs."),
+            )
+        else:
+            ds = xr.Dataset(
+                data_vars=dict(
+                    n=(['y', 'x', 't'], output),
+                ),
+                coords=dict(
+                    x=(['x'], self.x),
+                    y=(['y'], self.y),
+                    t=(['t'], self.t),
+                ),
+                attrs=dict(description="2D propagating blobs."),
+            )
 
         if file_name is not None:
             ds.to_netcdf(file_name)
