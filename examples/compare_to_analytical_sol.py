@@ -15,7 +15,6 @@ if not os.path.isfile('./profile_comparison.nc'):
 
 def plot_convergence_to_analytical_solution():
     ds = xr.open_dataset('profile_comparison.nc')
-    model_profile = ds.n.isel(y=0).mean(dim=('t'))
 
     x = np.linspace(0, 10, 100)
     t_p = 1
