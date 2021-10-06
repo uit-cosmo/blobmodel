@@ -182,6 +182,8 @@ class Model:
         '''
         fig = plt.figure()
         ax = fig.add_subplot(111)
+        div = make_axes_locatable(ax)
+        cax = div.append_axes('right', '5%', '5%')
 
         frames = []
 
@@ -195,6 +197,7 @@ class Model:
 
         cv0 = frames[0]
         im = ax.imshow(cv0, origin='lower')
+        fig.colorbar(im, cax=cax)
         tx = ax.set_title('t = 0')
 
         def animate(i):
@@ -228,6 +231,10 @@ class Model:
         truncation_Lx: float, optional
             number of times blob propagate through length Lx before blob is neglected
             only used if speed_up = True
+            
+        Returns
+        ----------
+            xarray dataset with result data
         '''
 
         __xx, __yy, __tt = np.meshgrid(self.x, self.y, self.t)
