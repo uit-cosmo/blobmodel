@@ -44,7 +44,7 @@ class Blob:
 
     def __x_shape(self, x, t):
         if self.blob_shape == 'gauss':
-            return np.exp(-((x - self.__get_x_blob_pos(t))**2/(2*self.width_x**2)))
+            return 1 / np.sqrt(np.pi) * np.exp(-((x - self.__get_x_blob_pos(t))**2/self.width_x**2))
         elif self.blob_shape == 'exp':
             return np.exp(x - self.__get_x_blob_pos(t))\
                 * np.heaviside(-1.*(x - self.__get_x_blob_pos(t)), 1)
@@ -59,7 +59,7 @@ class Blob:
             # the previous is used.
             y_diffs = y_diffs % Ly
             y_diffs[y_diffs > np.max(y)/2] -= Ly
-        return np.exp(-(y_diffs**2/(2*self.width_y**2)))
+        return 1 / np.sqrt(np.pi) * np.exp(-y_diffs**2/self.width_y**2)
 
     def __get_x_blob_pos(self, t):
         return self.pos_x + self.v_x*(t-self.t_init)
