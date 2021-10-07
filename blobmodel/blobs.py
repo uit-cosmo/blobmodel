@@ -67,7 +67,7 @@ class Blob:
             # The y_diff is centered in the simulation domain, if the difference is larger than half the domain,
             # the previous is used.
             y_diffs = y_diffs % Ly
-            y_diffs[y_diffs > np.max(y) / 2] -= Ly
+            y_diffs[y_diffs > Ly / 2] -= Ly
         return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_y ** 2)
 
     def __get_x_blob_pos(self, t):
