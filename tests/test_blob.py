@@ -12,7 +12,8 @@ blob = Blob(
     pos_x=0,
     pos_y=0,
     t_init=0,
-    t_drain=10**100)
+    t_drain=10 ** 100,
+)
 
 
 def test_initial_blob():
@@ -22,7 +23,9 @@ def test_initial_blob():
     mesh_x, mesh_y = np.meshgrid(x, y)
     blob_values = blob.discretize_blob(x=mesh_x, y=mesh_y, t=0, periodic_y=False, Ly=10)
 
-    expected_values = 1/np.pi * np.exp(-mesh_x**2/2) * np.exp(-mesh_y**2/2)
+    expected_values = (
+        1 / np.pi * np.exp(-(mesh_x ** 2) / 2) * np.exp(-(mesh_y ** 2) / 2)
+    )
     error = np.mean(abs(expected_values - blob_values))
 
     assert error < 0.1, "Numerical error too big"
@@ -35,7 +38,9 @@ def test_periodicity():
     mesh_x, mesh_y = np.meshgrid(x, y)
     blob_values = blob.discretize_blob(x=mesh_x, y=mesh_y, t=2, periodic_y=True, Ly=1)
 
-    expected_values = 1/np.pi * np.exp(-(mesh_x - 2)**2/2) * np.exp(-mesh_y**2/2)
+    expected_values = (
+        1 / np.pi * np.exp(-((mesh_x - 2) ** 2) / 2) * np.exp(-(mesh_y ** 2) / 2)
+    )
     error = np.mean(abs(expected_values - blob_values))
 
     assert error < 0.1, "Numerical error too big"
