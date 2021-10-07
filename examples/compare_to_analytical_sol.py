@@ -22,7 +22,7 @@ def plot_convergence_to_analytical_solution(ds):
     t_loss = 2.0
     t_d = t_loss*t_p/(t_loss+t_p)
 
-    analytical_profile = t_d/t_w * amp * np.exp(-x/(v_p*t_loss))
+    analytical_profile = 1/np.sqrt(np.pi)*t_d/t_w * amp * np.exp(-x/(v_p*t_loss))
 
     ds.n.isel(y=0).mean(dim=('t')).plot(label='blob_model')
     plt.yscale('log')
