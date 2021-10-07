@@ -50,11 +50,11 @@ class Blob:
             return (
                 1
                 / np.sqrt(np.pi)
-                * np.exp(-((x - self.get_x_blob_pos(t)) ** 2 / self.width_x ** 2))
+                * np.exp(-((x - self.__get_x_blob_pos(t)) ** 2 / self.width_x ** 2))
             )
         elif self.blob_shape == "exp":
-            return np.exp(x - self.get_x_blob_pos(t)) * np.heaviside(
-                -1.0 * (x - self.get_x_blob_pos(t)), 1
+            return np.exp(x - self.__get_x_blob_pos(t)) * np.heaviside(
+                -1.0 * (x - self.__get_x_blob_pos(t)), 1
             )
         else:
             raise NotImplementedError(
@@ -62,7 +62,7 @@ class Blob:
             )
 
     def __y_shape(self, y, t, periodic_y, Ly):
-        y_diffs = y - self.get_y_blob_pos(t)
+        y_diffs = y - self.__get_y_blob_pos(t)
         if periodic_y:
             # The y_diff is centered in the simulation domain, if the difference is larger than half the domain,
             # the previous is used.
@@ -70,8 +70,8 @@ class Blob:
             y_diffs[y_diffs > Ly / 2] -= Ly
         return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_y ** 2)
 
-    def get_x_blob_pos(self, t):
+    def __get_x_blob_pos(self, t):
         return self.pos_x + self.v_x * (t - self.t_init)
 
-    def get_y_blob_pos(self, t):
+    def __get_y_blob_pos(self, t):
         return self.pos_y + self.v_y * (t - self.t_init)
