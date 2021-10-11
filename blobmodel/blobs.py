@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 import numpy as np
+from nptyping import NDArray, Float
+from typing import Any
 
 
 @dataclass
@@ -20,7 +22,14 @@ class Blob:
     t_init: float
     t_drain: float
 
-    def discretize_blob(self, x, y, t, periodic_y=False, Ly=0):
+    def discretize_blob(
+        self,
+        x: NDArray[Any, 3, Float[64]],
+        y: NDArray[Any, 3, Float[64]],
+        t: NDArray[Any, 3, Float[64]],
+        periodic_y: bool = False,
+        Ly: float = 0,
+    ) -> NDArray[Any, 3, Float[64]]:
         """
         Discretize blob on grid
         The following blob shapes are implemented:
@@ -39,13 +48,17 @@ class Blob:
             * self.__blob_arrival(t)
         )
 
-    def __drain(self, t):
+    def __drain(self, t: NDArray[Any, 3, Float[64]]) -> NDArray[Any, 3, Float[64]]:
         return np.exp(-(t - self.t_init) / self.t_drain)
 
-    def __blob_arrival(self, t):
+    def __blob_arrival(
+        self, t: NDArray[Any, 3, Float[64]]
+    ) -> NDArray[Any, 3, Float[64]]:
         return np.heaviside(t - self.t_init, 1)
 
-    def __x_shape(self, x, t):
+    def __x_shape(
+        self, x: NDArray[Any, 3, Float[64]], t: NDArray[Any, 3, Float[64]]
+    ) -> NDArray[Any, 3, Float[64]]:
         if self.blob_shape == "gauss":
             return (
                 1
@@ -61,7 +74,13 @@ class Blob:
                 self.__class__.__name__ + ".blob shape not implemented"
             )
 
-    def __y_shape(self, y, t, periodic_y, Ly):
+    def __y_shape(
+        self,
+        y: NDArray[Any, 3, Float[64]],
+        t: NDArray[Any, 3, Float[64]],
+        periodic_y: bool,
+        Ly: float,
+    ) -> NDArray[Any, 3, Float[64]]:
         y_diffs = y - self.__get_y_blob_pos(t)
         if periodic_y:
             # The y_diff is centered in the simulation domain, if the difference is larger than half the domain,
@@ -70,8 +89,12 @@ class Blob:
             y_diffs[y_diffs > Ly / 2] -= Ly
         return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_y ** 2)
 
-    def __get_x_blob_pos(self, t):
+    def __get_x_blob_pos(
+        self, t: NDArray[Any, 3, Float[64]]
+    ) -> NDArray[Any, 3, Float[64]]:
         return self.pos_x + self.v_x * (t - self.t_init)
 
-    def __get_y_blob_pos(self, t):
+    def __get_y_blob_pos(
+        self, t: NDArray[Any, 3, Float[64]]
+    ) -> NDArray[Any, 3, Float[64]]:
         return self.pos_y + self.v_y * (t - self.t_init)

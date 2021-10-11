@@ -5,6 +5,8 @@ from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import xarray as xr
 from tqdm import tqdm
+from nptyping import NDArray, Float
+from typing import Any
 
 
 class Model:
@@ -13,8 +15,17 @@ class Model:
     """
 
     def __init__(
-        self, Nx, Ny, Lx, Ly, dt, T, periodic_y=False, blob_shape="gauss", t_drain=10
-    ):
+        self,
+        Nx: int,
+        Ny: int,
+        Lx: float,
+        Ly: float,
+        dt: float,
+        T: float,
+        periodic_y: bool = False,
+        blob_shape: str = "gauss",
+        t_drain: float = 10,
+    ) -> None:
         """
         Attributes
         ----------
@@ -31,25 +42,25 @@ class Model:
         t_drain: float, optional
             drain time for blobs 
         """
-        self.Nx = Nx
-        self.Ny = Ny
-        self.Lx = Lx
-        self.Ly = Ly
-        self.dt = dt
-        self.T = T
-        self.__blobs = []
-        self.periodic_y = periodic_y
-        self.blob_shape = blob_shape
-        self.t_drain = t_drain
-        self.x = np.arange(0, self.Lx, self.Lx / self.Nx)
+        self.Nx: int = Nx
+        self.Ny: int = Ny
+        self.Lx: float = Lx
+        self.Ly: float = Ly
+        self.dt: float = dt
+        self.T: float = T
+        self.__blobs: list[Blob] = []
+        self.periodic_y: bool = periodic_y
+        self.blob_shape: str = blob_shape
+        self.t_drain: float = t_drain
+        self.x: NDArray[Any, Float[64]] = np.arange(0, self.Lx, self.Lx / self.Nx)
         # For Ly == 0, model reduces to 1 spatial dimension
         if self.Ly == 0:
-            self.y = 0
+            self.y: NDArray[Any, Float[64]] = 0
         else:
             self.y = np.arange(0, self.Ly, self.Ly / self.Ny)
-        self.t = np.arange(0, self.T, self.dt)
+        self.t: NDArray[Any, Float[64]] = np.arange(0, self.T, self.dt)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         string representation of Model 
         """
@@ -60,32 +71,32 @@ class Model:
 
     def sample_blobs(
         self,
-        num_blobs,
-        A_dist="exp",
-        W_dist="exp",
-        vx_dist="deg",
-        vy_dist="normal",
-        A_scale=1.0,
-        W_scale=1.0,
-        vx_scale=1.0,
-        vy_scale=1.0,
-        A_shape=1.0,
-        W_shape=1.0,
-        vx_shape=1.0,
-        vy_shape=1.0,
-        A_loc=0.0,
-        W_loc=0.0,
-        vx_loc=0.0,
-        vy_loc=0.0,
-        A_low=0.0,
-        W_low=0.0,
-        vx_low=0.0,
-        vy_low=0.0,
-        A_high=1.0,
-        W_high=1.0,
-        vx_high=1.0,
-        vy_high=1.0,
-    ):
+        num_blobs: int,
+        A_dist: str = "exp",
+        W_dist: str = "exp",
+        vx_dist: str = "deg",
+        vy_dist: str = "normal",
+        A_scale: float = 1.0,
+        W_scale: float = 1.0,
+        vx_scale: float = 1.0,
+        vy_scale: float = 1.0,
+        A_shape: float = 1.0,
+        W_shape: float = 1.0,
+        vx_shape: float = 1.0,
+        vy_shape: float = 1.0,
+        A_loc: float = 0.0,
+        W_loc: float = 0.0,
+        vx_loc: float = 0.0,
+        vy_loc: float = 0.0,
+        A_low: float = 0.0,
+        W_low: float = 0.0,
+        vx_low: float = 0.0,
+        vy_low: float = 0.0,
+        A_high: float = 1.0,
+        W_high: float = 1.0,
+        vx_high: float = 1.0,
+        vy_high: float = 1.0,
+    ) -> None:
         """
         Choose appropriate distribution functions for blob parameters
 
@@ -114,7 +125,14 @@ class Model:
         Note that * refers to either A, W, vx or vy
         """
 
-        def choose_distribution(dist_type, scale, shape, loc, low, high):
+        def choose_distribution(
+            dist_type: str,
+            scale: float,
+            shape: float,
+            loc: float,
+            low: float,
+            high: float,
+        ) -> NDArray[Any, Float[64]]:
             """
             The following distributions are implemented:
                 exp: exponential distribution with scale parameter
@@ -174,7 +192,15 @@ class Model:
                 )
             )
 
-    def show_model(self, interval=100, save=False, gif_name="2d_blobs.gif", fps=10):
+        return
+
+    def show_model(
+        self,
+        interval: int = 100,
+        save: bool = False,
+        gif_name: str = "2d_blobs.gif",
+        fps: int = 10,
+    ) -> None:
         """
         show animation of Model
 
@@ -211,7 +237,7 @@ class Model:
         fig.colorbar(im, cax=cax)
         tx = ax.set_title("t = 0")
 
-        def animate(i):
+        def animate(i: int) -> None:
             arr = frames[i]
             vmax = np.max(arr)
             vmin = np.min(arr)
@@ -224,7 +250,9 @@ class Model:
             ani.save(gif_name, writer="ffmpeg", fps=fps)
         plt.show()
 
-    def integrate(self, file_name=None, speed_up=False, truncation_Lx=3):
+    def integrate(
+        self, file_name: str = None, speed_up: bool = False, truncation_Lx: float = 3
+    ) -> xr.Dataset:
         """
         Integrate Model over time and write out data as xarray dataset
 
@@ -283,7 +311,7 @@ class Model:
 
         return ds
 
-    def get_blobs(self):
+    def get_blobs(self) -> list[Blob]:
         """
         Returns blobs list. Note that if Model.sample_blobs has not been called, the list will be empty
         """
