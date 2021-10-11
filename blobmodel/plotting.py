@@ -14,7 +14,7 @@ def show_model(
     fps: int = 10,
 ) -> None:
     """
-        show animation of Model
+        Show animation of Model
 
         Parameters
         ----------
