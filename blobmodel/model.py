@@ -1,8 +1,5 @@
 from .blobs import Blob
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 import xarray as xr
 from tqdm import tqdm
 from nptyping import NDArray, Float
@@ -193,62 +190,6 @@ class Model:
             )
 
         return
-
-    def show_model(
-        self,
-        interval: int = 100,
-        save: bool = False,
-        gif_name: str = "2d_blobs.gif",
-        fps: int = 10,
-    ) -> None:
-        """
-        show animation of Model
-
-        Parameters
-        ----------
-        interval: int, optional
-            time interval between frames in ms
-        save: bool, optional
-            if True save animation as gif
-        gif_name: str, optional
-            set name for gif
-        fps: int, optional
-            set fps for gif
-        """
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        div = make_axes_locatable(ax)
-        cax = div.append_axes("right", "5%", "5%")
-
-        frames = []
-
-        __xx, __yy = np.meshgrid(self.x, self.y)
-
-        for t in tqdm(self.t, desc="Creating frames for animation"):
-            curVals = np.zeros(shape=(self.Ny, self.Nx))
-            for b in self.__blobs:
-                curVals += b.discretize_blob(
-                    x=__xx, y=__yy, t=t, periodic_y=self.periodic_y, Ly=self.Ly
-                )
-            frames.append(curVals)
-
-        cv0 = frames[0]
-        im = ax.imshow(cv0, origin="lower")
-        fig.colorbar(im, cax=cax)
-        tx = ax.set_title("t = 0")
-
-        def animate(i: int) -> None:
-            arr = frames[i]
-            vmax = np.max(arr)
-            vmin = np.min(arr)
-            im.set_data(arr)
-            im.set_clim(vmin, vmax)
-            tx.set_text(f"t = {i*self.dt:.2f}")
-
-        ani = FuncAnimation(fig, animate, frames=self.t.size, interval=interval)
-        if save:
-            ani.save(gif_name, writer="ffmpeg", fps=fps)
-        plt.show()
 
     def integrate(
         self, file_name: str = None, speed_up: bool = False, truncation_Lx: float = 3
