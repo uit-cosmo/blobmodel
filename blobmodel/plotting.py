@@ -61,4 +61,3 @@ def show_model(
     if save:
         ani.save(gif_name, writer="ffmpeg", fps=fps)
     plt.show()
-
