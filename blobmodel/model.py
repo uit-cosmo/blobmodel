@@ -1,4 +1,5 @@
 from .blobs import Blob
+from .stochasticality import BlobFactory, DefaultBlobFactory
 import numpy as np
 import xarray as xr
 from tqdm import tqdm
@@ -21,7 +22,9 @@ class Model:
         T: float,
         periodic_y: bool = False,
         blob_shape: str = "gauss",
+        num_blobs: int = 1000,
         t_drain: float = 10,
+        blob_factory: BlobFactory = DefaultBlobFactory(),
     ) -> None:
         """
         Attributes
@@ -48,6 +51,7 @@ class Model:
         self.__blobs: list[Blob] = []
         self.periodic_y: bool = periodic_y
         self.blob_shape: str = blob_shape
+        self.num_blobs: str = num_blobs
         self.t_drain: float = t_drain
         self.x: NDArray[Any, Float[64]] = np.arange(0, self.Lx, self.Lx / self.Nx)
         # For Ly == 0, model reduces to 1 spatial dimension
@@ -57,6 +61,15 @@ class Model:
             self.y = np.arange(0, self.Ly, self.Ly / self.Ny)
         self.t: NDArray[Any, Float[64]] = np.arange(0, self.T, self.dt)
 
+        self.blob_factory = blob_factory
+        self.__blobs = self.blob_factory.sample_blobs(
+            Ly=self.Ly,
+            T=self.T,
+            num_blobs=self.num_blobs,
+            blob_shape=self.blob_shape,
+            t_drain=self.t_drain,
+        )
+
     def __str__(self) -> str:
         """
         string representation of Model 
@@ -65,131 +78,6 @@ class Model:
             f"2d Blob Model with  Nx:{self.Nx},  Ny:{self.Ny}, Lx:{self.Lx}, Ly:{self.Ly}, "
             + f"dt:{self.dt}, T:{self.T}, y-periodicity:{self.periodic_y} and blob shape:{self.blob_shape}"
         )
-
-    def sample_blobs(
-        self,
-        num_blobs: int,
-        A_dist: str = "exp",
-        W_dist: str = "exp",
-        vx_dist: str = "deg",
-        vy_dist: str = "normal",
-        A_scale: float = 1.0,
-        W_scale: float = 1.0,
-        vx_scale: float = 1.0,
-        vy_scale: float = 1.0,
-        A_shape: float = 1.0,
-        W_shape: float = 1.0,
-        vx_shape: float = 1.0,
-        vy_shape: float = 1.0,
-        A_loc: float = 0.0,
-        W_loc: float = 0.0,
-        vx_loc: float = 0.0,
-        vy_loc: float = 0.0,
-        A_low: float = 0.0,
-        W_low: float = 0.0,
-        vx_low: float = 0.0,
-        vy_low: float = 0.0,
-        A_high: float = 1.0,
-        W_high: float = 1.0,
-        vx_high: float = 1.0,
-        vy_high: float = 1.0,
-    ) -> None:
-        """
-        Choose appropriate distribution functions for blob parameters
-
-        Parameters
-        ----------
-        num_blobs: int, number of blobs
-        A_dist: str, optional
-            distribution of blob amplitudes
-        W_dist: str, optional
-            distribution of blob widths
-        vx_dist: str, optional
-            distribution of blob velocities in x-dimension
-        vy_dist: str, optional
-            distribution of blob velocities in y-dimension
-        *_scale: float, optional
-            scale parameter for exp, gamma, normal and rayleigh distributions
-        *_shape: float, optional
-            shape paremeter for gamma distribution
-        *_loc:float, optional
-            location parameter for normal distribution
-        *_low: float, optional
-            lower boundary for uniform distribution
-        *_high: float, optional
-            upper boundary for uniform distribution
-
-        Note that * refers to either A, W, vx or vy
-        """
-
-        def choose_distribution(
-            dist_type: str,
-            scale: float,
-            shape: float,
-            loc: float,
-            low: float,
-            high: float,
-        ) -> NDArray[Any, Float[64]]:
-            """
-            The following distributions are implemented:
-                exp: exponential distribution with scale parameter
-                gamma: gamma distribution with shape and scale parameter
-                normal: normal distribution with loc and scale parameter
-                uniform: uniorm distribution with low and high parameter
-                ray: rayleight distribution with scale parameter
-                deg: array on ones 
-                zeros: array of zeros
-            """
-            if dist_type == "exp":
-                return np.random.exponential(scale=scale, size=num_blobs)
-            elif dist_type == "gamma":
-                return np.random.gamma(shape=shape, scale=scale, size=num_blobs)
-            elif dist_type == "normal":
-                return np.random.normal(loc=loc, scale=scale, size=num_blobs)
-            elif dist_type == "uniform":
-                return np.random.uniform(low=low, high=high, size=num_blobs)
-            elif dist_type == "ray":
-                return np.random.rayleigh(scale=scale, size=num_blobs)
-            elif dist_type == "deg":
-                return scale * np.ones(num_blobs)
-            elif dist_type == "zeros":
-                return np.zeros(num_blobs)
-            else:
-                raise NotImplementedError(
-                    self.__class__.__name__ + ".distribution function not implemented"
-                )
-
-        __amp = choose_distribution(A_dist, A_scale, A_shape, A_loc, A_low, A_high)
-        __width = choose_distribution(W_dist, W_scale, W_shape, W_loc, W_low, W_high)
-        __vx = choose_distribution(vx_dist, vx_scale, vx_shape, vx_loc, vx_low, vx_high)
-        __vy = choose_distribution(vy_dist, vy_scale, vy_shape, vy_loc, vy_low, vy_high)
-
-        # the following parameters are fixed
-        __posx = np.zeros(num_blobs)
-        __posy = np.random.uniform(low=0.0, high=self.Ly, size=num_blobs)
-        __t_init = np.random.uniform(low=0, high=self.T, size=num_blobs)
-
-        # sort blobs by __t_init
-        __t_init = np.sort(__t_init)
-
-        for i in range(num_blobs):
-            self.__blobs.append(
-                Blob(
-                    id=i,
-                    blob_shape=self.blob_shape,
-                    amplitude=__amp[i],
-                    width_x=__width[i],
-                    width_y=__width[i],
-                    v_x=__vx[i],
-                    v_y=__vy[i],
-                    pos_x=__posx[i],
-                    pos_y=__posy[i],
-                    t_init=__t_init[i],
-                    t_drain=self.t_drain,
-                )
-            )
-
-        return
 
     def integrate(
         self, file_name: str = None, speed_up: bool = False, truncation_Lx: float = 3
