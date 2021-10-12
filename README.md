@@ -15,20 +15,20 @@ pip install -e .
 
 
 ## Usage
-Create the grid on which the blobs are discretized with using the `Model` class. The blobs are then seeded by the `sample_blobs` method. The blob parameters are sampled from distribution functions that are specified by the input parameters for `sample_blobs`. The `integrate()` method computes the output as an xarray dataset and writhes it out in a `netcdf` file. A simple example is shown below:
+Create the grid on which the blobs are discretized with using the `Model` class. The blobs are then seeded by the `sample_blobs` method. The blob parameters are sampled from distribution functions that are specified by the input parameters for `sample_blobs`. The `integrate()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:
 
 ```Python
-from blobmodel import Model
+from blobmodel import Model, show_model
 
 bm = Model(Nx=200, Ny=100, Lx=10, Ly=10, dt=0.1, T=20, blob_shape='gauss')
 
 bm.sample_blobs(num_blobs=100)
 
-bm.integrate()
+ds = bm.integrate(file_name="example.nc")
 ```
-Alternatively, the data can be shown as an animation using the `show_model` method:
+The data can be shown as an animation using the `show_model` function:
 ```Python
-bm.show_model(interval=100)
+show_model(ds, interval=100)
 ```
 
 ## Input parameters
@@ -92,6 +92,8 @@ The following distributions are implemented:
             only used if speed_up = True
             
 ### `show_model()`
+- `ds`: xarray Dataset,
+            Model data
 - `interval`: int, optional,
             time interval between frames in ms
 - `save`: bool, optional,
