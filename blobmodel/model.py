@@ -51,7 +51,7 @@ class Model:
         self.__blobs: list[Blob] = []
         self.periodic_y: bool = periodic_y
         self.blob_shape: str = blob_shape
-        self.num_blobs: str = num_blobs
+        self.num_blobs: int = num_blobs
         self.t_drain: float = t_drain
         self.x: NDArray[Any, Float[64]] = np.arange(0, self.Lx, self.Lx / self.Nx)
         # For Ly == 0, model reduces to 1 spatial dimension

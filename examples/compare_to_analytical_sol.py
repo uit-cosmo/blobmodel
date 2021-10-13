@@ -21,9 +21,7 @@ tmp = Model(
     num_blobs=10000,
     blob_factory=bf,
 )
-# tmp.sample_blobs(
-#    num_blobs=10000, A_dist="deg", W_dist="deg", vx_dist="deg", vy_dist="zeros"
-# )
+
 ds = tmp.integrate(file_name="profile_comparison.nc", speed_up=True, truncation_Lx=1)
 
 

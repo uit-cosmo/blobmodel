@@ -11,7 +11,9 @@ class BlobFactory(ABC):
     """
 
     @abstractmethod
-    def sample_blobs(self) -> list[Blob]:
+    def sample_blobs(
+        self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
+    ) -> list[Blob]:
         raise NotImplementedError
 
 
@@ -26,10 +28,10 @@ class DefaultBlobFactory(BlobFactory):
         W_dist: str = "exp",
         vx_dist: str = "deg",
         vy_dist: str = "normal",
-        A_parameter: float = 1,
-        W_parameter: float = 1,
-        vx_parameter: float = 1,
-        vy_parameter: float = 1,
+        A_parameter: float = 1.0,
+        W_parameter: float = 1.0,
+        vx_parameter: float = 1.0,
+        vy_parameter: float = 1.0,
     ) -> None:
         self.A_dist = A_dist
         self.W_dist = W_dist
@@ -41,7 +43,7 @@ class DefaultBlobFactory(BlobFactory):
         self.vy_parameter = vy_parameter
 
     def __choose_distribution(
-        self, dist_type: str, free_parameter: float, num_blobs: float,
+        self, dist_type: str, free_parameter: float, num_blobs: int,
     ) -> NDArray[Any, Float[64]]:
         """
         The following distributions are implemented:
