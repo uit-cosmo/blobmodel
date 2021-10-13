@@ -79,9 +79,6 @@ class Model:
             t_drain=self.t_drain,
         )
 
-        __xx, __yy, __tt = np.meshgrid(
-            self.__geometry.x, self.__geometry.y, self.__geometry.t
-        )
         output = np.zeros(
             shape=(self.__geometry.Ny, self.__geometry.Nx, self.__geometry.t.size)
         )
@@ -98,17 +95,17 @@ class Model:
                     + start
                 )
                 output[:, :, start:stop] += b.discretize_blob(
-                    x=__xx[:, :, start:stop],
-                    y=__yy[:, :, start:stop],
-                    t=__tt[:, :, start:stop],
+                    x=self.__geometry.xx[:, :, start:stop],
+                    y=self.__geometry.yy[:, :, start:stop],
+                    t=self.__geometry.tt[:, :, start:stop],
                     periodic_y=self.__geometry.periodic_y,
                     Ly=self.__geometry.Ly,
                 )
             else:
                 output += b.discretize_blob(
-                    x=__xx,
-                    y=__yy,
-                    t=__tt,
+                    x=self.__geometry.xx,
+                    y=self.__geometry.yy,
+                    t=self.__geometry.tt,
                     periodic_y=self.__geometry.periodic_y,
                     Ly=self.__geometry.Ly,
                 )
