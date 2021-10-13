@@ -1,4 +1,4 @@
-from blobmodel import Model, BlobFactory, Blob, show_model, Geometry
+from blobmodel import Model, BlobFactory, Blob, show_model
 import numpy as np
 
 # create custom class that inherits from BlobFactory
@@ -45,11 +45,8 @@ class CustomBlobFactory(BlobFactory):
         return __blobs
 
 
-geo = Geometry(Nx=100, Ny=100, Lx=2, Ly=2, dt=0.1, T=10, periodic_y=True,)
 bf = CustomBlobFactory()
-tmp = Model(
-    geometry=geo, blob_shape="gauss", t_drain=2, num_blobs=1000, blob_factory=bf,
-)
+tmp = Model(blob_shape="gauss", t_drain=2, num_blobs=1000, blob_factory=bf,)
 
 ds = tmp.integrate(speed_up=True, truncation_Lx=1)
 show_model(ds=ds)

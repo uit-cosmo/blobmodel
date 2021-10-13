@@ -45,7 +45,9 @@ class Geometry:
         else:
             self.y = np.arange(0, self.Ly, self.Ly / self.Ny)
         self.t: NDArray[Any, Float[64]] = np.arange(0, self.T, self.dt)
-        self.xx, self.yy, self.tt = np.meshgrid(self.x, self.y, self.t)
+        self.x_matrix, self.y_matrix, self.t_matrix = np.meshgrid(
+            self.x, self.y, self.t
+        )
 
     def __str__(self) -> str:
         """

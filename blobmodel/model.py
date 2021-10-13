@@ -95,17 +95,17 @@ class Model:
                     + start
                 )
                 output[:, :, start:stop] += b.discretize_blob(
-                    x=self.__geometry.xx[:, :, start:stop],
-                    y=self.__geometry.yy[:, :, start:stop],
-                    t=self.__geometry.tt[:, :, start:stop],
+                    x=self.__geometry.x_matrix[:, :, start:stop],
+                    y=self.__geometry.y_matrix[:, :, start:stop],
+                    t=self.__geometry.t_matrix[:, :, start:stop],
                     periodic_y=self.__geometry.periodic_y,
                     Ly=self.__geometry.Ly,
                 )
             else:
                 output += b.discretize_blob(
-                    x=self.__geometry.xx,
-                    y=self.__geometry.yy,
-                    t=self.__geometry.tt,
+                    x=self.__geometry.x_matrix,
+                    y=self.__geometry.y_matrix,
+                    t=self.__geometry.t_matrix,
                     periodic_y=self.__geometry.periodic_y,
                     Ly=self.__geometry.Ly,
                 )
