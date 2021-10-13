@@ -1,6 +1,7 @@
-from blobmodel import Model
+from blobmodel import Model, Geometry
 
-bm = Model(Nx=100, Ny=50, Lx=10, Ly=10, dt=0.1, T=20, blob_shape="exp", num_blobs=1000)
+geo = Geometry(Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=10, periodic_y=False,)
+bm = Model(geometry=geo, blob_shape="exp", num_blobs=1000)
 
 # save data as nc file
 # use speedup option with blob truncated after propagating length 2*Lx
