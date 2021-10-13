@@ -15,14 +15,12 @@ pip install -e .
 
 
 ## Usage
-Create the grid on which the blobs are discretized with using the `Model` class. The blobs are then seeded by the `sample_blobs` method. The blob parameters are sampled from distribution functions that are specified by the input parameters for `sample_blobs`. The `integrate()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:
+Create the grid on which the blobs are discretized with using the `Model` class. The `integrate()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:
 
 ```Python
 from blobmodel import Model, show_model
 
-bm = Model(Nx=200, Ny=100, Lx=10, Ly=10, dt=0.1, T=20, blob_shape='gauss')
-
-bm.sample_blobs(num_blobs=100)
+bm = Model(Nx=200, Ny=100, Lx=10, Ly=10, dt=0.1, T=20, blob_shape='gauss',num_blobs=100)
 
 ds = bm.integrate(file_name="example.nc")
 ```
@@ -30,7 +28,29 @@ The data can be shown as an animation using the `show_model` function:
 ```Python
 show_model(ds, interval=100)
 ```
+You can specify the blob parameters with a BlobFactory class. The DefaultBlobFactory class has some of the most common distribution functions implemented. An example would look like this:
+```Python
+from blobmodel import Model, DefaultBlobFactory
 
+# use DefaultBlobFactory to define distribution functions fo random variables
+bf = DefaultBlobFactory(A_dist="exp", W_dist="uniform", vx_dist="deg", vy_dist="normal")
+
+# pass on bf when creating the Model
+tmp = Model(
+    Nx=100,
+    Ny=1,
+    Lx=10,
+    Ly=0,
+    dt=1,
+    T=1000,
+    blob_shape="exp",
+    t_drain=2,
+    periodic_y=False,
+    num_blobs=10000,
+    blob_factory=bf,
+)
+```
+Alternatively, you can specify all blob parameters exactly as you want by writing your own class which inherits from BlobFactory. See `examples/custom_blobfactory.py` as an example. 
 ## Input parameters
 ### `Model()`
 - `Nx`: int, grid points in x
@@ -43,11 +63,14 @@ show_model(ds, interval=100)
             allow periodicity in y-direction 
 - `blob_shape`: str, optional,
             switch between `gauss` and `exp` blob
+- `num_blobs`: int, optional
+            number of blobs
 - `t_drain`: float, optional,
             drain time for blobs 
+- `blob_factory`: BlobFactory, optional,
+            object containing blob parameters
 
-### `sample_blobs()`
-- `num_blobs`: int, number of blobs
+### `DefaultBlobFactory()`
 - `A_dist`: str, optional,
             distribution of blob amplitudes
 - `W_dist`: str, optional,
@@ -56,27 +79,23 @@ show_model(ds, interval=100)
             distribution of blob velocities in x-dimension
 - `vy_dist`: str, optinal,
             distribution of blob velocities in y-dimension
-- `*_scale`: float, optional,
-            scale parameter for exp, gamma, normal and rayleigh distributions
-- `*_shape`: float, optional,
-            shape paremeter for gamma distribution
-- `*_loc`:float, optional,
-            location parameter for normal distribution
-- `*_low`: float, optional,
-            lower boundary for uniform distribution
-- `*_high`: float, optional,
-            upper boundary for uniform distribution
+- `A_parameter`: float, optional,
+            `free_parameter` for amplitudes
+- `W_parameter`: float, optional,
+            `free_parameter` for widths
+- `vx_parameter`: float, optional,
+            `free_parameter` for vx
+- `vy_parameter`: float, optional,
+            `free_parameter` for vy
             
-Note that `*` refers to either `A`, `W`, `vx` or `vy`
-
 The following distributions are implemented:
 
-- `exp`: exponential distribution with scale parameter
-- `gamma`: gamma distribution with shape and scale parameter
-- `normal`: normal distribution with loc and scale parameter
-- `uniform`: uniorm distribution with low and high parameter
-- `ray`: rayleight distribution with scale parameter
-- `deg`: array on ones 
+- `exp`: exponential distribution with mean 1
+- `gamma`: gamma distribution with `free_parameter` as shape parameter and mean 1
+- `normal`: normal distribution with zero mean and `free_parameter` as scale parameter
+- `uniform`: uniorm distribution with mean 1 and `free_parameter` as width
+- `ray`: rayleight distribution with mean 1
+- `deg`: array on ones
 - `zeros`: array of zeros
                 
 ### `integrate()`
