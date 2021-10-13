@@ -14,12 +14,17 @@ class BlobFactory(ABC):
     def sample_blobs(
         self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
     ) -> list[Blob]:
+        """
+        creates list of Blobs used in Model
+        """
         raise NotImplementedError
 
 
 class DefaultBlobFactory(BlobFactory):
     """
-    Defualt blob parameters 
+    Default implementation of BlobFactory. 
+    Generates blob parameters for different possible random distributions. 
+    All random variables are independent from each other
     """
 
     def __init__(
@@ -33,18 +38,6 @@ class DefaultBlobFactory(BlobFactory):
         vx_parameter: float = 1.0,
         vy_parameter: float = 1.0,
     ) -> None:
-        self.A_dist = A_dist
-        self.W_dist = W_dist
-        self.vx_dist = vx_dist
-        self.vy_dist = vy_dist
-        self.A_parameter = A_parameter
-        self.W_parameter = W_parameter
-        self.vx_parameter = vx_parameter
-        self.vy_parameter = vy_parameter
-
-    def __choose_distribution(
-        self, dist_type: str, free_parameter: float, num_blobs: int,
-    ) -> NDArray[Any, Float[64]]:
         """
         The following distributions are implemented:
             exp: exponential distribution with mean 1
@@ -55,6 +48,19 @@ class DefaultBlobFactory(BlobFactory):
             deg: array on ones
             zeros: array of zeros
         """
+        self.A_dist = A_dist
+        self.W_dist = W_dist
+        self.vx_dist = vx_dist
+        self.vy_dist = vy_dist
+        self.A_parameter = A_parameter
+        self.W_parameter = W_parameter
+        self.vx_parameter = vx_parameter
+        self.vy_parameter = vy_parameter
+
+    def __draw_random_variables(
+        self, dist_type: str, free_parameter: float, num_blobs: int,
+    ) -> NDArray[Any, Float[64]]:
+
         if dist_type == "exp":
             return np.random.exponential(scale=1, size=num_blobs)
         elif dist_type == "gamma":
@@ -81,12 +87,12 @@ class DefaultBlobFactory(BlobFactory):
     def sample_blobs(
         self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
     ) -> list[Blob]:
-        __amp = self.__choose_distribution(
+        __amp = self.__draw_random_variables(
             dist_type=self.A_dist, free_parameter=self.A_parameter, num_blobs=num_blobs
         )
-        __width = self.__choose_distribution(self.W_dist, self.W_parameter, num_blobs)
-        __vx = self.__choose_distribution(self.vx_dist, self.vx_parameter, num_blobs)
-        __vy = self.__choose_distribution(self.vy_dist, self.vy_parameter, num_blobs)
+        __width = self.__draw_random_variables(self.W_dist, self.W_parameter, num_blobs)
+        __vx = self.__draw_random_variables(self.vx_dist, self.vx_parameter, num_blobs)
+        __vy = self.__draw_random_variables(self.vy_dist, self.vy_parameter, num_blobs)
         __posx = np.zeros(num_blobs)
         __posy = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
         __t_init = np.random.uniform(low=0, high=T, size=num_blobs)

@@ -48,7 +48,6 @@ class Model:
         self.Ly: float = Ly
         self.dt: float = dt
         self.T: float = T
-        self.__blobs: list[Blob] = []
         self.periodic_y: bool = periodic_y
         self.blob_shape: str = blob_shape
         self.num_blobs: int = num_blobs
@@ -60,15 +59,8 @@ class Model:
         else:
             self.y = np.arange(0, self.Ly, self.Ly / self.Ny)
         self.t: NDArray[Any, Float[64]] = np.arange(0, self.T, self.dt)
-
-        self.blob_factory = blob_factory
-        self.__blobs = self.blob_factory.sample_blobs(
-            Ly=self.Ly,
-            T=self.T,
-            num_blobs=self.num_blobs,
-            blob_shape=self.blob_shape,
-            t_drain=self.t_drain,
-        )
+        self.__blobs: list[Blob] = []
+        self.__blob_factory = blob_factory
 
     def __str__(self) -> str:
         """
@@ -103,6 +95,14 @@ class Model:
         ----------
             xarray dataset with result data
         """
+
+        self.__blobs = self.__blob_factory.sample_blobs(
+            Ly=self.Ly,
+            T=self.T,
+            num_blobs=self.num_blobs,
+            blob_shape=self.blob_shape,
+            t_drain=self.t_drain,
+        )
 
         __xx, __yy, __tt = np.meshgrid(self.x, self.y, self.t)
         output = np.zeros(shape=(self.Ny, self.Nx, self.t.size))
