@@ -4,8 +4,6 @@ from .geometry import Geometry
 import numpy as np
 import xarray as xr
 from tqdm import tqdm
-from nptyping import NDArray, Float
-from typing import Any
 
 
 class Model:
