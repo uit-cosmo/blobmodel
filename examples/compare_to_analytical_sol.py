@@ -1,8 +1,12 @@
-from blobmodel import Model
+from blobmodel import Model, DefaultBlobFactory
 import xarray as xr
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
+# use DefaultBlobFactory to define distribution functions fo random variables
+bf = DefaultBlobFactory(A_dist="deg", W_dist="deg", vx_dist="deg", vy_dist="zeros")
+
 
 tmp = Model(
     Nx=100,
@@ -14,10 +18,10 @@ tmp = Model(
     blob_shape="exp",
     t_drain=2,
     periodic_y=False,
+    num_blobs=10000,
+    blob_factory=bf,
 )
-tmp.sample_blobs(
-    num_blobs=10000, A_dist="deg", W_dist="deg", vx_dist="deg", vy_dist="zeros"
-)
+
 ds = tmp.integrate(file_name="profile_comparison.nc", speed_up=True, truncation_Lx=1)
 
 
