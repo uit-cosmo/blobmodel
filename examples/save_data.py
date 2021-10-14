@@ -14,4 +14,4 @@ bm = Model(
 
 # save data as nc file
 # use speedup option with blob truncated after propagating length 2*Lx
-bm.integrate(file_name="example.nc", speed_up=True, truncation_Lx=2)
+bm.make_realization(file_name="example.nc", speed_up=True, truncation_Lx=2)

@@ -21,7 +21,9 @@ tmp = Model(
     blob_factory=bf,
 )
 
-ds = tmp.integrate(file_name="profile_comparison.nc", speed_up=True, truncation_Lx=1)
+ds = tmp.make_realization(
+    file_name="profile_comparison.nc", speed_up=True, truncation_Lx=1
+)
 
 
 def plot_convergence_to_analytical_solution(ds):

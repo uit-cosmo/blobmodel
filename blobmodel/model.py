@@ -60,7 +60,7 @@ class Model:
         """
         return f"2d Blob Model with blob shape:{self.blob_shape}, num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
 
-    def integrate(
+    def make_realization(
         self, file_name: str = None, speed_up: bool = False, truncation_Lx: float = 3
     ) -> xr.Dataset:
         """
