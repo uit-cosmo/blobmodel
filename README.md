@@ -15,38 +15,45 @@ pip install -e .
 
 
 ## Usage
-Create the grid on which the blobs are discretized with the Geometry class. The blob shape and the number of blobs is specified in the `Model` class. The `integrate()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:
+Create the grid on which the blobs are discretized with using the `Model` class. The `integrate()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:
 
 ```Python
-from blobmodel import Model, show_model, Geometry
+from blobmodel import Model, show_model
 
-geo = Geometry(Nx=200, Ny=100, Lx=10, Ly=10, dt=0.1, T=20)
-
-bm = Model(geometry=geo, blob_shape="gauss", num_blobs=100)
+bm = Model(Nx=200, Ny=100, Lx=10, Ly=10, dt=0.1, T=20, blob_shape='gauss',num_blobs=100)
 
 ds = bm.integrate(file_name="example.nc")
-
 ```
 The data can be shown as an animation using the `show_model` function:
 ```Python
-show_model(ds)
+show_model(ds, interval=100)
 ```
 You can specify the blob parameters with a BlobFactory class. The DefaultBlobFactory class has some of the most common distribution functions implemented. An example would look like this:
 ```Python
-from blobmodel import Model, Geometry, DefaultBlobFactory                                             
- 
-geo = Geometry(Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=20)
+from blobmodel import Model, DefaultBlobFactory
 
 # use DefaultBlobFactory to define distribution functions fo random variables
 bf = DefaultBlobFactory(A_dist="exp", W_dist="uniform", vx_dist="deg", vy_dist="normal")
 
 # pass on bf when creating the Model
-tmp = Model(geometry=geo, blob_shape="exp", t_drain=2, num_blobs=100, blob_factory=bf)
-
+tmp = Model(
+    Nx=100,
+    Ny=1,
+    Lx=10,
+    Ly=0,
+    dt=1,
+    T=1000,
+    blob_shape="exp",
+    t_drain=2,
+    periodic_y=False,
+    num_blobs=10000,
+    blob_factory=bf,
+)
 ```
 Alternatively, you can specify all blob parameters exactly as you want by writing your own class which inherits from BlobFactory. See `examples/custom_blobfactory.py` as an example. 
 ## Input parameters
-### `Geometry()`
+## Input parameters
+### `Model()`
 - `Nx`: int, grid points in x
 - `Ny`: int, grid points in y
 - `Lx`: float, length of grid in x
@@ -55,12 +62,9 @@ Alternatively, you can specify all blob parameters exactly as you want by writin
 - `T`: float, time length 
 - `periodic_y`: bool, optional,
             allow periodicity in y-direction 
-### `Model()`
-- `geometry`: Geometry, optional,
-            define grid for Model
 - `blob_shape`: str, optional,
             switch between `gauss` and `exp` blob
-- `num_blobs`: int, optional,
+- `num_blobs`: int, optional
             number of blobs
 - `t_drain`: float, optional,
             drain time for blobs 
