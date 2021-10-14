@@ -1,10 +1,9 @@
 from .blobs import Blob
 from .stochasticality import BlobFactory, DefaultBlobFactory
+from .geometry import Geometry
 import numpy as np
 import xarray as xr
 from tqdm import tqdm
-from nptyping import NDArray, Float
-from typing import Any
 
 
 class Model:
@@ -14,12 +13,12 @@ class Model:
 
     def __init__(
         self,
-        Nx: int,
-        Ny: int,
-        Lx: float,
-        Ly: float,
-        dt: float,
-        T: float,
+        Nx: int = 100,
+        Ny: int = 100,
+        Lx: float = 10,
+        Ly: float = 10,
+        dt: float = 0.1,
+        T: float = 10,
         periodic_y: bool = False,
         blob_shape: str = "gauss",
         num_blobs: int = 1000,
@@ -37,28 +36,21 @@ class Model:
         T: float, time length 
         periodic_y: bool, optional
             allow periodicity in y-direction 
+        periodic_y: bool, optional
+            allow periodicity in y-direction 
         blob_shape: str, optional
             see Blob dataclass for available shapes
         t_drain: float, optional
-            drain time for blobs 
+            drain time for blobs
+        blob_factory: BlobFactory, optional
+            sets distributions of blob parameters 
         """
-        self.Nx: int = Nx
-        self.Ny: int = Ny
-        self.Lx: float = Lx
-        self.Ly: float = Ly
-        self.dt: float = dt
-        self.T: float = T
-        self.periodic_y: bool = periodic_y
+        self.__geometry: Geometry = Geometry(
+            Nx=Nx, Ny=Ny, Lx=Lx, Ly=Ly, dt=dt, T=T, periodic_y=periodic_y,
+        )
         self.blob_shape: str = blob_shape
         self.num_blobs: int = num_blobs
         self.t_drain: float = t_drain
-        self.x: NDArray[Any, Float[64]] = np.arange(0, self.Lx, self.Lx / self.Nx)
-        # For Ly == 0, model reduces to 1 spatial dimension
-        if self.Ly == 0:
-            self.y: NDArray[Any, Float[64]] = 0
-        else:
-            self.y = np.arange(0, self.Ly, self.Ly / self.Ny)
-        self.t: NDArray[Any, Float[64]] = np.arange(0, self.T, self.dt)
         self.__blobs: list[Blob] = []
         self.__blob_factory = blob_factory
 
@@ -66,12 +58,9 @@ class Model:
         """
         string representation of Model 
         """
-        return (
-            f"2d Blob Model with  Nx:{self.Nx},  Ny:{self.Ny}, Lx:{self.Lx}, Ly:{self.Ly}, "
-            + f"dt:{self.dt}, T:{self.T}, y-periodicity:{self.periodic_y} and blob shape:{self.blob_shape}"
-        )
+        return f"2d Blob Model with blob shape:{self.blob_shape}, num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
 
-    def integrate(
+    def make_realization(
         self, file_name: str = None, speed_up: bool = False, truncation_Lx: float = 3
     ) -> xr.Dataset:
         """
@@ -97,41 +86,59 @@ class Model:
         """
 
         self.__blobs = self.__blob_factory.sample_blobs(
-            Ly=self.Ly,
-            T=self.T,
+            Ly=self.__geometry.Ly,
+            T=self.__geometry.T,
             num_blobs=self.num_blobs,
             blob_shape=self.blob_shape,
             t_drain=self.t_drain,
         )
 
-        __xx, __yy, __tt = np.meshgrid(self.x, self.y, self.t)
-        output = np.zeros(shape=(self.Ny, self.Nx, self.t.size))
+        output = np.zeros(
+            shape=(self.__geometry.Ny, self.__geometry.Nx, self.__geometry.t.size)
+        )
 
         for b in tqdm(self.__blobs, desc="Summing up Blobs"):
             if speed_up:
-                start = int(b.t_init / self.dt)
-                stop = int(truncation_Lx * self.Lx / (b.v_x * self.dt)) + start
+                start = int(b.t_init / self.__geometry.dt)
+                stop = (
+                    int(
+                        truncation_Lx
+                        * self.__geometry.Lx
+                        / (b.v_x * self.__geometry.dt)
+                    )
+                    + start
+                )
                 output[:, :, start:stop] += b.discretize_blob(
-                    x=__xx[:, :, start:stop],
-                    y=__yy[:, :, start:stop],
-                    t=__tt[:, :, start:stop],
-                    periodic_y=self.periodic_y,
-                    Ly=self.Ly,
+                    x=self.__geometry.x_matrix[:, :, start:stop],
+                    y=self.__geometry.y_matrix[:, :, start:stop],
+                    t=self.__geometry.t_matrix[:, :, start:stop],
+                    periodic_y=self.__geometry.periodic_y,
+                    Ly=self.__geometry.Ly,
                 )
             else:
                 output += b.discretize_blob(
-                    x=__xx, y=__yy, t=__tt, periodic_y=self.periodic_y, Ly=self.Ly
+                    x=self.__geometry.x_matrix,
+                    y=self.__geometry.y_matrix,
+                    t=self.__geometry.t_matrix,
+                    periodic_y=self.__geometry.periodic_y,
+                    Ly=self.__geometry.Ly,
                 )
-        if self.Ly == 0:
+        if self.__geometry.Ly == 0:
             ds = xr.Dataset(
                 data_vars=dict(n=(["y", "x", "t"], output),),
-                coords=dict(x=(["x"], self.x), t=(["t"], self.t),),
+                coords=dict(
+                    x=(["x"], self.__geometry.x), t=(["t"], self.__geometry.t),
+                ),
                 attrs=dict(description="2D propagating blobs."),
             )
         else:
             ds = xr.Dataset(
                 data_vars=dict(n=(["y", "x", "t"], output),),
-                coords=dict(x=(["x"], self.x), y=(["y"], self.y), t=(["t"], self.t),),
+                coords=dict(
+                    x=(["x"], self.__geometry.x),
+                    y=(["y"], self.__geometry.y),
+                    t=(["t"], self.__geometry.t),
+                ),
                 attrs=dict(description="2D propagating blobs."),
             )
 

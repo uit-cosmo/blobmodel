@@ -1,11 +1,10 @@
-from blobmodel import Model, DefaultBlobFactory
+from blobmodel import Model, DefaultBlobFactory, Geometry
 import xarray as xr
 import numpy as np
 
 
 # use DefaultBlobFactory to define distribution functions fo random variables
 bf = DefaultBlobFactory(A_dist="deg", W_dist="deg", vx_dist="deg", vy_dist="zeros")
-
 
 tmp = Model(
     Nx=100,
@@ -21,7 +20,7 @@ tmp = Model(
     blob_factory=bf,
 )
 
-tmp.integrate(file_name="test_analytical.nc", speed_up=True, truncation_Lx=1)
+tmp.make_realization(file_name="test_analytical.nc", speed_up=True, truncation_Lx=1)
 
 
 def test_convergence_to_analytical_solution():

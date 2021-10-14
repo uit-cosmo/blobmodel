@@ -60,5 +60,5 @@ tmp = Model(
     blob_factory=bf,
 )
 
-ds = tmp.integrate(speed_up=True, truncation_Lx=1)
+ds = tmp.make_realization(speed_up=True, truncation_Lx=1)
 show_model(ds=ds)
