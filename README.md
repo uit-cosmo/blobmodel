@@ -15,18 +15,18 @@ pip install -e .
 
 
 ## Usage
-Create the grid on which the blobs are discretized with using the `Model` class. The `integrate()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:
+Create the grid on which the blobs are discretized with using the `Model` class. The `make_realization()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:
 
 ```Python
 from blobmodel import Model, show_model
 
 bm = Model(Nx=200, Ny=100, Lx=10, Ly=10, dt=0.1, T=20, blob_shape='gauss',num_blobs=100)
 
-ds = bm.integrate(file_name="example.nc")
+ds = bm.make_realization(file_name="example.nc")
 ```
 The data can be shown as an animation using the `show_model` function:
 ```Python
-show_model(ds, interval=100)
+show_model(ds)
 ```
 You can specify the blob parameters with a BlobFactory class. The DefaultBlobFactory class has some of the most common distribution functions implemented. An example would look like this:
 ```Python
@@ -99,7 +99,7 @@ The following distributions are implemented:
 - `deg`: array on ones
 - `zeros`: array of zeros
                 
-### `integrate()`
+### `make_realization()`
 - `file_name`: str, optional, 
             file name for .nc file containing data as xarray dataset
 - `speed_up`: bool, optional,
