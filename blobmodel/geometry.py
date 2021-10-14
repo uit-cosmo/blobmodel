@@ -10,13 +10,13 @@ class Geometry:
 
     def __init__(
         self,
-        Nx: int = 100,
-        Ny: int = 100,
-        Lx: float = 10,
-        Ly: float = 10,
-        dt: float = 0.1,
-        T: float = 10,
-        periodic_y: bool = False,
+        Nx: int,
+        Ny: int,
+        Lx: float,
+        Ly: float,
+        dt: float,
+        T: float,
+        periodic_y: bool,
     ) -> None:
         """
         Attributes

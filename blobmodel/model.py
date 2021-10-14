@@ -13,7 +13,13 @@ class Model:
 
     def __init__(
         self,
-        geometry: Geometry = Geometry(),
+        Nx: int = 100,
+        Ny: int = 100,
+        Lx: float = 10,
+        Ly: float = 10,
+        dt: float = 0.1,
+        T: float = 10,
+        periodic_y: bool = False,
         blob_shape: str = "gauss",
         num_blobs: int = 1000,
         t_drain: float = 10,
@@ -22,8 +28,14 @@ class Model:
         """
         Attributes
         ----------
-        geometry: Geometry, Optional
-            define grid for Model
+        Nx: int, grid points in x
+        Ny: int, grid points in y
+        Lx: float, length of grid in x
+        Ly: float, length of grid in y
+        dt: float, time step 
+        T: float, time length 
+        periodic_y: bool, optional
+            allow periodicity in y-direction 
         periodic_y: bool, optional
             allow periodicity in y-direction 
         blob_shape: str, optional
@@ -33,7 +45,9 @@ class Model:
         blob_factory: BlobFactory, optional
             sets distributions of blob parameters 
         """
-        self.__geometry: Geometry = geometry
+        self.__geometry: Geometry = Geometry(
+            Nx=Nx, Ny=Ny, Lx=Lx, Ly=Ly, dt=dt, T=T, periodic_y=periodic_y,
+        )
         self.blob_shape: str = blob_shape
         self.num_blobs: int = num_blobs
         self.t_drain: float = t_drain

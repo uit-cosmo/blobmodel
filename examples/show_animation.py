@@ -1,7 +1,16 @@
-from blobmodel import Model, show_model, Geometry
+from blobmodel import Model, show_model
 
-geo = Geometry(Nx=100, Ny=50, Lx=10, Ly=10, dt=0.1, T=20, periodic_y=False,)
-bm = Model(geometry=geo, blob_shape="gauss", num_blobs=1000)
+bm = Model(
+    Nx=100,
+    Ny=50,
+    Lx=10,
+    Ly=10,
+    dt=0.1,
+    T=20,
+    periodic_y=False,
+    blob_shape="gauss",
+    num_blobs=1000,
+)
 
 # create data
 ds = bm.integrate(speed_up=True, truncation_Lx=2)
