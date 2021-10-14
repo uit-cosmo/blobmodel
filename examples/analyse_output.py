@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 import os
 
 if not os.path.isfile("./example.nc"):
-    bm = Model(blob_shape="exp", num_blobs=1000)
+    bm = Model(
+        Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=10, blob_shape="exp", num_blobs=1000
+    )
     bm.integrate(file_name="example.nc", speed_up=True, truncation_Lx=2)
 
 # use xarray to open output

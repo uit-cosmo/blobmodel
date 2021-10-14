@@ -46,7 +46,19 @@ class CustomBlobFactory(BlobFactory):
 
 
 bf = CustomBlobFactory()
-tmp = Model(blob_shape="gauss", t_drain=2, num_blobs=1000, blob_factory=bf,)
+tmp = Model(
+    Nx=100,
+    Ny=100,
+    Lx=2,
+    Ly=2,
+    dt=0.1,
+    T=10,
+    blob_shape="gauss",
+    t_drain=2,
+    periodic_y=True,
+    num_blobs=1000,
+    blob_factory=bf,
+)
 
 ds = tmp.integrate(speed_up=True, truncation_Lx=1)
 show_model(ds=ds)

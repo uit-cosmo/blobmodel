@@ -1,4 +1,4 @@
-from blobmodel import Model, DefaultBlobFactory, Geometry
+from blobmodel import Model, DefaultBlobFactory
 import xarray as xr
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,14 +7,21 @@ import os
 # use DefaultBlobFactory to define distribution functions fo random variables
 bf = DefaultBlobFactory(A_dist="deg", W_dist="deg", vx_dist="deg", vy_dist="zeros")
 
-geo = Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=1, T=1000, periodic_y=False,)
-
-
 tmp = Model(
-    geometry=geo, blob_shape="exp", t_drain=2, num_blobs=10000, blob_factory=bf,
+    Nx=100,
+    Ny=1,
+    Lx=10,
+    Ly=0,
+    dt=1,
+    T=1000,
+    blob_shape="exp",
+    t_drain=2,
+    periodic_y=False,
+    num_blobs=10000,
+    blob_factory=bf,
 )
 
-ds = tmp.integrate(file_name="profile_comparison.nc", speed_up=True, truncation_Lx=2)
+ds = tmp.integrate(file_name="profile_comparison.nc", speed_up=True, truncation_Lx=1)
 
 
 def plot_convergence_to_analytical_solution(ds):
