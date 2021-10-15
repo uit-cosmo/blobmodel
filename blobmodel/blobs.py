@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import numpy as np
 from nptyping import NDArray
+from typing import Any, Tuple
 
 
 @dataclass
@@ -39,6 +40,7 @@ class Blob:
                 -------
                 discretized blob on 3d array with dimensions x,y and t : np.array
         """
+        # __theta = np.tan(self.v_y / self.v_x)
         return (
             self.amplitude
             * self.__drain(t)
@@ -85,3 +87,19 @@ class Blob:
 
     def __get_y_blob_pos(self, t: NDArray) -> NDArray:
         return self.pos_y + self.v_y * (t - self.t_init)
+
+    def __x_y_to_prop_perp_transform(
+        self, x: NDArray, y: NDArray, theta: float
+    ) -> Tuple[Any, Any]:
+        return (
+            x * np.cos(theta) + y * np.sin(theta),
+            -x * np.sin(theta) + y * np.cos(theta),
+        )
+
+    def __prop_perp_to_x_y_transform(
+        self, prop: NDArray, perp: NDArray, theta: float
+    ) -> Tuple[Any, Any]:
+        return (
+            prop * np.cos(theta) - perp * np.sin(theta),
+            prop * np.sin(theta) + perp * np.cos(theta),
+        )
