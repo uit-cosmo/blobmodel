@@ -40,12 +40,15 @@ class Blob:
                 -------
                 discretized blob on 3d array with dimensions x,y and t : np.array
         """
-        # __theta = np.tan(self.v_y / self.v_x)
+        self.__theta = np.arctan(self.v_y / self.v_x)
+        x_perp, y_perp = self.__rotate(
+            origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self.__theta
+        )
         return (
             self.amplitude
             * self.__drain(t)
-            * self.__x_shape(x, t)
-            * self.__y_shape(y, t, periodic_y, Ly)
+            * self.__porpagation_direction_shape(x_perp, t)
+            * self.__perpendicular_direction_shape(y_perp, t, periodic_y, Ly)
             * self.__blob_arrival(t)
         )
 
@@ -55,26 +58,28 @@ class Blob:
     def __blob_arrival(self, t: NDArray) -> NDArray:
         return np.heaviside(t - self.t_init, 1)
 
-    def __x_shape(self, x: NDArray, t: NDArray) -> NDArray:
+    def __porpagation_direction_shape(self, x: NDArray, t: NDArray) -> NDArray:
         if self.blob_shape == "gauss":
             return (
                 1
                 / np.sqrt(np.pi)
-                * np.exp(-((x - self.__get_x_blob_pos(t)) ** 2 / self.width_x ** 2))
+                * np.exp(
+                    -((x - self.__prop_dir_blob_position(t)) ** 2 / self.width_x ** 2)
+                )
             )
         elif self.blob_shape == "exp":
-            return np.exp(x - self.__get_x_blob_pos(t)) * np.heaviside(
-                -1.0 * (x - self.__get_x_blob_pos(t)), 1
+            return np.exp(x - self.__prop_dir_blob_position(t)) * np.heaviside(
+                -1.0 * (x - self.__prop_dir_blob_position(t)), 1
             )
         else:
             raise NotImplementedError(
                 self.__class__.__name__ + ".blob shape not implemented"
             )
 
-    def __y_shape(
+    def __perpendicular_direction_shape(
         self, y: NDArray, t: NDArray, periodic_y: bool, Ly: float,
     ) -> NDArray:
-        y_diffs = y - self.__get_y_blob_pos(t)
+        y_diffs = y - self.__perp_dir_blob_position(t)
         if periodic_y:
             # The y_diff is centered in the simulation domain, if the difference is larger than half the domain,
             # the previous is used.
@@ -82,24 +87,18 @@ class Blob:
             y_diffs[y_diffs > Ly / 2] -= Ly
         return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_y ** 2)
 
-    def __get_x_blob_pos(self, t: NDArray) -> NDArray:
-        return self.pos_x + self.v_x * (t - self.t_init)
+    def __prop_dir_blob_position(self, t: NDArray) -> NDArray:
+        return self.pos_x + (self.v_x ** 2 + self.v_y ** 2) ** 0.5 * (t - self.t_init)
 
-    def __get_y_blob_pos(self, t: NDArray) -> NDArray:
-        return self.pos_y + self.v_y * (t - self.t_init)
+    def __perp_dir_blob_position(self, t: NDArray) -> NDArray:
+        return self.pos_y
 
-    def __x_y_to_prop_perp_transform(
-        self, x: NDArray, y: NDArray, theta: float
+    def __rotate(
+        self, origin: Tuple, x: NDArray, y: NDArray, angle: float
     ) -> Tuple[Any, Any]:
-        return (
-            x * np.cos(theta) + y * np.sin(theta),
-            -x * np.sin(theta) + y * np.cos(theta),
-        )
+        ox, oy = origin
+        px, py = x, y
 
-    def __prop_perp_to_x_y_transform(
-        self, prop: NDArray, perp: NDArray, theta: float
-    ) -> Tuple[Any, Any]:
-        return (
-            prop * np.cos(theta) - perp * np.sin(theta),
-            prop * np.sin(theta) + perp * np.cos(theta),
-        )
+        qx = ox + np.cos(angle) * (px - ox) - np.sin(angle) * (py - oy)
+        qy = oy + np.sin(angle) * (px - ox) + np.cos(angle) * (py - oy)
+        return qx, qy
