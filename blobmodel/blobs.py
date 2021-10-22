@@ -74,11 +74,14 @@ class Blob:
     ) -> NDArray:
         y_diffs = y - self.__get_y_blob_pos(t)
         if periodic_y:
-            # The y_diff is centered in the simulation domain, if the difference is larger than half the domain,
-            # the previous is used.
-            y_diffs = y_diffs % Ly
-            y_diffs[y_diffs > Ly / 2] -= Ly
-        return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_y ** 2)
+            # shift of Ly/2 needed for modulo operator
+            return (
+                1
+                / np.sqrt(np.pi)
+                * np.exp(-(((y_diffs + Ly / 2) % Ly - Ly / 2) ** 2) / self.width_y ** 2)
+            )
+        else:
+            return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_y ** 2)
 
     def __get_x_blob_pos(self, t: NDArray) -> NDArray:
         return self.pos_x + self.v_x * (t - self.t_init)
