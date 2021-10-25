@@ -66,13 +66,13 @@ class Blob:
         self, x: NDArray, y: NDArray, t: NDArray, periodic_y: bool, Ly: float
     ) -> NDArray:
         x_diffs = x - self.__prop_dir_blob_position(t)
-        if periodic_y == True:
-            y_diffs = np.abs(y - self.__perp_dir_blob_position(t))
-            steps = (
-                (y_diffs + 0.5 * Ly * np.cos(self.__theta))
-                / (Ly * np.cos(self.__theta))
-            ).astype(int)
-            x_diffs = x_diffs + steps * (Ly - self.pos_y) / np.abs(np.sin(self.__theta))
+        # if periodic_y == True:
+        #     y_diffs = np.abs(y - self.__perp_dir_blob_position(t))
+        #     steps = (
+        #         (y_diffs + 0.5 * Ly * np.cos(self.__theta))
+        #         / (Ly * np.cos(self.__theta))
+        #     ).astype(int)
+        #     x_diffs = x_diffs + steps * (Ly - self.pos_y) / np.abs(np.sin(self.__theta))
         if self.blob_shape == "gauss":
             return 1 / np.sqrt(np.pi) * np.exp(-(x_diffs ** 2 / self.width_x ** 2))
         elif self.blob_shape == "exp":
@@ -87,16 +87,14 @@ class Blob:
     ) -> NDArray:
         y_diffs = y - self.__perp_dir_blob_position(t)
         if periodic_y:
-            # # The y_diff is centered in the simulation domain, if the difference is larger than half the domain,
-            # # the previous is used.
-            # y_diffs = y_diffs % Ly
-            # x_offset = Ly * np.tan(self.__theta)
-            # y_diffs[y_diffs > Ly / 2] -= Ly
-            y_diffs = np.abs(y - self.__perp_dir_blob_position(t))
-            y_diffs = y_diffs % ((Ly * np.cos(self.__theta)))
-            y_diffs -= Ly * np.cos(self.__theta) / 2
-            y_diffs = np.abs(np.abs(y_diffs) - Ly * np.cos(self.__theta) / 2)
-        return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_y ** 2)
+            # shift of Ly/2 needed for modulo operator
+            return (
+                1
+                / np.sqrt(np.pi)
+                * np.exp(-(((y_diffs + Ly / 2) % Ly - Ly / 2) ** 2) / self.width_y ** 2)
+            )
+        else:
+            return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_y ** 2)
 
     def __prop_dir_blob_position(self, t: NDArray) -> NDArray:
         return self.pos_x + (self.v_x ** 2 + self.v_y ** 2) ** 0.5 * (t - self.t_init)
