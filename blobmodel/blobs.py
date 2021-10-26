@@ -48,13 +48,39 @@ class Blob:
         x_perp, y_perp = self.__rotate(
             origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self.__theta
         )
-        return (
-            self.amplitude
-            * self.__drain(t)
-            * self.__porpagation_direction_shape(x_perp, y_perp, t, periodic_y, Ly)
-            * self.__perpendicular_direction_shape(y_perp, t, periodic_y, Ly)
-            * self.__blob_arrival(t)
-        )
+        if periodic_y:
+            return (
+                self.amplitude
+                * self.__drain(t)
+                * self.__porpagation_direction_shape(x_perp, t)
+                * self.__perpendicular_direction_shape(y_perp, t)
+                + self.amplitude
+                * self.__drain(t)
+                * self.__porpagation_direction_shape(
+                    x_perp + Ly * np.sin(self.__theta), t
+                )
+                * self.__perpendicular_direction_shape(
+                    y_perp + Ly * np.cos(self.__theta), t
+                )
+                * self.__blob_arrival(t)
+                + self.amplitude
+                * self.__drain(t)
+                * self.__porpagation_direction_shape(
+                    x_perp - Ly * np.sin(self.__theta), t
+                )
+                * self.__perpendicular_direction_shape(
+                    y_perp - Ly * np.cos(self.__theta), t
+                )
+                * self.__blob_arrival(t)
+            )
+        else:
+            return (
+                self.amplitude
+                * self.__drain(t)
+                * self.__porpagation_direction_shape(x_perp, t)
+                * self.__perpendicular_direction_shape(y_perp, t)
+                * self.__blob_arrival(t)
+            )
 
     def __drain(self, t: NDArray) -> NDArray:
         return np.exp(-(t - self.t_init) / self.t_drain)
@@ -62,17 +88,9 @@ class Blob:
     def __blob_arrival(self, t: NDArray) -> NDArray:
         return np.heaviside(t - self.t_init, 1)
 
-    def __porpagation_direction_shape(
-        self, x: NDArray, y: NDArray, t: NDArray, periodic_y: bool, Ly: float
-    ) -> NDArray:
+    def __porpagation_direction_shape(self, x: NDArray, t: NDArray) -> NDArray:
         x_diffs = x - self.__prop_dir_blob_position(t)
-        # if periodic_y == True:
-        #     y_diffs = np.abs(y - self.__perp_dir_blob_position(t))
-        #     steps = (
-        #         (y_diffs + 0.5 * Ly * np.cos(self.__theta))
-        #         / (Ly * np.cos(self.__theta))
-        #     ).astype(int)
-        #     x_diffs = x_diffs + steps * (Ly - self.pos_y) / np.abs(np.sin(self.__theta))
+
         if self.blob_shape == "gauss":
             return 1 / np.sqrt(np.pi) * np.exp(-(x_diffs ** 2 / self.width_x ** 2))
         elif self.blob_shape == "exp":
@@ -82,19 +100,9 @@ class Blob:
                 self.__class__.__name__ + ".blob shape not implemented"
             )
 
-    def __perpendicular_direction_shape(
-        self, y: NDArray, t: NDArray, periodic_y: bool, Ly: float,
-    ) -> NDArray:
+    def __perpendicular_direction_shape(self, y: NDArray, t: NDArray) -> NDArray:
         y_diffs = y - self.__perp_dir_blob_position(t)
-        if periodic_y:
-            # shift of Ly/2 needed for modulo operator
-            return (
-                1
-                / np.sqrt(np.pi)
-                * np.exp(-(((y_diffs + Ly / 2) % Ly - Ly / 2) ** 2) / self.width_y ** 2)
-            )
-        else:
-            return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_y ** 2)
+        return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_y ** 2)
 
     def __prop_dir_blob_position(self, t: NDArray) -> NDArray:
         return self.pos_x + (self.v_x ** 2 + self.v_y ** 2) ** 0.5 * (t - self.t_init)
