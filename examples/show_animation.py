@@ -41,19 +41,19 @@ class CustomBlobFactory(BlobFactory):
         return __blobs
 
 
-bf = CustomBlobFactory()
+# bf = CustomBlobFactory()
 
 bm = Model(
-    Nx=500,
-    Ny=500,
+    Nx=100,
+    Ny=100,
     Lx=10,
     Ly=10,
     dt=0.1,
     T=10,
     periodic_y=True,
     blob_shape="exp",
-    num_blobs=1,
-    blob_factory=bf,
+    num_blobs=100,
+    # blob_factory=bf,
 )
 
 # create data

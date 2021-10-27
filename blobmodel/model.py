@@ -100,14 +100,18 @@ class Model:
         for b in tqdm(self.__blobs, desc="Summing up Blobs"):
             if speed_up:
                 start = int(b.t_init / self.__geometry.dt)
-                stop = (
-                    int(
-                        truncation_Lx
-                        * self.__geometry.Lx
-                        / (b.v_x * self.__geometry.dt)
+                try:
+                    stop = (
+                        int(
+                            truncation_Lx
+                            * self.__geometry.Lx
+                            / (b.v_x * self.__geometry.dt)
+                        )
+                        + start
                     )
-                    + start
-                )
+                except:
+                    print("Warning occurs due to v_x == 0")
+                    stop = self.__geometry.t.size
                 output[:, :, start:stop] += b.discretize_blob(
                     x=self.__geometry.x_matrix[:, :, start:stop],
                     y=self.__geometry.y_matrix[:, :, start:stop],
