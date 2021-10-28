@@ -175,8 +175,8 @@ class Blob:
         return self.pos_y
 
     def __rotate(
-        self, origin: Tuple, x: NDArray, y: NDArray, angle: float
-    ) -> Tuple[Any, Any]:
+        self, origin: Tuple[float, float], x: NDArray, y: NDArray, angle: float
+    ) -> Tuple[float, float]:
         ox, oy = origin
         px, py = x, y
 
