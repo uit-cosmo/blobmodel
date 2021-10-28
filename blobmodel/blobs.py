@@ -36,9 +36,7 @@ class Blob:
                 -------
                 discretized blob on 3d array with dimensions x,y and t : np.array
         """
-        if (
-            self.width_perp > 0.1 * Ly or self.width_prop > 0.1 * Ly
-        ) and periodic_y == True:
+        if (self.width_perp > 0.1 * Ly or self.width_prop > 0.1 * Ly) and periodic_y:
             warnings.warn("blob width small compared to Ly")
         if self.v_x != 0:
             self.__theta = np.arctan(self.v_y / self.v_x)

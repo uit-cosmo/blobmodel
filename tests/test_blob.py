@@ -12,7 +12,7 @@ blob = Blob(
     pos_x=0,
     pos_y=0,
     t_init=0,
-    t_drain=10 ** 100,
+    t_drain=10 ** 10,
 )
 
 
@@ -32,9 +32,11 @@ def test_initial_blob():
 def test_periodicity():
     x = np.arange(0, 10, 0.1)
     y = np.arange(0, 10, 1)
-
-    mesh_x, mesh_y = np.meshgrid(x, y)
-    blob_values = blob.discretize_blob(x=mesh_x, y=mesh_y, t=2, periodic_y=True, Ly=10)
+    t = np.array(2)
+    mesh_x, mesh_y, mesh_t = np.meshgrid(x, y, t)
+    blob_values = blob.discretize_blob(
+        x=mesh_x, y=mesh_y, t=mesh_t, periodic_y=True, Ly=10
+    )
 
     expected_values = 1 / np.pi * np.exp(-((mesh_x - 2) ** 2)) * np.exp(
         -(mesh_y ** 2)
