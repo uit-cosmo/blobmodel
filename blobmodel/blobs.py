@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import numpy as np
 from nptyping import NDArray
 from typing import Any, Tuple
+import warnings
 
 
 @dataclass
@@ -13,8 +14,8 @@ class Blob:
     id: int
     blob_shape: str
     amplitude: float
-    width_x: float
-    width_y: float
+    width_prop: float
+    width_perp: float
     v_x: float
     v_y: float
     pos_x: float
@@ -35,6 +36,10 @@ class Blob:
                 -------
                 discretized blob on 3d array with dimensions x,y and t : np.array
         """
+        if (
+            self.width_perp > 0.1 * Ly or self.width_prop > 0.1 * Ly
+        ) and periodic_y == True:
+            warnings.warn("blob width small compared to Ly")
         if self.v_x != 0:
             self.__theta = np.arctan(self.v_y / self.v_x)
         else:
@@ -46,7 +51,7 @@ class Blob:
         if periodic_y:
             __x_border = (Ly - self.pos_y) / np.sin(self.__theta)
             if type(t) == int or type(t) == float:
-                # t has domensionality 0
+                # t has dimensionality = 0, used for testing
                 __number_of_y_propagations = (
                     self.__prop_dir_blob_position(t)
                     + Ly / np.sin(self.__theta)
@@ -138,7 +143,7 @@ class Blob:
             x_diffs = x - self.__prop_dir_blob_position(t)
 
         if self.blob_shape == "gauss":
-            return 1 / np.sqrt(np.pi) * np.exp(-(x_diffs ** 2 / self.width_x ** 2))
+            return 1 / np.sqrt(np.pi) * np.exp(-(x_diffs ** 2 / self.width_prop ** 2))
         elif self.blob_shape == "exp":
             return np.exp(x_diffs) * np.heaviside(-1.0 * (x_diffs), 1)
         else:
@@ -161,7 +166,7 @@ class Blob:
             )
         else:
             y_diffs = y - self.__perp_dir_blob_position()
-        return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_y ** 2)
+        return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_perp ** 2)
 
     def __prop_dir_blob_position(self, t: NDArray) -> NDArray:
         return self.pos_x + (self.v_x ** 2 + self.v_y ** 2) ** 0.5 * (t - self.t_init)

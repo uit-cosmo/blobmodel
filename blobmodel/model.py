@@ -38,6 +38,9 @@ class Model:
             allow periodicity in y-direction 
         periodic_y: bool, optional
             allow periodicity in y-direction 
+            
+            Important: only good approximation for Ly >> blob width
+        
         blob_shape: str, optional
             see Blob dataclass for available shapes
         t_drain: float, optional
