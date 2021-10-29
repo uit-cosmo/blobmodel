@@ -61,61 +61,64 @@ class Blob:
                     + Ly / np.sin(self.__theta)
                     - __x_border
                 ) // (Ly / np.sin(self.__theta))
-
-            return (
-                self.amplitude
-                * self.__drain(t)
-                * self.__propagation_direction_shape(
-                    x_perp, t, Ly, periodic_y, __number_of_y_propagations
+            __blob_values = (
+                self.__single_blob(
+                    x_perp, y_perp, t, Ly, periodic_y, __number_of_y_propagations
                 )
-                * self.__perpendicular_direction_shape(
-                    y_perp, Ly, periodic_y, __number_of_y_propagations
-                )
-                + self.amplitude
-                * self.__drain(t)
-                * self.__propagation_direction_shape(
-                    x_perp + Ly * np.sin(self.__theta),
+                + self.__single_blob(
+                    x_perp,
+                    y_perp,
                     t,
                     Ly,
                     periodic_y,
                     __number_of_y_propagations,
+                    x_offset=Ly * np.sin(self.__theta),
+                    y_offset=Ly * np.cos(self.__theta),
                 )
-                * self.__perpendicular_direction_shape(
-                    y_perp + Ly * np.cos(self.__theta),
-                    Ly,
-                    periodic_y,
-                    __number_of_y_propagations,
-                )
-                * self.__blob_arrival(t)
-                + self.amplitude
-                * self.__drain(t)
-                * self.__propagation_direction_shape(
-                    x_perp - Ly * np.sin(self.__theta),
+                + self.__single_blob(
+                    x_perp,
+                    y_perp,
                     t,
                     Ly,
                     periodic_y,
                     __number_of_y_propagations,
+                    x_offset=-Ly * np.sin(self.__theta),
+                    y_offset=-Ly * np.cos(self.__theta),
                 )
-                * self.__perpendicular_direction_shape(
-                    y_perp - Ly * np.cos(self.__theta),
-                    Ly,
-                    periodic_y,
-                    __number_of_y_propagations,
-                )
-                * self.__blob_arrival(t)
             )
         else:
-            return (
-                self.amplitude
-                * self.__drain(t)
-                * self.__propagation_direction_shape(
-                    x_perp, t, Ly, periodic_y, number_of_y_propagations=0
-                )
-                * self.__perpendicular_direction_shape(
-                    y_perp, Ly, periodic_y, number_of_y_propagations=0
-                )
-                * self.__blob_arrival(t)
+            __blob_values = self.__single_blob(x_perp, y_perp, t, Ly, periodic_y)
+        return __blob_values
+
+    def __single_blob(
+        self,
+        x_perp: NDArray,
+        y_perp: NDArray,
+        t: NDArray,
+        Ly: float,
+        periodic_y: bool,
+        number_of_y_propagations: NDArray = 0,
+        x_offset: NDArray = 0,
+        y_offset: NDArray = 0,
+    ) -> NDArray:
+        return (
+            self.amplitude
+            * self.__drain(t)
+            * self.__propagation_direction_shape(
+                x_perp + x_offset,
+                t,
+                Ly,
+                periodic_y,
+                number_of_y_propagations=number_of_y_propagations,
             )
+            * self.__perpendicular_direction_shape(
+                y_perp + y_offset,
+                Ly,
+                periodic_y,
+                number_of_y_propagations=number_of_y_propagations,
+            )
+            * self.__blob_arrival(t)
+        )
 
     def __drain(self, t: NDArray) -> NDArray:
         return np.exp(-(t - self.t_init) / self.t_drain)
