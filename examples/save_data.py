@@ -1,7 +1,6 @@
 from blobmodel import Model
 
-bm = Model(
-    Nx=100,
+bm = Model(Nx=100,
     Ny=100,
     Lx=10,
     Ly=10,
