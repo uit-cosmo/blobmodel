@@ -26,6 +26,7 @@ setup(
         "tqdm>=4.62.2",
         "pytest>=3.3.0",
         "nptyping>=1.4.4",
+        "black>=19",
     ],
     classifiers=[
         "Intended Audience :: Education",
