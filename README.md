@@ -1,4 +1,4 @@
-![Tests](https://github.com/uit-cosmo/2d_propagating_blobs/actions/workflows/tests.yml/badge.svg)
+![Tests](https://github.com/uit-cosmo/2d_propagating_blobs/actions/workflows/workflow.yml/badge.svg)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 
 # 2d_propagating_blobs
