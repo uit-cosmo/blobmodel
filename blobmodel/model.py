@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 class Model:
     """
-    2D Model of propagating blobs 
+    2D Model of propagating blobs
     """
 
     def __init__(
@@ -32,24 +32,30 @@ class Model:
         Ny: int, grid points in y
         Lx: float, length of grid in x
         Ly: float, length of grid in y
-        dt: float, time step 
-        T: float, time length 
+        dt: float, time step
+        T: float, time length
         periodic_y: bool, optional
-            allow periodicity in y-direction 
+            allow periodicity in y-direction
         periodic_y: bool, optional
-            allow periodicity in y-direction 
-            
+            allow periodicity in y-direction
+
             Important: only good approximation for Ly >> blob width
-        
+
         blob_shape: str, optional
             see Blob dataclass for available shapes
         t_drain: float, optional
             drain time for blobs
         blob_factory: BlobFactory, optional
-            sets distributions of blob parameters 
+            sets distributions of blob parameters
         """
         self.__geometry: Geometry = Geometry(
-            Nx=Nx, Ny=Ny, Lx=Lx, Ly=Ly, dt=dt, T=T, periodic_y=periodic_y,
+            Nx=Nx,
+            Ny=Ny,
+            Lx=Lx,
+            Ly=Ly,
+            dt=dt,
+            T=T,
+            periodic_y=periodic_y,
         )
         self.blob_shape: str = blob_shape
         self.num_blobs: int = num_blobs
@@ -59,7 +65,7 @@ class Model:
 
     def __str__(self) -> str:
         """
-        string representation of Model 
+        string representation of Model
         """
         return f"2d Blob Model with blob shape:{self.blob_shape}, num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
 
@@ -132,15 +138,20 @@ class Model:
                 )
         if self.__geometry.Ly == 0:
             ds = xr.Dataset(
-                data_vars=dict(n=(["y", "x", "t"], output),),
+                data_vars=dict(
+                    n=(["y", "x", "t"], output),
+                ),
                 coords=dict(
-                    x=(["x"], self.__geometry.x), t=(["t"], self.__geometry.t),
+                    x=(["x"], self.__geometry.x),
+                    t=(["t"], self.__geometry.t),
                 ),
                 attrs=dict(description="2D propagating blobs."),
             )
         else:
             ds = xr.Dataset(
-                data_vars=dict(n=(["y", "x", "t"], output),),
+                data_vars=dict(
+                    n=(["y", "x", "t"], output),
+                ),
                 coords=dict(
                     x=(["x"], self.__geometry.x),
                     y=(["y"], self.__geometry.y),

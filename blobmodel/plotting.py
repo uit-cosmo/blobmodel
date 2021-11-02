@@ -13,21 +13,21 @@ def show_model(
     fps: int = 10,
 ) -> None:
     """
-        Show animation of Model output
+    Show animation of Model output
 
-        Parameters
-        ----------
-        ds: xarray Dataset,
-            Model data
-        interval: int, optional
-            time interval between frames in ms
-        save: bool, optional
-            if True save animation as gif
-        gif_name: str, optional
-            set name for gif
-        fps: int, optional
-            set fps for gif
-        """
+    Parameters
+    ----------
+    ds: xarray Dataset,
+        Model data
+    interval: int, optional
+        time interval between frames in ms
+    save: bool, optional
+        if True save animation as gif
+    gif_name: str, optional
+        set name for gif
+    fps: int, optional
+        set fps for gif
+    """
     fig = plt.figure()
     ax = fig.add_subplot(111)
     div = make_axes_locatable(ax)
