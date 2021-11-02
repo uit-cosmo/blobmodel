@@ -51,4 +51,4 @@ jobs:
         pip install mypy
         mypy  --ignore-missing-imports .
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v
+      uses: codecov/codecov-action@v2
