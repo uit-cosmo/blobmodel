@@ -47,11 +47,11 @@ jobs:
         pip install pytest
         pytest -v --cov
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v2
       with:
         fail_ci_if_error: true
-        # token: c401b968-81db-4a5a-94aa-0af234bb7873
-        # files: coverage.xml
+        token: c401b968-81db-4a5a-94aa-0af234bb7873
+        files: ../../coverage.xml
 
     - name: Type checking with mypy
       run: |
