@@ -7,7 +7,7 @@ from typing import Any
 
 class BlobFactory(ABC):
     """
-    Abstract class used by 2d propagating blob model to specify blob parameters. 
+    Abstract class used by 2d propagating blob model to specify blob parameters.
     """
 
     @abstractmethod
@@ -22,8 +22,8 @@ class BlobFactory(ABC):
 
 class DefaultBlobFactory(BlobFactory):
     """
-    Default implementation of BlobFactory. 
-    Generates blob parameters for different possible random distributions. 
+    Default implementation of BlobFactory.
+    Generates blob parameters for different possible random distributions.
     All random variables are independent from each other
     """
 
@@ -58,7 +58,10 @@ class DefaultBlobFactory(BlobFactory):
         self.vy_parameter = vy_parameter
 
     def __draw_random_variables(
-        self, dist_type: str, free_parameter: float, num_blobs: int,
+        self,
+        dist_type: str,
+        free_parameter: float,
+        num_blobs: int,
     ) -> NDArray[Any, Float[64]]:
 
         if dist_type == "exp":

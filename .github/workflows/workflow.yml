@@ -1,0 +1,55 @@
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  black:
+
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v1
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+    - name: Check formatting with black
+      run: |
+        pip install black
+        black --check .
+
+  pytest:
+
+    runs-on: ubuntu-latest
+    if: always()
+    strategy:
+      matrix:
+        python-version: [3.9]
+        pip-packages:
+          - "setuptools pip pytest pytest-cov coverage codecov mypy"
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade ${{ matrix.pip-packages }}
+        pip install -e .
+    - name: Test with pytest
+      run: |
+        pip install pytest
+        pytest -v --cov 
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+
+    - name: Type checking with mypy
+      run: |
+        pip install mypy
+        mypy  --ignore-missing-imports .

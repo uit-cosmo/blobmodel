@@ -25,10 +25,10 @@ class Geometry:
         Ny: int, grid points in y
         Lx: float, length of grid in x
         Ly: float, length of grid in y
-        dt: float, time step 
-        T: float, time length 
+        dt: float, time step
+        T: float, time length
         periodic_y: bool, optional
-            allow periodicity in y-direction 
+            allow periodicity in y-direction
         """
         self.Nx = Nx
         self.Ny = Ny
@@ -51,7 +51,7 @@ class Geometry:
 
     def __str__(self) -> str:
         """
-        string representation of Geometry 
+        string representation of Geometry
         """
         return (
             f"Geometry parameters:  Nx:{self.Nx},  Ny:{self.Ny}, Lx:{self.Lx}, Ly:{self.Ly}, "
