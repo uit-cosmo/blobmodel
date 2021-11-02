@@ -3,7 +3,7 @@ name: Python package
 on:
   push:
     branches-ignore:
-      - master
+      - main
   pull_request:
 
 jobs:
@@ -24,7 +24,6 @@ jobs:
         pip install black
         black --check .
 
-jobs:
   pytest:
 
     runs-on: ubuntu-latest
