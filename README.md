@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/uit-cosmo/2d_propagating_blobs/badge.svg)](https://codecov.io/gh/uit-cosmo/2d_propagating_blobs)
+
 # 2d_propagating_blobs
 Two dimensional model of advecting and dissipating blobs.
 
