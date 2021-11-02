@@ -1,4 +1,4 @@
-![Tests](https://github.com/uit-cosmo/2d_propagating_blobs/actions/workflows/pythonpackage.yml/badge.svg)
+![Tests](https://github.com/uit-cosmo/2d_propagating_blobs/actions/workflows/tests.yml/badge.svg)
 
 # 2d_propagating_blobs
 Two dimensional model of advecting and dissipating blobs.
