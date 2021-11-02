@@ -50,6 +50,7 @@ jobs:
       uses: codecov/codecov-action@v2
       with:
         token: c401b968-81db-4a5a-94aa-0af234bb7873
+        files: coverage.xml
 
     - name: Type checking with mypy
       run: |
