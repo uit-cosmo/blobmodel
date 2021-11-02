@@ -17,7 +17,7 @@ setup(
     license="GPL",
     version="1.0",
     packages=["blobmodel"],
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     install_requires=[
         "xarray>=0.11",
         "numpy>=1.20.0",
