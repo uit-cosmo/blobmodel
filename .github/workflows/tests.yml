@@ -46,9 +46,9 @@ jobs:
       run: |
         pip install pytest
         pytest -v --cov
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
     - name: Type checking with mypy
       run: |
         pip install mypy
         mypy  --ignore-missing-imports .
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
