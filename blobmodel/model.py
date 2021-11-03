@@ -49,7 +49,13 @@ class Model:
             sets distributions of blob parameters
         """
         self.__geometry: Geometry = Geometry(
-            Nx=Nx, Ny=Ny, Lx=Lx, Ly=Ly, dt=dt, T=T, periodic_y=periodic_y,
+            Nx=Nx,
+            Ny=Ny,
+            Lx=Lx,
+            Ly=Ly,
+            dt=dt,
+            T=T,
+            periodic_y=periodic_y,
         )
         self.blob_shape: str = blob_shape
         self.num_blobs: int = num_blobs
@@ -131,15 +137,20 @@ class Model:
                 )
         if self.__geometry.Ly == 0:
             ds = xr.Dataset(
-                data_vars=dict(n=(["y", "x", "t"], output),),
+                data_vars=dict(
+                    n=(["y", "x", "t"], output),
+                ),
                 coords=dict(
-                    x=(["x"], self.__geometry.x), t=(["t"], self.__geometry.t),
+                    x=(["x"], self.__geometry.x),
+                    t=(["t"], self.__geometry.t),
                 ),
                 attrs=dict(description="2D propagating blobs."),
             )
         else:
             ds = xr.Dataset(
-                data_vars=dict(n=(["y", "x", "t"], output),),
+                data_vars=dict(
+                    n=(["y", "x", "t"], output),
+                ),
                 coords=dict(
                     x=(["x"], self.__geometry.x),
                     y=(["y"], self.__geometry.y),
