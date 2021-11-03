@@ -18,7 +18,7 @@ bm = Model(
 # create data
 ds = bm.make_realization()
 
-
+# warnings are supressed since plt complains about animation blocked
 @patch("matplotlib.pyplot.show")
 def test_plot_fn(mock_show):
     warnings.filterwarnings("ignore")
