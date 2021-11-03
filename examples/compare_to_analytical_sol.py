@@ -21,9 +21,7 @@ tmp = Model(
     blob_factory=bf,
 )
 
-ds = tmp.make_realization(
-    file_name="profile_comparison.nc", speed_up=True, truncation_Lx=1
-)
+ds = tmp.make_realization(file_name="profile_comparison.nc", speed_up=True, error=1e-2)
 
 
 def plot_convergence_to_analytical_solution(ds):

@@ -20,7 +20,7 @@ tmp = Model(
     blob_factory=bf,
 )
 
-tmp.make_realization(file_name="test_analytical.nc", speed_up=True, truncation_Lx=1)
+tmp.make_realization(file_name="test_analytical.nc", speed_up=True, error=1e-2)
 
 
 def test_convergence_to_analytical_solution():
