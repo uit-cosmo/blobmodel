@@ -44,8 +44,8 @@ class CustomBlobFactory(BlobFactory):
 bf = CustomBlobFactory()
 
 bm = Model(
-    Nx=500,
-    Ny=500,
+    Nx=100,
+    Ny=100,
     Lx=10,
     Ly=10,
     dt=0.1,
@@ -54,10 +54,11 @@ bm = Model(
     blob_shape="exp",
     num_blobs=1,
     blob_factory=bf,
+    t_drain=1e10,
 )
 
 # create data
-ds = bm.make_realization(speed_up=True, truncation_Lx=2)
+ds = bm.make_realization(speed_up=True, error=1e-2)
 
 # show animation and save as gif
 show_model(ds=ds, interval=100, save=True, gif_name="example.gif", fps=10)

@@ -1,27 +1,44 @@
-from dataclasses import dataclass
 import numpy as np
 from nptyping import NDArray
-from typing import Any, Tuple
+from typing import Tuple
 import warnings
 
 
-@dataclass
 class Blob:
     """
     A single blob
     """
 
-    id: int
-    blob_shape: str
-    amplitude: float
-    width_prop: float
-    width_perp: float
-    v_x: float
-    v_y: float
-    pos_x: float
-    pos_y: float
-    t_init: float
-    t_drain: float
+    def __init__(
+        self,
+        id: int,
+        blob_shape: str,
+        amplitude: float,
+        width_prop: float,
+        width_perp: float,
+        v_x: float,
+        v_y: float,
+        pos_x: float,
+        pos_y: float,
+        t_init: float,
+        t_drain: float,
+    ) -> None:
+        self.int = int
+        self.id = id
+        self.blob_shape = blob_shape
+        self.amplitude = amplitude
+        self.width_prop = width_prop
+        self.width_perp = width_perp
+        self.v_x = v_x
+        self.v_y = v_y
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+        self.t_init = t_init
+        self.t_drain = t_drain
+        if self.v_x != 0:
+            self.theta = np.arctan(self.v_y / self.v_x)
+        else:
+            self.theta = np.pi / 2 * np.sign(self.v_y)
 
     def discretize_blob(
         self,
@@ -42,30 +59,26 @@ class Blob:
                 discretized blob on 3d array with dimensions x,y and t : np.array
         """
         if (self.width_perp > 0.1 * Ly or self.width_prop > 0.1 * Ly) and periodic_y:
-            warnings.warn("blob width small compared to Ly")
-        if self.v_x != 0:
-            self.__theta = np.arctan(self.v_y / self.v_x)
-        else:
-            self.__theta = np.pi / 2 * np.sign(self.v_y)
+            warnings.warn("blob width big compared to Ly")
 
         x_perp, y_perp = self.__rotate(
-            origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self.__theta
+            origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self.theta
         )
         if periodic_y:
-            __x_border = (Ly - self.pos_y) / np.sin(self.__theta)
+            __x_border = (Ly - self.pos_y) / np.sin(self.theta)
             if type(t) == int or type(t) == float:
                 # t has dimensionality = 0, used for testing
                 __number_of_y_propagations = (
                     self.__prop_dir_blob_position(t)
-                    + Ly / np.sin(self.__theta)
+                    + Ly / np.sin(self.theta)
                     - __x_border
-                ) // (Ly / np.sin(self.__theta))
+                ) // (Ly / np.sin(self.theta))
             else:
                 __number_of_y_propagations = (
                     self.__prop_dir_blob_position(t)[0, 0]
-                    + Ly / np.sin(self.__theta)
+                    + Ly / np.sin(self.theta)
                     - __x_border
-                ) // (Ly / np.sin(self.__theta))
+                ) // (Ly / np.sin(self.theta))
             __blob_values = (
                 self.__single_blob(
                     x_perp, y_perp, t, Ly, periodic_y, __number_of_y_propagations
@@ -77,8 +90,8 @@ class Blob:
                     Ly,
                     periodic_y,
                     __number_of_y_propagations,
-                    x_offset=Ly * np.sin(self.__theta),
-                    y_offset=Ly * np.cos(self.__theta),
+                    x_offset=Ly * np.sin(self.theta),
+                    y_offset=Ly * np.cos(self.theta),
                 )
                 + self.__single_blob(
                     x_perp,
@@ -87,8 +100,8 @@ class Blob:
                     Ly,
                     periodic_y,
                     __number_of_y_propagations,
-                    x_offset=-Ly * np.sin(self.__theta),
-                    y_offset=-Ly * np.cos(self.__theta),
+                    x_offset=-Ly * np.sin(self.theta),
+                    y_offset=-Ly * np.cos(self.theta),
                 )
             )
         else:
@@ -143,7 +156,7 @@ class Blob:
             x_diffs = (
                 x
                 - self.__prop_dir_blob_position(t)
-                + number_of_y_propagations * Ly * np.sin(self.__theta)
+                + number_of_y_propagations * Ly * np.sin(self.theta)
             )
         else:
             x_diffs = x - self.__prop_dir_blob_position(t)
@@ -168,7 +181,7 @@ class Blob:
             y_diffs = (
                 y
                 - self.__perp_dir_blob_position()
-                + number_of_y_propagations * Ly * np.cos(self.__theta)
+                + number_of_y_propagations * Ly * np.cos(self.theta)
             )
         else:
             y_diffs = y - self.__perp_dir_blob_position()

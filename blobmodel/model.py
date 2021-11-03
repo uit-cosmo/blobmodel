@@ -70,7 +70,7 @@ class Model:
         return f"2d Blob Model with blob shape:{self.blob_shape}, num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
 
     def make_realization(
-        self, file_name: str = None, speed_up: bool = False, truncation_Lx: float = 3
+        self, file_name: str = None, speed_up: bool = False, error: float = 1e-10
     ) -> xr.Dataset:
         """
         Integrate Model over time and write out data as xarray dataset
@@ -107,16 +107,15 @@ class Model:
         )
 
         for b in tqdm(self.__blobs, desc="Summing up Blobs"):
+            # speedup implemeted for exponential pulses
+            # can also be used for gaussian pulses since they converge faster than exponential pulses
             if speed_up:
                 start = int(b.t_init / self.__geometry.dt)
                 try:
-                    stop = (
-                        int(
-                            truncation_Lx
-                            * self.__geometry.Lx
-                            / (b.v_x * self.__geometry.dt)
-                        )
-                        + start
+                    # ignores t_drain when calculating stop time
+                    stop = start + int(
+                        (-np.log(error * np.sqrt(np.pi)) + self.__geometry.Lx - b.pos_x)
+                        / (b.v_x * self.__geometry.dt)
                     )
                 except:
                     print("Warning occurs due to v_x == 0")
