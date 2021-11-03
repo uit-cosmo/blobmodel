@@ -1,4 +1,4 @@
-from blobmodel import Model, DefaultBlobFactory, Geometry
+from blobmodel import Model, DefaultBlobFactory
 import xarray as xr
 import numpy as np
 
