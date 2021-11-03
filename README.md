@@ -106,13 +106,12 @@ The following distributions are implemented:
 - `file_name`: str, optional, 
             file name for .nc file containing data as xarray dataset
 - `speed_up`: bool, optional,
-            speeding up code by discretizing each single blob at smaller time window given by
-            `t` in (`Blob.t_init`, `truncation_Lx*Lx/Blob.v_x + Blob.t_init`)
+            speeding up code by discretizing each single blob at smaller time window 
+            when blob values fall under given error value the blob gets discarded 
 
             !!!  this is only a good approximation for blob_shape='exp' !!!
-- `truncation_Lx`: float, optional,
-            number of times blob propagate through length Lx before blob is neglected,
-            only used if speed_up = True
+- `error`: float, optional,
+            numerical error at x = Lx when blob gets truncated 
             
 ### `show_model()`
 - `ds`: xarray Dataset,
