@@ -114,18 +114,11 @@ class Model:
                 if b.v_x == 0:
                     stop = self.__geometry.t.size
                 else:
-                    try:
-                        # ignores t_drain when calculating stop time
-                        stop = start + int(
-                            (
-                                -np.log(error * np.sqrt(np.pi))
-                                + self.__geometry.Lx
-                                - b.pos_x
-                            )
-                            / (b.v_x * self.__geometry.dt)
-                        )
-                    except:
-                        stop = self.__geometry.t.size
+                    # ignores t_drain when calculating stop time
+                    stop = start + int(
+                        (-np.log(error * np.sqrt(np.pi)) + self.__geometry.Lx - b.pos_x)
+                        / (b.v_x * self.__geometry.dt)
+                    )
                 output[:, :, start:stop] += b.discretize_blob(
                     x=self.__geometry.x_matrix[:, :, start:stop],
                     y=self.__geometry.y_matrix[:, :, start:stop],
