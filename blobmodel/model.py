@@ -49,13 +49,7 @@ class Model:
             sets distributions of blob parameters
         """
         self.__geometry: Geometry = Geometry(
-            Nx=Nx,
-            Ny=Ny,
-            Lx=Lx,
-            Ly=Ly,
-            dt=dt,
-            T=T,
-            periodic_y=periodic_y,
+            Nx=Nx, Ny=Ny, Lx=Lx, Ly=Ly, dt=dt, T=T, periodic_y=periodic_y,
         )
         self.blob_shape: str = blob_shape
         self.num_blobs: int = num_blobs
@@ -111,15 +105,21 @@ class Model:
             # can also be used for gaussian pulses since they converge faster than exponential pulses
             if speed_up:
                 start = int(b.t_init / self.__geometry.dt)
-                try:
-                    # ignores t_drain when calculating stop time
-                    stop = start + int(
-                        (-np.log(error * np.sqrt(np.pi)) + self.__geometry.Lx - b.pos_x)
-                        / (b.v_x * self.__geometry.dt)
-                    )
-                except:
-                    print("Warning occurs due to v_x == 0")
+                if b.v_x == 0:
                     stop = self.__geometry.t.size
+                else:
+                    try:
+                        # ignores t_drain when calculating stop time
+                        stop = start + int(
+                            (
+                                -np.log(error * np.sqrt(np.pi))
+                                + self.__geometry.Lx
+                                - b.pos_x
+                            )
+                            / (b.v_x * self.__geometry.dt)
+                        )
+                    except:
+                        stop = self.__geometry.t.size
                 output[:, :, start:stop] += b.discretize_blob(
                     x=self.__geometry.x_matrix[:, :, start:stop],
                     y=self.__geometry.y_matrix[:, :, start:stop],
@@ -137,20 +137,15 @@ class Model:
                 )
         if self.__geometry.Ly == 0:
             ds = xr.Dataset(
-                data_vars=dict(
-                    n=(["y", "x", "t"], output),
-                ),
+                data_vars=dict(n=(["y", "x", "t"], output),),
                 coords=dict(
-                    x=(["x"], self.__geometry.x),
-                    t=(["t"], self.__geometry.t),
+                    x=(["x"], self.__geometry.x), t=(["t"], self.__geometry.t),
                 ),
                 attrs=dict(description="2D propagating blobs."),
             )
         else:
             ds = xr.Dataset(
-                data_vars=dict(
-                    n=(["y", "x", "t"], output),
-                ),
+                data_vars=dict(n=(["y", "x", "t"], output),),
                 coords=dict(
                     x=(["x"], self.__geometry.x),
                     y=(["y"], self.__geometry.y),
