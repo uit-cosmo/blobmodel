@@ -1,7 +1,5 @@
 from blobmodel import Model, BlobFactory, Blob
 import numpy as np
-import warnings
-import matplotlib.pyplot as plt
 
 
 class CustomBlobFactoryVy0(BlobFactory):
@@ -82,7 +80,7 @@ class CustomBlobFactoryVx0(BlobFactory):
         return __blobs
 
 
-bf = CustomBlobFactoryVy0()
+bf_vy_0 = CustomBlobFactoryVy0()
 
 bm_vy_0 = Model(
     Nx=10,
@@ -94,11 +92,11 @@ bm_vy_0 = Model(
     periodic_y=True,
     blob_shape="exp",
     num_blobs=1,
-    blob_factory=bf,
+    blob_factory=bf_vy_0,
     t_drain=1e10,
 )
 
-bf = CustomBlobFactoryVx0()
+bf_vx_0 = CustomBlobFactoryVx0()
 
 bm_vx_0 = Model(
     Nx=10,
@@ -110,7 +108,7 @@ bm_vx_0 = Model(
     periodic_y=True,
     blob_shape="exp",
     num_blobs=1,
-    blob_factory=bf,
+    blob_factory=bf_vx_0,
     t_drain=1e10,
 )
 
