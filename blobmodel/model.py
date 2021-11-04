@@ -111,15 +111,14 @@ class Model:
             # can also be used for gaussian pulses since they converge faster than exponential pulses
             if speed_up:
                 start = int(b.t_init / self.__geometry.dt)
-                try:
+                if b.v_x == 0:
+                    stop = self.__geometry.t.size
+                else:
                     # ignores t_drain when calculating stop time
                     stop = start + int(
                         (-np.log(error * np.sqrt(np.pi)) + self.__geometry.Lx - b.pos_x)
                         / (b.v_x * self.__geometry.dt)
                     )
-                except:
-                    print("Warning occurs due to v_x == 0")
-                    stop = self.__geometry.t.size
                 output[:, :, start:stop] += b.discretize_blob(
                     x=self.__geometry.x_matrix[:, :, start:stop],
                     y=self.__geometry.y_matrix[:, :, start:stop],

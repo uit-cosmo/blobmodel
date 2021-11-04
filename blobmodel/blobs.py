@@ -65,20 +65,21 @@ class Blob:
             origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self.theta
         )
         if periodic_y:
-            __x_border = (Ly - self.pos_y) / np.sin(self.theta)
+            if np.sin(self.theta) == 0:
+                __x_border = Ly - self.pos_y
+                __adjusted_Ly = Ly
+            else:
+                __x_border = (Ly - self.pos_y) / np.sin(self.theta)
+                __adjusted_Ly = Ly / np.sin(self.theta)
             if type(t) == int or type(t) == float:
                 # t has dimensionality = 0, used for testing
                 __number_of_y_propagations = (
-                    self.__prop_dir_blob_position(t)
-                    + Ly / np.sin(self.theta)
-                    - __x_border
-                ) // (Ly / np.sin(self.theta))
+                    self.__prop_dir_blob_position(t) + __adjusted_Ly - __x_border
+                ) // __adjusted_Ly
             else:
                 __number_of_y_propagations = (
-                    self.__prop_dir_blob_position(t)[0, 0]
-                    + Ly / np.sin(self.theta)
-                    - __x_border
-                ) // (Ly / np.sin(self.theta))
+                    self.__prop_dir_blob_position(t)[0, 0] + __adjusted_Ly - __x_border
+                ) // __adjusted_Ly
             __blob_values = (
                 self.__single_blob(
                     x_perp, y_perp, t, Ly, periodic_y, __number_of_y_propagations
