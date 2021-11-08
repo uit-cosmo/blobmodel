@@ -103,21 +103,19 @@ class DefaultBlobFactory(BlobFactory):
         # sort blobs by __t_init
         __t_init = np.sort(__t_init)
 
-        __blobs = []
-        for i in range(num_blobs):
-            __blobs.append(
-                Blob(
-                    id=i,
-                    blob_shape=blob_shape,
-                    amplitude=__amp[i],
-                    width_prop=__width[i],
-                    width_perp=__width[i],
-                    v_x=__vx[i],
-                    v_y=__vy[i],
-                    pos_x=__posx[i],
-                    pos_y=__posy[i],
-                    t_init=__t_init[i],
-                    t_drain=t_drain,
-                )
+        return [
+            Blob(
+                id=i,
+                blob_shape=blob_shape,
+                amplitude=__amp[i],
+                width_prop=__width[i],
+                width_perp=__width[i],
+                v_x=__vx[i],
+                v_y=__vy[i],
+                pos_x=__posx[i],
+                pos_y=__posy[i],
+                t_init=__t_init[i],
+                t_drain=t_drain,
             )
-        return __blobs
+            for i in range(num_blobs)
+        ]

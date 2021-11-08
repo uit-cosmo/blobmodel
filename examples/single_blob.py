@@ -20,25 +20,22 @@ class CustomBlobFactory(BlobFactory):
         __posy = np.ones(num_blobs) * Ly / 2
         __t_init = np.ones(num_blobs) * 0
 
-        # this block must remain the same
-        __blobs = []
-        for i in range(num_blobs):
-            __blobs.append(
-                Blob(
-                    id=i,
-                    blob_shape=blob_shape,
-                    amplitude=__amp[i],
-                    width_prop=__width[i],
-                    width_perp=__width[i],
-                    v_x=__vx[i],
-                    v_y=__vy[i],
-                    pos_x=__posx[i],
-                    pos_y=__posy[i],
-                    t_init=__t_init[i],
-                    t_drain=t_drain,
-                )
+        return [
+            Blob(
+                id=i,
+                blob_shape=blob_shape,
+                amplitude=__amp[i],
+                width_prop=__width[i],
+                width_perp=__width[i],
+                v_x=__vx[i],
+                v_y=__vy[i],
+                pos_x=__posx[i],
+                pos_y=__posy[i],
+                t_init=__t_init[i],
+                t_drain=t_drain,
             )
-        return __blobs
+            for i in range(num_blobs)
+        ]
 
 
 bf = CustomBlobFactory()
