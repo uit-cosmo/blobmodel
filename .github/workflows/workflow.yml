@@ -22,7 +22,7 @@ jobs:
     - name: Docformatter
       run: |
         pip install docformatter
-        docformatter -r .
+        docformatter --check -r blobmodel/
 
   pytest:
 
