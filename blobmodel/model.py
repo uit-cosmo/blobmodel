@@ -7,9 +7,7 @@ from tqdm import tqdm
 
 
 class Model:
-    """
-    2D Model of propagating blobs
-    """
+    """2D Model of propagating blobs."""
 
     def __init__(
         self,
@@ -64,16 +62,13 @@ class Model:
         self.__blob_factory = blob_factory
 
     def __str__(self) -> str:
-        """
-        string representation of Model
-        """
+        """string representation of Model."""
         return f"2d Blob Model with blob shape:{self.blob_shape}, num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
 
     def make_realization(
         self, file_name: str = None, speed_up: bool = False, error: float = 1e-10
     ) -> xr.Dataset:
-        """
-        Integrate Model over time and write out data as xarray dataset
+        """Integrate Model over time and write out data as xarray dataset.
 
         Parameters
         ----------
@@ -164,7 +159,9 @@ class Model:
         return ds
 
     def get_blobs(self) -> list[Blob]:
-        """
-        Returns blobs list. Note that if Model.sample_blobs has not been called, the list will be empty
+        """Returns blobs list.
+
+        Note that if Model.sample_blobs has not been called, the list
+        will be empty
         """
         return self.__blobs

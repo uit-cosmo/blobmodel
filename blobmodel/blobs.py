@@ -5,9 +5,7 @@ import warnings
 
 
 class Blob:
-    """
-    A single blob
-    """
+    """A single blob."""
 
     def __init__(
         self,
