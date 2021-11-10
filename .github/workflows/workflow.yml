@@ -53,3 +53,8 @@ jobs:
       run: |
         pip install mypy
         mypy  --ignore-missing-imports .
+
+    - name: Docformatter
+      run: |
+        pip install --upgrade docformatter
+        docformatter -r .
