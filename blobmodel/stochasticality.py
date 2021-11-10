@@ -6,25 +6,22 @@ from typing import Any
 
 
 class BlobFactory(ABC):
-    """
-    Abstract class used by 2d propagating blob model to specify blob parameters.
-    """
+    """Abstract class used by 2d propagating blob model to specify blob
+    parameters."""
 
     @abstractmethod
     def sample_blobs(
         self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
     ) -> list[Blob]:
-        """
-        creates list of Blobs used in Model
-        """
+        """creates list of Blobs used in Model."""
         raise NotImplementedError
 
 
 class DefaultBlobFactory(BlobFactory):
-    """
-    Default implementation of BlobFactory.
-    Generates blob parameters for different possible random distributions.
-    All random variables are independent from each other
+    """Default implementation of BlobFactory.
+
+    Generates blob parameters for different possible random
+    distributions. All random variables are independent from each other
     """
 
     def __init__(
@@ -38,15 +35,15 @@ class DefaultBlobFactory(BlobFactory):
         vx_parameter: float = 1.0,
         vy_parameter: float = 1.0,
     ) -> None:
-        """
-        The following distributions are implemented:
-            exp: exponential distribution with mean 1
-            gamma: gamma distribution with `free_parameter` as shape parameter and mean 1
-            normal: normal distribution with zero mean and `free_parameter` as scale parameter
-            uniform: uniorm distribution with mean 1 and `free_parameter` as width
-            ray: rayleight distribution with mean 1
-            deg: array on ones
-            zeros: array of zeros
+        """The following distributions are implemented:
+
+        exp: exponential distribution with mean 1
+        gamma: gamma distribution with `free_parameter` as shape parameter and mean 1
+        normal: normal distribution with zero mean and `free_parameter` as scale parameter
+        uniform: uniorm distribution with mean 1 and `free_parameter` as width
+        ray: rayleight distribution with mean 1
+        deg: array on ones
+        zeros: array of zeros
         """
         self.A_dist = A_dist
         self.W_dist = W_dist
