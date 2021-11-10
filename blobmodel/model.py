@@ -68,9 +68,7 @@ class Model:
     def make_realization(
         self, file_name: str = None, speed_up: bool = False, error: float = 1e-10
     ) -> xr.Dataset:
-        """
-
-        Integrate Model over time and write out data as xarray dataset.
+        """Integrate Model over time and write out data as xarray dataset.
 
         Parameters
         ----------
