@@ -19,6 +19,10 @@ jobs:
       run: |
         pip install black
         black --check .
+    - name: Docformatter
+      run: |
+        pip install docformatter
+        docformatter -r .
 
   pytest:
 
@@ -53,8 +57,3 @@ jobs:
       run: |
         pip install mypy
         mypy  --ignore-missing-imports .
-
-    - name: Docformatter
-      run: |
-        pip install --upgrade docformatter
-        docformatter -r .
