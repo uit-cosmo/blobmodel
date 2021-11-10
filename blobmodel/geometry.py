@@ -4,9 +4,7 @@ import numpy as np
 
 
 class Geometry:
-    """
-    Define grid for Model
-    """
+    """Define grid for Model."""
 
     def __init__(
         self,
@@ -50,9 +48,7 @@ class Geometry:
         )
 
     def __str__(self) -> str:
-        """
-        string representation of Geometry
-        """
+        """string representation of Geometry."""
         return (
             f"Geometry parameters:  Nx:{self.Nx},  Ny:{self.Ny}, Lx:{self.Lx}, Ly:{self.Ly}, "
             + f"dt:{self.dt}, T:{self.T}, y-periodicity:{self.periodic_y}"
