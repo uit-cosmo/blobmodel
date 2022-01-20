@@ -34,11 +34,10 @@ class Model:
         T: float, time length
         periodic_y: bool, optional
             allow periodicity in y-direction
-        periodic_y: bool, optional
-            allow periodicity in y-direction
 
             Important: only good approximation for Ly >> blob width
-
+        num_blobs:
+            number of blobs
         blob_shape: str, optional
             see Blob dataclass for available shapes
         t_drain: float, optional
@@ -80,8 +79,8 @@ class Model:
 
             !!!  this is only a good approximation for blob_shape='exp' !!!
 
-        truncation_Lx: float, optional
-            number of times blob propagate through length Lx before blob is neglected
+        error: float, optional
+            if blob values under error are neglected for speedup
             only used if speed_up = True
 
         Returns
