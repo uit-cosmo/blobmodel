@@ -74,13 +74,12 @@ class Model:
         file_name: str, optional
             file name for .nc file containing data as xarray dataset
         speed_up: bool, optional
-            speeding up code by discretizing each single blob at smaller time window given by
-            t in (Blob.t_init, truncation_Lx*Lx/Blob.v_x + Blob.t_init)
-
+            speeding up code by discretizing each single blob at smaller time window
+            when blob values fall under given error value the blob gets discarded
             !!!  this is only a good approximation for blob_shape='exp' !!!
 
         error: float, optional
-            if blob values under error are neglected for speedup
+            numerical error at x = Lx when blob gets truncated
             only used if speed_up = True
 
         Returns
