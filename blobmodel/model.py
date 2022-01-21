@@ -65,7 +65,12 @@ class Model:
         return f"2d Blob Model with blob shape:{self.blob_shape}, num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
 
     def make_realization(
-        self, file_name: str = None, speed_up: bool = False, error: float = 1e-10
+        self,
+        file_name: str = None,
+        speed_up: bool = False,
+        error: float = 1e-10,
+        labels: bool = False,
+        label_border: float = 0.75,
     ) -> xr.Dataset:
         """Integrate Model over time and write out data as xarray dataset.
 
@@ -81,6 +86,12 @@ class Model:
         error: float, optional
             numerical error at x = Lx when blob gets truncated
             only used if speed_up = True
+        labels: bool, optional
+            if True, field with blob labels is returned
+            used for creating training data for supervised machine learning algorithms
+        label_border: float, optional
+            defines region of blob as region where density >= label_border * amplitude of Blob
+            only used if labels = True
 
         Returns
         ----------
@@ -95,42 +106,68 @@ class Model:
             t_drain=self.t_drain,
         )
 
-        output = np.zeros(
+        __density = np.zeros(
             shape=(self.__geometry.Ny, self.__geometry.Nx, self.__geometry.t.size)
         )
+        if labels:
+            __labels_field = np.zeros(
+                shape=(self.__geometry.Ny, self.__geometry.Nx, self.__geometry.t.size)
+            )
 
         for b in tqdm(self.__blobs, desc="Summing up Blobs"):
             # speedup implemeted for exponential pulses
             # can also be used for gaussian pulses since they converge faster than exponential pulses
             if speed_up:
-                start = int(b.t_init / self.__geometry.dt)
+                __start = int(b.t_init / self.__geometry.dt)
                 if b.v_x == 0:
-                    stop = self.__geometry.t.size
+                    __stop = self.__geometry.t.size
                 else:
                     # ignores t_drain when calculating stop time
-                    stop = start + int(
-                        (-np.log(error * np.sqrt(np.pi)) + self.__geometry.Lx - b.pos_x)
-                        / (b.v_x * self.__geometry.dt)
+                    __stop = np.minimum(
+                        self.__geometry.t.size,
+                        __start
+                        + int(
+                            (
+                                -np.log(error * np.sqrt(np.pi))
+                                + self.__geometry.Lx
+                                - b.pos_x
+                            )
+                            / (b.v_x * self.__geometry.dt)
+                        ),
                     )
-                output[:, :, start:stop] += b.discretize_blob(
-                    x=self.__geometry.x_matrix[:, :, start:stop],
-                    y=self.__geometry.y_matrix[:, :, start:stop],
-                    t=self.__geometry.t_matrix[:, :, start:stop],
+                __single_blob = b.discretize_blob(
+                    x=self.__geometry.x_matrix[:, :, __start:__stop],
+                    y=self.__geometry.y_matrix[:, :, __start:__stop],
+                    t=self.__geometry.t_matrix[:, :, __start:__stop],
                     periodic_y=self.__geometry.periodic_y,
                     Ly=self.__geometry.Ly,
                 )
+                __density[:, :, __start:__stop] += __single_blob
+                if labels:
+                    __max_amplitudes = np.max(__single_blob, axis=(0, 1))
+                    __max_amplitudes[__max_amplitudes == 0] = np.inf
+                    __tmp = np.copy(__labels_field[:, :, __start:__stop])
+                    __tmp[__single_blob >= __max_amplitudes * label_border] = 1
+                    __labels_field[:, :, __start:__stop] = __tmp
+
             else:
-                output += b.discretize_blob(
+                __single_blob = b.discretize_blob(
                     x=self.__geometry.x_matrix,
                     y=self.__geometry.y_matrix,
                     t=self.__geometry.t_matrix,
                     periodic_y=self.__geometry.periodic_y,
                     Ly=self.__geometry.Ly,
                 )
+                __density += __single_blob
+                if labels:
+                    __max_amplitudes = np.max(__single_blob, axis=(0, 1))
+                    __max_amplitudes[__max_amplitudes == 0] = np.inf
+                    __labels_field[__single_blob >= __max_amplitudes * label_border] = 1
+
         if self.__geometry.Ly == 0:
             ds = xr.Dataset(
                 data_vars=dict(
-                    n=(["y", "x", "t"], output),
+                    n=(["y", "x", "t"], __density),
                 ),
                 coords=dict(
                     x=(["x"], self.__geometry.x),
@@ -141,7 +178,7 @@ class Model:
         else:
             ds = xr.Dataset(
                 data_vars=dict(
-                    n=(["y", "x", "t"], output),
+                    n=(["y", "x", "t"], __density),
                 ),
                 coords=dict(
                     x=(["x"], self.__geometry.x),
@@ -150,6 +187,8 @@ class Model:
                 ),
                 attrs=dict(description="2D propagating blobs."),
             )
+        if labels:
+            ds = ds.assign(blob_labels=(["y", "x", "t"], __labels_field))
 
         if file_name is not None:
             ds.to_netcdf(file_name)

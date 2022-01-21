@@ -113,7 +113,12 @@ The following distributions are implemented:
             !!!  this is only a good approximation for blob_shape='exp' !!!
 - `error`: float, optional,
             numerical error at x = Lx when blob gets truncated 
-            
+- `labels`: bool, optional,
+            if True, field with blob labels is returned
+            used for creating training data for supervised machine learning algorithms
+- `label_border`: float, optional,
+            defines region of blob as region where density >= label_border * amplitude of Blob
+            only used if labels = True
 ### `show_model()`
 - `ds`: xarray Dataset,
             Model data
