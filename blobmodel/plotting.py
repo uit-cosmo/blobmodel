@@ -7,6 +7,7 @@ import xarray as xr
 
 def show_model(
     ds: xr.Dataset,
+    variable: str = "n",
     interval: int = 100,
     save: bool = False,
     gif_name: str = "2d_blobs.gif",
@@ -18,6 +19,8 @@ def show_model(
     ----------
     ds: xarray Dataset,
         Model data
+    variable: str, optional
+        variable to be animated
     interval: int, optional
         time interval between frames in ms
     save: bool, optional
@@ -35,7 +38,7 @@ def show_model(
     frames = []
 
     for timestep in ds.t.values:
-        frame = ds["n"].sel(t=timestep).values
+        frame = ds[variable].sel(t=timestep).values
         frames.append(frame)
 
     cv0 = frames[0]
