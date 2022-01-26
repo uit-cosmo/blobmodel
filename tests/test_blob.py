@@ -2,7 +2,7 @@ from blobmodel import Blob
 import numpy as np
 
 blob = Blob(
-    id=0,
+    blob_id=0,
     blob_shape="gauss",
     amplitude=1,
     width_prop=1,
@@ -48,7 +48,7 @@ def test_periodicity():
 
 def test_single_point():
     blob_sp = Blob(
-        id=0,
+        blob_id=0,
         blob_shape="gauss",
         amplitude=1,
         width_prop=1,

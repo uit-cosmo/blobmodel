@@ -22,4 +22,4 @@ ds = bm.make_realization()
 @patch("matplotlib.pyplot.show")
 def test_plot_fn(mock_show):
     warnings.filterwarnings("ignore")
-    show_model(ds=ds, interval=100, save=False, fps=10)
+    show_model(dataset=ds, interval=100, save=False, fps=10)

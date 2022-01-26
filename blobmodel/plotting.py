@@ -6,7 +6,7 @@ import xarray as xr
 
 
 def show_model(
-    ds: xr.Dataset,
+    dataset: xr.Dataset,
     variable: str = "n",
     interval: int = 100,
     save: bool = False,
@@ -17,7 +17,7 @@ def show_model(
 
     Parameters
     ----------
-    ds: xarray Dataset,
+    dataset: xarray Dataset,
         Model data
     variable: str, optional
         variable to be animated
@@ -37,8 +37,8 @@ def show_model(
 
     frames = []
 
-    for timestep in ds.t.values:
-        frame = ds[variable].sel(t=timestep).values
+    for timestep in dataset.t.values:
+        frame = dataset[variable].sel(t=timestep).values
         frames.append(frame)
 
     cv0 = frames[0]
@@ -46,7 +46,7 @@ def show_model(
     fig.colorbar(im, cax=cax)
     tx = ax.set_title("t = 0")
 
-    dt = ds.t.values[1] - ds.t.values[0]
+    dt = dataset.t.values[1] - dataset.t.values[0]
 
     def animate(i: int) -> None:
         arr = frames[i]
@@ -56,7 +56,9 @@ def show_model(
         im.set_clim(vmin, vmax)
         tx.set_text(f"t = {i*dt:.2f}")
 
-    ani = FuncAnimation(fig, animate, frames=ds["t"].values.size, interval=interval)
+    ani = FuncAnimation(
+        fig, animate, frames=dataset["t"].values.size, interval=interval
+    )
     if save:
         ani.save(gif_name, writer="ffmpeg", fps=fps)
     plt.show()

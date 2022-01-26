@@ -14,10 +14,11 @@ bm = Model(
     blob_shape="gauss",
     num_blobs=10,
     t_drain=1e10,
+    labels=True,
 )
 
 # create data
-ds = bm.make_realization(speed_up=True, error=1e-2, labels=True)
+ds = bm.make_realization(speed_up=True, error=1e-2)
 
 print(ds)
 

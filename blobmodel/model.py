@@ -1,9 +1,9 @@
-from .blobs import Blob
-from .stochasticality import BlobFactory, DefaultBlobFactory
-from .geometry import Geometry
 import numpy as np
 import xarray as xr
 from tqdm import tqdm
+from .blobs import Blob
+from .stochasticality import BlobFactory, DefaultBlobFactory
+from .geometry import Geometry
 
 
 class Model:
@@ -22,6 +22,8 @@ class Model:
         num_blobs: int = 1000,
         t_drain: float = 10,
         blob_factory: BlobFactory = DefaultBlobFactory(),
+        labels: bool = False,
+        label_border: float = 0.75,
     ) -> None:
         """
         Attributes
@@ -44,8 +46,14 @@ class Model:
             drain time for blobs
         blob_factory: BlobFactory, optional
             sets distributions of blob parameters
+        labels: bool, optional
+            if True, field with blob labels is returned
+            used for creating training data for supervised machine learning algorithms
+        label_border: float, optional
+            defines region of blob as region where density >= label_border * amplitude of Blob
+            only used if labels = True
         """
-        self.__geometry: Geometry = Geometry(
+        self._geometry: Geometry = Geometry(
             Nx=Nx,
             Ny=Ny,
             Lx=Lx,
@@ -57,12 +65,22 @@ class Model:
         self.blob_shape: str = blob_shape
         self.num_blobs: int = num_blobs
         self.t_drain: float = t_drain
-        self.__blobs: list[Blob] = []
-        self.__blob_factory = blob_factory
+        self._blobs: list[Blob] = []
+        self._blob_factory = blob_factory
+        self._density = np.zeros(
+            shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
+        )
+        self._labels = labels
+        self._label_border = label_border
+        if self._labels:
+            self._labels_field = np.zeros(
+                shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
+            )
 
     def __str__(self) -> str:
         """string representation of Model."""
-        return f"2d Blob Model with blob shape:{self.blob_shape}, num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
+        return f"2d Blob Model with blob shape:{self.blob_shape},\
+             num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
 
     def get_blobs(self) -> list[Blob]:
         """Returns blobs list.
@@ -70,15 +88,13 @@ class Model:
         Note that if Model.sample_blobs has not been called, the list
         will be empty
         """
-        return self.__blobs
+        return self._blobs
 
     def make_realization(
         self,
         file_name: str = None,
         speed_up: bool = False,
         error: float = 1e-10,
-        labels: bool = False,
-        label_border: float = 0.75,
     ) -> xr.Dataset:
         """Integrate Model over time and write out data as xarray dataset.
 
@@ -94,109 +110,102 @@ class Model:
         error: float, optional
             numerical error at x = Lx when blob gets truncated
             only used if speed_up = True
-        labels: bool, optional
-            if True, field with blob labels is returned
-            used for creating training data for supervised machine learning algorithms
-        label_border: float, optional
-            defines region of blob as region where density >= label_border * amplitude of Blob
-            only used if labels = True
 
         Returns
         ----------
             xarray dataset with result data
         """
 
-        self.__blobs = self.__blob_factory.sample_blobs(
-            Ly=self.__geometry.Ly,
-            T=self.__geometry.T,
+        self._blobs = self._blob_factory.sample_blobs(
+            Ly=self._geometry.Ly,
+            T=self._geometry.T,
             num_blobs=self.num_blobs,
             blob_shape=self.blob_shape,
             t_drain=self.t_drain,
         )
 
-        self.__density = np.zeros(
-            shape=(self.__geometry.Ny, self.__geometry.Nx, self.__geometry.t.size)
-        )
-        if labels:
-            self.__labels_field = np.zeros(
-                shape=(self.__geometry.Ny, self.__geometry.Nx, self.__geometry.t.size)
-            )
+        for blob in tqdm(self._blobs, desc="Summing up Blobs"):
+            self._sum_up_blobs(blob, speed_up, error)
 
-        for b in tqdm(self.__blobs, desc="Summing up Blobs"):
-            self.__sum_up_blobs(b, speed_up, error, labels, label_border)
-
-        ds = self.__create_xr_dataset(labels)
+        dataset = self._create_xr_dataset()
 
         if file_name is not None:
-            ds.to_netcdf(file_name)
+            dataset.to_netcdf(file_name)
 
-        return ds
+        return dataset
 
-    def __create_xr_dataset(self, labels) -> xr.Dataset:
-        if self.__geometry.Ly == 0:
-            ds = xr.Dataset(
+    def _create_xr_dataset(self) -> xr.Dataset:
+        if self._geometry.Ly == 0:
+            dataset = xr.Dataset(
                 data_vars=dict(
-                    n=(["y", "x", "t"], self.__density),
+                    n=(["y", "x", "t"], self._density),
                 ),
                 coords=dict(
-                    x=(["x"], self.__geometry.x),
-                    t=(["t"], self.__geometry.t),
+                    x=(["x"], self._geometry.x),
+                    t=(["t"], self._geometry.t),
                 ),
                 attrs=dict(description="2D propagating blobs."),
             )
         else:
-            ds = xr.Dataset(
+            dataset = xr.Dataset(
                 data_vars=dict(
-                    n=(["y", "x", "t"], self.__density),
+                    n=(["y", "x", "t"], self._density),
                 ),
                 coords=dict(
-                    x=(["x"], self.__geometry.x),
-                    y=(["y"], self.__geometry.y),
-                    t=(["t"], self.__geometry.t),
+                    x=(["x"], self._geometry.x),
+                    y=(["y"], self._geometry.y),
+                    t=(["t"], self._geometry.t),
                 ),
                 attrs=dict(description="2D propagating blobs."),
             )
-        if labels:
-            ds = ds.assign(blob_labels=(["y", "x", "t"], self.__labels_field))
+        if self._labels:
+            dataset = dataset.assign(blob_labels=(["y", "x", "t"], self._labels_field))
 
-        return ds
+        return dataset
 
-    def __sum_up_blobs(
-        self, b: Blob, speed_up: bool, error: float, labels: bool, label_border: float
+    def _sum_up_blobs(
+        self,
+        blob: Blob,
+        speed_up: bool,
+        error: float,
     ):
-        __start, __stop = self.__compute_start_stop(b, speed_up, error)
-        __single_blob = b.discretize_blob(
-            x=self.__geometry.x_matrix[:, :, __start:__stop],
-            y=self.__geometry.y_matrix[:, :, __start:__stop],
-            t=self.__geometry.t_matrix[:, :, __start:__stop],
-            periodic_y=self.__geometry.periodic_y,
-            Ly=self.__geometry.Ly,
+        _start, _stop = self._compute_start_stop(blob, speed_up, error)
+        _single_blob = blob.discretize_blob(
+            x=self._geometry.x_matrix[:, :, _start:_stop],
+            y=self._geometry.y_matrix[:, :, _start:_stop],
+            t=self._geometry.t_matrix[:, :, _start:_stop],
+            periodic_y=self._geometry.periodic_y,
+            Ly=self._geometry.Ly,
         )
-        self.__density[:, :, __start:__stop] += __single_blob
-        if labels:
-            __max_amplitudes = np.max(__single_blob, axis=(0, 1))
-            __max_amplitudes[__max_amplitudes == 0] = np.inf
-            self.__labels_field[:, :, __start:__stop][
-                __single_blob >= __max_amplitudes * label_border
+        self._density[:, :, _start:_stop] += _single_blob
+        if self._labels:
+            _max_amplitudes = np.max(_single_blob, axis=(0, 1))
+            _max_amplitudes[_max_amplitudes == 0] = np.inf
+            self._labels_field[:, :, _start:_stop][
+                _single_blob >= _max_amplitudes * self._label_border
             ] = 1
 
-    def __compute_start_stop(self, b: Blob, speed_up: bool, error: float):
+    def _compute_start_stop(self, blob: Blob, speed_up: bool, error: float):
         if speed_up:
-            __start = int(b.t_init / self.__geometry.dt)
-            if b.v_x == 0:
-                __stop = self.__geometry.t.size
+            _start = int(blob.t_init / self._geometry.dt)
+            if blob.v_x == 0:
+                _stop = self._geometry.t.size
             else:
                 # ignores t_drain when calculating stop time
-                __stop = np.minimum(
-                    self.__geometry.t.size,
-                    __start
+                _stop = np.minimum(
+                    self._geometry.t.size,
+                    _start
                     + int(
-                        (-np.log(error * np.sqrt(np.pi)) + self.__geometry.Lx - b.pos_x)
-                        / (b.v_x * self.__geometry.dt)
+                        (
+                            -np.log(error * np.sqrt(np.pi))
+                            + self._geometry.Lx
+                            - blob.pos_x
+                        )
+                        / (blob.v_x * self._geometry.dt)
                     ),
                 )
         else:
-            __start = 0
-            __stop = self.__geometry.t.size
+            _start = 0
+            _stop = self._geometry.t.size
 
-        return __start, __stop
+        return _start, _stop

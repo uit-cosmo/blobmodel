@@ -38,10 +38,7 @@ class Geometry:
 
         # calculate x, y and t coordinates
         self.x: NDArray[Any, Float[64]] = np.arange(0, self.Lx, self.Lx / self.Nx)
-        if self.Ly == 0:
-            self.y: NDArray[Any, Float[64]] = 0
-        else:
-            self.y = np.arange(0, self.Ly, self.Ly / self.Ny)
+        self.y = 0 if self.Ly == 0 else np.arange(0, self.Ly, self.Ly / self.Ny)
         self.t: NDArray[Any, Float[64]] = np.arange(0, self.T, self.dt)
         self.x_matrix, self.y_matrix, self.t_matrix = np.meshgrid(
             self.x, self.y, self.t
