@@ -164,7 +164,7 @@ class Blob:
             return np.exp(x_diffs) * np.heaviside(-1.0 * (x_diffs), 1)
         else:
             raise NotImplementedError(
-                self.__class__.__name__ + ".blob shape not implemented"
+                self.__class__.__name__ + ".blob_shape not implemented"
             )
 
     def _perpendicular_direction_shape(

@@ -1,3 +1,4 @@
+import pytest
 from blobmodel import DefaultBlobFactory
 
 
@@ -23,4 +24,7 @@ def test_mean_of_distribution():
         assert -0.05 <= tmp.mean() <= 0.05
 
 
-test_mean_of_distribution()
+def test_not_implemented_distribution():
+    with pytest.raises(NotImplementedError):
+        bf = DefaultBlobFactory(A_dist="something_different")
+        bf.sample_blobs(1, 1, 1, 1, 1)

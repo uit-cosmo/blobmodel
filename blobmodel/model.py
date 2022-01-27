@@ -79,8 +79,10 @@ class Model:
 
     def __str__(self) -> str:
         """string representation of Model."""
-        return f"2d Blob Model with blob shape:{self.blob_shape},\
-             num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
+        return (
+            f"2d Blob Model with blob shape:{self.blob_shape},"
+            + f" num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
+        )
 
     def get_blobs(self) -> list[Blob]:
         """Returns blobs list.
