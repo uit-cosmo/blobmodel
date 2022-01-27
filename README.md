@@ -74,7 +74,12 @@ Alternatively, you can specify all blob parameters exactly as you want by writin
             drain time for blobs 
 - `blob_factory`: BlobFactory, optional,
             object containing blob parameters
-
+- `labels`: bool, optional,
+            if True, field with blob labels is returned
+            used for creating training data for supervised machine learning algorithms
+- `label_border`: float, optional,
+            defines region of blob as region where density >= label_border * amplitude of Blob
+            only used if labels = True
 ### `DefaultBlobFactory()`
 - `A_dist`: str, optional,
             distribution of blob amplitudes
@@ -102,7 +107,6 @@ The following distributions are implemented:
 - `ray`: rayleight distribution with mean 1
 - `deg`: array on ones
 - `zeros`: array of zeros
-                
 ### `make_realization()`
 - `file_name`: str, optional, 
             file name for .nc file containing data as xarray dataset
@@ -113,12 +117,6 @@ The following distributions are implemented:
             !!!  this is only a good approximation for blob_shape='exp' !!!
 - `error`: float, optional,
             numerical error at x = Lx when blob gets truncated 
-- `labels`: bool, optional,
-            if True, field with blob labels is returned
-            used for creating training data for supervised machine learning algorithms
-- `label_border`: float, optional,
-            defines region of blob as region where density >= label_border * amplitude of Blob
-            only used if labels = True
 ### `show_model()`
 - `ds`: xarray Dataset,
             Model data
