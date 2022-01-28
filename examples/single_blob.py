@@ -11,27 +11,27 @@ class CustomBlobFactory(BlobFactory):
     ) -> list[Blob]:
 
         # set custom parameter distributions
-        __amp = np.ones(num_blobs)
-        __width = np.ones(num_blobs)
-        __vx = np.ones(num_blobs)
-        __vy = np.ones(num_blobs)
+        _amp = np.ones(num_blobs)
+        _width = np.ones(num_blobs)
+        _vx = np.ones(num_blobs)
+        _vy = np.ones(num_blobs)
 
-        __posx = np.zeros(num_blobs)
-        __posy = np.ones(num_blobs) * Ly / 2
-        __t_init = np.ones(num_blobs) * 0
+        _posx = np.zeros(num_blobs)
+        _posy = np.ones(num_blobs) * Ly / 2
+        _t_init = np.ones(num_blobs) * 0
 
         return [
             Blob(
-                id=i,
+                blob_id=i,
                 blob_shape=blob_shape,
-                amplitude=__amp[i],
-                width_prop=__width[i],
-                width_perp=__width[i],
-                v_x=__vx[i],
-                v_y=__vy[i],
-                pos_x=__posx[i],
-                pos_y=__posy[i],
-                t_init=__t_init[i],
+                amplitude=_amp[i],
+                width_prop=_width[i],
+                width_perp=_width[i],
+                v_x=_vx[i],
+                v_y=_vy[i],
+                pos_x=_posx[i],
+                pos_y=_posy[i],
+                t_init=_t_init[i],
                 t_drain=t_drain,
             )
             for i in range(num_blobs)
@@ -58,4 +58,4 @@ bm = Model(
 ds = bm.make_realization(speed_up=True, error=1e-2)
 
 # show animation and save as gif
-show_model(ds=ds, interval=100, save=True, gif_name="example.gif", fps=10)
+show_model(dataset=ds, interval=100, save=True, gif_name="example.gif", fps=10)

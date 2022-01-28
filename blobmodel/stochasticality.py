@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 import numpy as np
-from .blobs import Blob
 from nptyping import NDArray, Float
 from typing import Any
+from .blobs import Blob
 
 
 class BlobFactory(ABC):
@@ -54,7 +54,7 @@ class DefaultBlobFactory(BlobFactory):
         self.vx_parameter = vx_parameter
         self.vy_parameter = vy_parameter
 
-    def __draw_random_variables(
+    def _draw_random_variables(
         self,
         dist_type: str,
         free_parameter: float,
@@ -87,31 +87,31 @@ class DefaultBlobFactory(BlobFactory):
     def sample_blobs(
         self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
     ) -> list[Blob]:
-        __amp = self.__draw_random_variables(
+        _amp = self._draw_random_variables(
             dist_type=self.A_dist, free_parameter=self.A_parameter, num_blobs=num_blobs
         )
-        __width = self.__draw_random_variables(self.W_dist, self.W_parameter, num_blobs)
-        __vx = self.__draw_random_variables(self.vx_dist, self.vx_parameter, num_blobs)
-        __vy = self.__draw_random_variables(self.vy_dist, self.vy_parameter, num_blobs)
-        __posx = np.zeros(num_blobs)
-        __posy = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
-        __t_init = np.random.uniform(low=0, high=T, size=num_blobs)
+        _width = self._draw_random_variables(self.W_dist, self.W_parameter, num_blobs)
+        _vx = self._draw_random_variables(self.vx_dist, self.vx_parameter, num_blobs)
+        _vy = self._draw_random_variables(self.vy_dist, self.vy_parameter, num_blobs)
+        _posx = np.zeros(num_blobs)
+        _posy = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
+        _t_init = np.random.uniform(low=0, high=T, size=num_blobs)
 
         # sort blobs by __t_init
-        __t_init = np.sort(__t_init)
+        _t_init = np.sort(_t_init)
 
         return [
             Blob(
-                id=i,
+                blob_id=i,
                 blob_shape=blob_shape,
-                amplitude=__amp[i],
-                width_prop=__width[i],
-                width_perp=__width[i],
-                v_x=__vx[i],
-                v_y=__vy[i],
-                pos_x=__posx[i],
-                pos_y=__posy[i],
-                t_init=__t_init[i],
+                amplitude=_amp[i],
+                width_prop=_width[i],
+                width_perp=_width[i],
+                v_x=_vx[i],
+                v_y=_vy[i],
+                pos_x=_posx[i],
+                pos_y=_posy[i],
+                t_init=_t_init[i],
                 t_drain=t_drain,
             )
             for i in range(num_blobs)

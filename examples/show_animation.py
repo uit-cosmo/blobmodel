@@ -19,4 +19,4 @@ bm = Model(
 # create data
 ds = bm.make_realization(speed_up=True, error=1e-2)
 # show animation and save as gif
-show_model(ds=ds, interval=100, save=True, gif_name="example.gif", fps=10)
+show_model(dataset=ds, interval=100, save=True, gif_name="example.gif", fps=10)
