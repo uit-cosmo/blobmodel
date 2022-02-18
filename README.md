@@ -56,7 +56,6 @@ tmp = Model(
 ```
 Alternatively, you can specify all blob parameters exactly as you want by writing your own class which inherits from BlobFactory. See `examples/custom_blobfactory.py` as an example. 
 ## Input parameters
-## Input parameters
 ### `Model()`
 - `Nx`: int, grid points in x
 - `Ny`: int, grid points in y
