@@ -54,7 +54,13 @@ class Model:
             only used if labels = True
         """
         self._geometry: Geometry = Geometry(
-            Nx=Nx, Ny=Ny, Lx=Lx, Ly=Ly, dt=dt, T=T, periodic_y=periodic_y,
+            Nx=Nx,
+            Ny=Ny,
+            Lx=Lx,
+            Ly=Ly,
+            dt=dt,
+            T=T,
+            periodic_y=periodic_y,
         )
         self.blob_shape: str = blob_shape
         self.num_blobs: int = num_blobs
@@ -87,7 +93,10 @@ class Model:
         return self._blobs
 
     def make_realization(
-        self, file_name: str = None, speed_up: bool = False, error: float = 1e-10,
+        self,
+        file_name: str = None,
+        speed_up: bool = False,
+        error: float = 1e-10,
     ) -> xr.Dataset:
         """Integrate Model over time and write out data as xarray dataset.
 
@@ -130,13 +139,20 @@ class Model:
     def _create_xr_dataset(self) -> xr.Dataset:
         if self._geometry.Ly == 0:
             dataset = xr.Dataset(
-                data_vars=dict(n=(["y", "x", "t"], self._density),),
-                coords=dict(x=(["x"], self._geometry.x), t=(["t"], self._geometry.t),),
+                data_vars=dict(
+                    n=(["y", "x", "t"], self._density),
+                ),
+                coords=dict(
+                    x=(["x"], self._geometry.x),
+                    t=(["t"], self._geometry.t),
+                ),
                 attrs=dict(description="2D propagating blobs."),
             )
         else:
             dataset = xr.Dataset(
-                data_vars=dict(n=(["y", "x", "t"], self._density),),
+                data_vars=dict(
+                    n=(["y", "x", "t"], self._density),
+                ),
                 coords=dict(
                     x=(["x"], self._geometry.x),
                     y=(["y"], self._geometry.y),
@@ -150,7 +166,10 @@ class Model:
         return dataset
 
     def _sum_up_blobs(
-        self, blob: Blob, speed_up: bool, error: float,
+        self,
+        blob: Blob,
+        speed_up: bool,
+        error: float,
     ):
         _start, _stop = self._compute_start_stop(blob, speed_up, error)
         _single_blob = blob.discretize_blob(

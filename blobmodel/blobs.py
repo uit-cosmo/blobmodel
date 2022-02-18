@@ -39,7 +39,12 @@ class Blob:
             self.theta = np.pi / 2 * np.sign(self.v_y)
 
     def discretize_blob(
-        self, x: NDArray, y: NDArray, t: NDArray, Ly: float, periodic_y: bool = False,
+        self,
+        x: NDArray,
+        y: NDArray,
+        t: NDArray,
+        Ly: float,
+        periodic_y: bool = False,
     ) -> NDArray:
         """
         Discretize blob on grid
