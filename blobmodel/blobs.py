@@ -39,12 +39,7 @@ class Blob:
             self.theta = np.pi / 2 * np.sign(self.v_y)
 
     def discretize_blob(
-        self,
-        x: NDArray,
-        y: NDArray,
-        t: NDArray,
-        Ly: float,
-        periodic_y: bool = False,
+        self, x: NDArray, y: NDArray, t: NDArray, Ly: float, periodic_y: bool = False,
     ) -> NDArray:
         """
         Discretize blob on grid
@@ -159,7 +154,7 @@ class Blob:
             x_diffs = x - self._prop_dir_blob_position(t)
 
         if self.blob_shape == "gauss":
-            return 1 / np.sqrt(np.pi) * np.exp(-(x_diffs**2 / self.width_prop**2))
+            return 1 / np.sqrt(np.pi) * np.exp(-(x_diffs ** 2 / self.width_prop ** 2))
         elif self.blob_shape == "exp":
             return np.exp(x_diffs) * np.heaviside(-1.0 * (x_diffs), 1)
         else:
@@ -182,10 +177,10 @@ class Blob:
             )
         else:
             y_diffs = y - self._perp_dir_blob_position()
-        return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs**2) / self.width_perp**2)
+        return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_perp ** 2)
 
     def _prop_dir_blob_position(self, t: NDArray) -> NDArray:
-        return self.pos_x + (self.v_x**2 + self.v_y**2) ** 0.5 * (t - self.t_init)
+        return self.pos_x + (self.v_x ** 2 + self.v_y ** 2) ** 0.5 * (t - self.t_init)
 
     def _perp_dir_blob_position(self) -> NDArray:
         return self.pos_y

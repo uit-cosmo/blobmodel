@@ -8,7 +8,7 @@ bm = Model(
     dt=0.1,
     T=10,
     periodic_y=False,
-    blob_shape="different_shape",
+    blob_shape="gauss",
     num_blobs=100,
 )
 
