@@ -1,6 +1,7 @@
 import numpy as np
 import xarray as xr
 from tqdm import tqdm
+from typing import List
 from .blobs import Blob
 from .stochasticality import BlobFactory, DefaultBlobFactory
 from .geometry import Geometry
@@ -78,7 +79,7 @@ class Model:
             + f" num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
         )
 
-    def get_blobs(self) -> list[Blob]:
+    def get_blobs(self) -> List[Blob]:
         """Returns blobs list.
 
         Note that if Model.sample_blobs has not been called, the list
