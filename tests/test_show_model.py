@@ -23,3 +23,6 @@ ds = bm.make_realization()
 def test_plot_fn(mock_show):
     warnings.filterwarnings("ignore")
     show_model(dataset=ds, interval=100, save=False, fps=10)
+
+
+test_plot_fn()

@@ -9,14 +9,19 @@ The code has been deveoped originally to model profiles in the scrape-off layer 
 ![Density evolution](readme_gifs/2d_blobs.gif ) 
 
 ## Installation
-
-Dev install:
-```
-git clone https://github.com/uit-cosmo/2d_propagating_blobs.git
-cd 2d_propagating_blobs
-pip install -e .
+The package is published to PyPI and can be installed with
+```sh
+pip install blobmodel
 ```
 
+If you want the development version you must first clone the repo to your local machine,
+then install the project in development mode:
+
+```sh
+git clone git@github.com:uit-cosmo/2d-propagating-blobs.git
+cd 2d-propagating-blobs
+poetry install
+```
 
 ## Usage
 Create the grid on which the blobs are discretized with using the `Model` class. The `make_realization()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:

@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "blobmodel"
+version = "0.1.1"
+description = "Two dimensional model of propagating blobs"
+authors = ["gregordecristoforo <gregor.decristoforo@gmail.com>"]
+homepage = "https://github.com/uit-cosmo/2d_propagating_blobs/blob/main/"
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+xarray = "^0.21.1"
+numpy = "^1.22.2"
+scipy = "^1.8.0"
+matplotlib = "^3.5.1"
+tqdm = "^4.62.3"
+pytest = "^7.0.1"
+nptyping = "^1.4.4"
+mypy = "^0.931"
+black = "^22.1.0"
+docformatter = "^1.4"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

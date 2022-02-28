@@ -1,5 +1,6 @@
 from blobmodel import Model, BlobFactory, Blob
 import numpy as np
+from typing import List
 
 
 class CustomBlobFactoryVy0(BlobFactory):
@@ -8,7 +9,7 @@ class CustomBlobFactoryVy0(BlobFactory):
 
     def sample_blobs(
         self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
-    ) -> list[Blob]:
+    ) -> List[Blob]:
 
         # set custom parameter distributions
         _amp = np.ones(num_blobs)
@@ -44,7 +45,7 @@ class CustomBlobFactoryVx0(BlobFactory):
 
     def sample_blobs(
         self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
-    ) -> list[Blob]:
+    ) -> List[Blob]:
 
         # set custom parameter distributions
         _amp = np.ones(num_blobs)

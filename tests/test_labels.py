@@ -1,7 +1,7 @@
 from blobmodel import Model, BlobFactory, Blob
 import numpy as np
 import warnings
-
+from typing import List
 
 # here you can define your custom parameter distributions
 class CustomBlobFactory(BlobFactory):
@@ -10,7 +10,7 @@ class CustomBlobFactory(BlobFactory):
 
     def sample_blobs(
         self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
-    ) -> list[Blob]:
+    ) -> List[Blob]:
 
         # set custom parameter distributions
         _amp = np.ones(num_blobs)
@@ -104,3 +104,7 @@ def test_bloblabels():
     )
     diff = ds["blob_labels"].values - correct_labels
     assert np.max(diff) < 0.00001
+
+
+test_bloblabels_speedup()
+test_bloblabels()
