@@ -62,4 +62,4 @@ jobs:
 
     - name: Type checking with mypy
       run: |
-        mypy  --ignore-missing-imports .
+        poetry run mypy  --ignore-missing-imports .
