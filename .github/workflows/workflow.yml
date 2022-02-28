@@ -23,7 +23,7 @@ jobs:
         python -m poetry install
     - name: Check formatting with black
       run: |
-        black --check .
+        poetry run black --check .
     - name: Docformatter
       run: |
         docformatter --check -r blobmodel/
@@ -54,7 +54,7 @@ jobs:
         python -m poetry install
     - name: Test with pytest
       run: |
-        pytest -v --cov 
+        poetry run pytest -v --cov
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
 
