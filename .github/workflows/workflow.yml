@@ -52,6 +52,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m poetry install
+    - name: Install pytest-cov
+      run: pip install pytest-cov
     - name: Test with pytest
       run: |
         poetry run pytest -v --cov
