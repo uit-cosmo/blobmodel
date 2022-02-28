@@ -55,7 +55,10 @@ class DefaultBlobFactory(BlobFactory):
         self.vy_parameter = vy_parameter
 
     def _draw_random_variables(
-        self, dist_type: str, free_parameter: float, num_blobs: int,
+        self,
+        dist_type: str,
+        free_parameter: float,
+        num_blobs: int,
     ) -> NDArray[Any, Float[64]]:
 
         if dist_type == "exp":
