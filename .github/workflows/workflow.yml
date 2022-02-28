@@ -20,7 +20,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        run: python -m poetry install
+        python -m poetry install
     - name: Check formatting with black
       run: |
         black --check .
@@ -51,7 +51,7 @@ jobs:
         poetry --version
     - name: Install dependencies
       run: |
-        run: python -m poetry install
+        python -m poetry install
     - name: Test with pytest
       run: |
         pytest -v --cov 
