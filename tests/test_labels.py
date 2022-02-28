@@ -104,3 +104,7 @@ def test_bloblabels():
     )
     diff = ds["blob_labels"].values - correct_labels
     assert np.max(diff) < 0.00001
+
+
+test_bloblabels_speedup()
+test_bloblabels()
