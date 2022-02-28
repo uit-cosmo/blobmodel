@@ -34,7 +34,7 @@ jobs:
     if: always()
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: [3.10]
         pip-packages:
           - "setuptools pip pytest pytest-cov coverage codecov mypy"
       fail-fast: false
