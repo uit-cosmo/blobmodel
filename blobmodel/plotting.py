@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 import xarray as xr
+from matplotlib import animation
 
 
 def show_model(
@@ -56,7 +56,7 @@ def show_model(
         im.set_clim(vmin, vmax)
         tx.set_text(f"t = {i*dt:.2f}")
 
-    ani = FuncAnimation(
+    ani = animation.FuncAnimation(
         fig, animate, frames=dataset["t"].values.size, interval=interval
     )
     if save:
