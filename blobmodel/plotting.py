@@ -55,10 +55,11 @@ def show_model(
         frames.append(frame)
 
     if dataset.y.size == 1:
-        fig = plt.figure()
         ax = plt.axes(xlim=(0, dataset.x[-1]), ylim=(0, dataset.n.max()))
-        tx = ax.set_title("t = 0")
+        tx = ax.set_title(r"$t = 0$")
         (line,) = ax.plot([], [], lw=2)
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(rf"${variable}$")
         ani = animation.FuncAnimation(
             fig, animate_1d, frames=dataset["t"].values.size, interval=interval
         )
