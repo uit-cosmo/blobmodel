@@ -202,14 +202,16 @@ class Model:
                 __max_amplitudes[__max_amplitudes == 0] = np.inf
                 self._labels_field[:, :, _start:_stop][
                     _single_blob >= __max_amplitudes * self._label_border
-                ] = blob.blob_id+1
+                ] = (blob.blob_id + 1)
 
             if self.label_type == "diff":
                 __max_amplitudes = np.max(_single_blob, axis=(0, 1))
                 __max_amplitudes[__max_amplitudes == 0] = np.inf
                 self._labels_field[:, :, _start:_stop][
-                    _single_blob >= __max_amplitudes * self._label_border + self._density[:, :, _start:_stop]*0.25
-                ] = blob.blob_id+1
+                    _single_blob
+                    >= __max_amplitudes * self._label_border
+                    + self._density[:, :, _start:_stop] * 0.25
+                ] = (blob.blob_id + 1)
         self._density[:, :, _start:_stop] += _single_blob
 
     def _compute_start_stop(self, blob: Blob, speed_up: bool, error: float):
@@ -236,6 +238,3 @@ class Model:
             _stop = self._geometry.t.size
 
         return _start, _stop
-
-
-
