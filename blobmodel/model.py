@@ -54,6 +54,8 @@ class Model:
         label_border: float, optional
             defines region of blob as region where density >= label_border * amplitude of Blob
             only used if labels = True
+        label_type: str, optional
+            defines which type of label you want
         """
         self._geometry: Geometry = Geometry(
             Nx=Nx,
@@ -129,6 +131,11 @@ class Model:
             t_drain=self.t_drain,
         )
 
+        amp = []
+        for i in range(len(self._blobs)):
+            amp.append(self._blobs[i].amplitude)
+        self._blobs = np.array(self._blobs)[np.argsort(amp)]
+
         for blob in tqdm(self._blobs, desc="Summing up Blobs"):
             self._sum_up_blobs(blob, speed_up, error)
 
@@ -201,7 +208,7 @@ class Model:
                 __max_amplitudes = np.max(_single_blob, axis=(0, 1))
                 __max_amplitudes[__max_amplitudes == 0] = np.inf
                 self._labels_field[:, :, _start:_stop][
-                    _single_blob >= __max_amplitudes*0.75 + self._density[:, :, _start:_stop]*0.25
+                    _single_blob >= __max_amplitudes * self._label_border + self._density[:, :, _start:_stop]*0.25
                 ] = blob.blob_id+1
         self._density[:, :, _start:_stop] += _single_blob
 
