@@ -1,7 +1,0 @@
-[run]
-branch = True
-source = blobmodel
-
-[report]
-omit =
-    tests/*
