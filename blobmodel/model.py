@@ -23,9 +23,8 @@ class Model:
         num_blobs: int = 1000,
         t_drain: float = 10,
         blob_factory: BlobFactory = DefaultBlobFactory(),
-        labels: bool = False,
+        labels: str = "off",
         label_border: float = 0.75,
-        label_type: str = "simple",
     ) -> None:
         """
         Attributes
@@ -48,14 +47,14 @@ class Model:
             drain time for blobs
         blob_factory: BlobFactory, optional
             sets distributions of blob parameters
-        labels: bool, optional
-            if True, field with blob labels is returned
+        labels: str, optional
+            "off": no blob labels returned
+            "same": regions where blobs are present are set to label 1
+            "individual": different blobs return individual labels
             used for creating training data for supervised machine learning algorithms
         label_border: float, optional
             defines region of blob as region where density >= label_border * amplitude of Blob
-            only used if labels = True
-        label_type: str, optional
-            defines which type of label you want
+            only used if labels = "same" or "individual"
         """
         self._geometry: Geometry = Geometry(
             Nx=Nx,
@@ -76,11 +75,10 @@ class Model:
         )
         self._labels = labels
         self._label_border = label_border
-        if self._labels:
+        if self._labels in {"same", "individual"}:
             self._labels_field = np.zeros(
                 shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
             )
-        self.label_type = label_type
 
     def __str__(self) -> str:
         """string representation of Model."""
@@ -131,11 +129,6 @@ class Model:
             t_drain=self.t_drain,
         )
 
-        amp = []
-        for i in range(len(self._blobs)):
-            amp.append(self._blobs[i].amplitude)
-        self._blobs = np.array(self._blobs)[np.argsort(amp)]
-
         for blob in tqdm(self._blobs, desc="Summing up Blobs"):
             self._sum_up_blobs(blob, speed_up, error)
 
@@ -170,7 +163,7 @@ class Model:
                 ),
                 attrs=dict(description="2D propagating blobs."),
             )
-        if self._labels:
+        if self._labels in {"same", "individual"}:
             dataset = dataset.assign(blob_labels=(["y", "x", "t"], self._labels_field))
 
         return dataset
@@ -190,29 +183,20 @@ class Model:
             Ly=self._geometry.Ly,
         )
 
-        if self._labels:
-            if self.label_type == "simple":
-                __max_amplitudes = np.max(_single_blob, axis=(0, 1))
-                __max_amplitudes[__max_amplitudes == 0] = np.inf
-                self._labels_field[:, :, _start:_stop][
-                    _single_blob >= __max_amplitudes * self._label_border
-                ] = 1
-            if self.label_type == "simple diff":
-                __max_amplitudes = np.max(_single_blob, axis=(0, 1))
-                __max_amplitudes[__max_amplitudes == 0] = np.inf
-                self._labels_field[:, :, _start:_stop][
-                    _single_blob >= __max_amplitudes * self._label_border
-                ] = (blob.blob_id + 1)
-
-            if self.label_type == "diff":
-                __max_amplitudes = np.max(_single_blob, axis=(0, 1))
-                __max_amplitudes[__max_amplitudes == 0] = np.inf
-                self._labels_field[:, :, _start:_stop][
-                    _single_blob
-                    >= __max_amplitudes * self._label_border
-                    + self._density[:, :, _start:_stop] * 0.25
-                ] = (blob.blob_id + 1)
         self._density[:, :, _start:_stop] += _single_blob
+
+        if self._labels == "same":
+            __max_amplitudes = np.max(_single_blob, axis=(0, 1))
+            __max_amplitudes[__max_amplitudes == 0] = np.inf
+            self._labels_field[:, :, _start:_stop][
+                _single_blob >= __max_amplitudes * self._label_border
+            ] = 1
+        elif self._labels == "individual":
+            __max_amplitudes = np.max(_single_blob, axis=(0, 1))
+            __max_amplitudes[__max_amplitudes == 0] = np.inf
+            self._labels_field[:, :, _start:_stop][
+                _single_blob >= __max_amplitudes * self._label_border
+            ] = (blob.blob_id + 1)
 
     def _compute_start_stop(self, blob: Blob, speed_up: bool, error: float):
         if speed_up:

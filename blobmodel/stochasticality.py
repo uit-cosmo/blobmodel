@@ -97,10 +97,10 @@ class DefaultBlobFactory(BlobFactory):
         _posy = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
         _t_init = np.random.uniform(low=0, high=T, size=num_blobs)
 
-        # sort blobs by __t_init
-        _t_init = np.sort(_t_init)
+        # # sort blobs by _t_init
+        # _t_init = np.sort(_t_init)
 
-        return [
+        _Blobs = [
             Blob(
                 blob_id=i,
                 blob_shape=blob_shape,
@@ -116,3 +116,6 @@ class DefaultBlobFactory(BlobFactory):
             )
             for i in range(num_blobs)
         ]
+
+        # sort blobs by amplitude
+        return np.array(_Blobs)[np.argsort(_amp)]
