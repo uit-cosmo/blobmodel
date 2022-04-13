@@ -139,7 +139,8 @@ dmypy.json
 .idea/
 
 # gifs
-*.gif
+1d_blobs.gif
+example.gif
 
 # png files
 *.png
