@@ -23,7 +23,7 @@ class Model:
         num_blobs: int = 1000,
         t_drain: float = 10,
         blob_factory: BlobFactory = DefaultBlobFactory(),
-        labels: bool = False,
+        labels: str = "off",
         label_border: float = 0.75,
     ) -> None:
         """
@@ -47,12 +47,14 @@ class Model:
             drain time for blobs
         blob_factory: BlobFactory, optional
             sets distributions of blob parameters
-        labels: bool, optional
-            if True, field with blob labels is returned
+        labels: str, optional
+            "off": no blob labels returned
+            "same": regions where blobs are present are set to label 1
+            "individual": different blobs return individual labels
             used for creating training data for supervised machine learning algorithms
         label_border: float, optional
             defines region of blob as region where density >= label_border * amplitude of Blob
-            only used if labels = True
+            only used if labels = "same" or "individual"
         """
         self._geometry: Geometry = Geometry(
             Nx=Nx,
@@ -73,7 +75,7 @@ class Model:
         )
         self._labels = labels
         self._label_border = label_border
-        if self._labels:
+        if self._labels in {"same", "individual"}:
             self._labels_field = np.zeros(
                 shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
             )
@@ -161,7 +163,7 @@ class Model:
                 ),
                 attrs=dict(description="2D propagating blobs."),
             )
-        if self._labels:
+        if self._labels in {"same", "individual"}:
             dataset = dataset.assign(blob_labels=(["y", "x", "t"], self._labels_field))
 
         return dataset
@@ -180,13 +182,21 @@ class Model:
             periodic_y=self._geometry.periodic_y,
             Ly=self._geometry.Ly,
         )
+
         self._density[:, :, _start:_stop] += _single_blob
-        if self._labels:
-            _max_amplitudes = np.max(_single_blob, axis=(0, 1))
-            _max_amplitudes[_max_amplitudes == 0] = np.inf
+
+        if self._labels == "same":
+            __max_amplitudes = np.max(_single_blob, axis=(0, 1))
+            __max_amplitudes[__max_amplitudes == 0] = np.inf
             self._labels_field[:, :, _start:_stop][
-                _single_blob >= _max_amplitudes * self._label_border
+                _single_blob >= __max_amplitudes * self._label_border
             ] = 1
+        elif self._labels == "individual":
+            __max_amplitudes = np.max(_single_blob, axis=(0, 1))
+            __max_amplitudes[__max_amplitudes == 0] = np.inf
+            self._labels_field[:, :, _start:_stop][
+                _single_blob >= __max_amplitudes * self._label_border
+            ] = (blob.blob_id + 1)
 
     def _compute_start_stop(self, blob: Blob, speed_up: bool, error: float):
         if speed_up:

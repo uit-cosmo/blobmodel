@@ -55,7 +55,7 @@ def test_bloblabels_speedup():
         num_blobs=1,
         blob_factory=bf,
         t_drain=1e10,
-        labels=True,
+        labels="same",
     )
     ds = bm.make_realization(speed_up=True, error=1e-2)
     correct_labels = np.array(
@@ -88,7 +88,7 @@ def test_bloblabels():
         num_blobs=1,
         blob_factory=bf,
         t_drain=1e10,
-        labels=True,
+        labels="same",
     )
     ds = bm.make_realization(speed_up=False)
     correct_labels = np.array(
