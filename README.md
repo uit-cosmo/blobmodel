@@ -78,8 +78,10 @@ Alternatively, you can specify all blob parameters exactly as you want by writin
             drain time for blobs 
 - `blob_factory`: BlobFactory, optional,
             object containing blob parameters
-- `labels`: bool, optional,
-            if True, field with blob labels is returned
+- `labels`: str, optional,
+            "off": no blob labels returned,
+            "same": regions where blobs are present are set to label 1,
+            "individual": different blobs return individual labels,
             used for creating training data for supervised machine learning algorithms
 - `label_border`: float, optional,
             defines region of blob as region where density >= label_border * amplitude of Blob
