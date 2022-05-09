@@ -3,7 +3,7 @@ from blobmodel import Model, show_model
 import warnings
 
 
-bm = Model(
+bm_2d = Model(
     Nx=10,
     Ny=10,
     Lx=10,
@@ -16,13 +16,36 @@ bm = Model(
 )
 
 # create data
-ds = bm.make_realization()
+ds_2d = bm_2d.make_realization()
 
 # warnings are supressed since plt complains about animation blocked
 @patch("matplotlib.pyplot.show")
-def test_plot_fn(mock_show):
+def test_plot_2d(mock_show):
     warnings.filterwarnings("ignore")
-    show_model(dataset=ds, interval=100, save=False, fps=10)
+    show_model(dataset=ds_2d, interval=100, save=False, fps=10)
 
 
-test_plot_fn()
+bm_1d = Model(
+    Nx=10,
+    Ny=1,
+    Lx=10,
+    Ly=1,
+    dt=0.1,
+    T=1,
+    periodic_y=False,
+    blob_shape="exp",
+    num_blobs=1,
+)
+
+# create data
+ds_1d = bm_1d.make_realization()
+
+# warnings are supressed since plt complains about animation blocked
+@patch("matplotlib.pyplot.show")
+def test_plot_1d(mock_show):
+    warnings.filterwarnings("ignore")
+    show_model(dataset=ds_1d, interval=100, save=False, fps=10)
+
+
+test_plot_2d()
+test_plot_1d()

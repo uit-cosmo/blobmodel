@@ -1,5 +1,4 @@
 from blobmodel import Model, show_model
-import numpy as np
 
 # here you can define your custom parameter distributions
 
