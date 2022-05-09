@@ -10,7 +10,7 @@ def show_model(
     variable: str = "n",
     interval: int = 100,
     save: bool = False,
-    gif_name: str = "2d_blobs.gif",
+    gif_name: str = "blobs.gif",
     fps: int = 10,
 ) -> None:
     """Show animation of Model output.
