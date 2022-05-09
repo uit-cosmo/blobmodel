@@ -5,9 +5,10 @@
 # 2d_propagating_blobs
 Two dimensional model of advecting and dissipating blobs.
 
-The code has been deveoped originally to model profiles in the scrape-off layer of fusion experiments but it can be used to model any 2d system consisting of advecting pulses. An example is shown below:
-![Density evolution](readme_gifs/2d_blobs.gif ) 
+The code has been developed originally to model profiles in the scrape-off layer of fusion experiments but it can be used to model any 1d or 2d system consisting of advecting pulses. Examples for one and two dimensions are shown below:
+![Density evolution](readme_gifs/2d_blobs.gif)
 
+![Density evolution](readme_gifs/1d_blobs.gif)
 ## Installation
 The package is published to PyPI and can be installed with
 ```sh
