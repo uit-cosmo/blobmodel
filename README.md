@@ -71,6 +71,8 @@ Alternatively, you can specify all blob parameters exactly as you want by writin
 - `T`: float, time length 
 - `periodic_y`: bool, optional,
             allow periodicity in y-direction 
+            
+            !!!  this is only a good approximation if Ly is significantly bigger than blobs  !!!
 - `blob_shape`: str, optional,
             switch between `gauss` and `exp` blob
 - `num_blobs`: int, optional
