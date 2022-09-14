@@ -70,15 +70,9 @@ class Model:
         self.t_drain: float = t_drain
         self._blobs: list[Blob] = []
         self._blob_factory = blob_factory
-        self._density = np.zeros(
-            shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
-        )
         self._labels = labels
         self._label_border = label_border
-        if self._labels in {"same", "individual"}:
-            self._labels_field = np.zeros(
-                shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
-            )
+        self._reset_fields()
 
     def __str__(self) -> str:
         """string representation of Model."""
@@ -120,9 +114,9 @@ class Model:
         ----------
             xarray dataset with result data
         """
-        self._density = np.zeros(
-            shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
-        )
+
+        # Reset density field
+        self._reset_fields()
 
         self._blobs = self._blob_factory.sample_blobs(
             Ly=self._geometry.Ly,
@@ -225,3 +219,12 @@ class Model:
             _stop = self._geometry.t.size
 
         return _start, _stop
+
+    def _reset_fields(self):
+        self._density = np.zeros(
+            shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
+        )
+        if self._labels in {"same", "individual"}:
+            self._labels_field = np.zeros(
+                shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
+            )
