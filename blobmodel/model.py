@@ -120,6 +120,9 @@ class Model:
         ----------
             xarray dataset with result data
         """
+        self._density = np.zeros(
+            shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
+        )
 
         self._blobs = self._blob_factory.sample_blobs(
             Ly=self._geometry.Ly,
