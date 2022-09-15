@@ -136,7 +136,9 @@ class Blob:
         )
 
     def _drain(self, t: NDArray) -> NDArray:
-        return np.exp(-(t - self.t_init) / self.t_drain)
+        if isinstance(self.t_drain, (int, float)):
+            return np.exp(-(t - self.t_init) / self.t_drain)
+        return np.exp(-(t - self.t_init) / self.t_drain[np.newaxis, :, np.newaxis])
 
     def _blob_arrival(self, t: NDArray) -> NDArray:
         return np.heaviside(t - self.t_init, 1)
@@ -164,7 +166,7 @@ class Blob:
             return np.exp(x_diffs) * np.heaviside(-1.0 * (x_diffs), 1)
         else:
             raise NotImplementedError(
-                self.__class__.__name__ + ".blob_shape not implemented"
+                f"{self.__class__.__name__}.blob_shape not implemented"
             )
 
     def _perpendicular_direction_shape(
