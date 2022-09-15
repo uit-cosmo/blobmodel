@@ -69,6 +69,11 @@ class Model:
         self.blob_shape: str = blob_shape
         self.num_blobs: int = num_blobs
         self.t_drain: Union[float, NDArray] = t_drain
+
+        assert (
+            isinstance(t_drain, (int, float)) or len(t_drain) == Nx
+        ), "t_drain must be of either length 1 or Nx"
+
         self._blobs: list[Blob] = []
         self._blob_factory = blob_factory
         self._density = np.zeros(
