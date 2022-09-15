@@ -1,5 +1,5 @@
 import warnings
-from typing import Tuple
+from typing import Tuple, Union
 from nptyping import NDArray
 import numpy as np
 
@@ -19,7 +19,7 @@ class Blob:
         pos_x: float,
         pos_y: float,
         t_init: float,
-        t_drain: float,
+        t_drain: Union[float, NDArray],
     ) -> None:
         self.int = int
         self.blob_id = blob_id
