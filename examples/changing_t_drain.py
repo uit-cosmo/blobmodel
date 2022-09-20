@@ -30,7 +30,7 @@ def plot_cahnging_t_drain(ds):
     t_w = 1 / 10
     amp = 1
     v_p = 1.0
-    t_loss = 2.0
+    t_loss = t_drain
     t_d = t_loss * t_p / (t_loss + t_p)
 
     analytical_profile = (
