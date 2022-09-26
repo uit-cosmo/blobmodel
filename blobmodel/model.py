@@ -1,10 +1,11 @@
 import numpy as np
 import xarray as xr
 from tqdm import tqdm
-from typing import List
+from typing import List, Union
 from .blobs import Blob
 from .stochasticality import BlobFactory, DefaultBlobFactory
 from .geometry import Geometry
+from nptyping import NDArray
 
 
 class Model:
@@ -21,7 +22,7 @@ class Model:
         periodic_y: bool = False,
         blob_shape: str = "gauss",
         num_blobs: int = 1000,
-        t_drain: float = 10,
+        t_drain: Union[float, NDArray] = 10,
         blob_factory: BlobFactory = DefaultBlobFactory(),
         labels: str = "off",
         label_border: float = 0.75,
@@ -43,7 +44,7 @@ class Model:
             number of blobs
         blob_shape: str, optional
             see Blob dataclass for available shapes
-        t_drain: float, optional
+        t_drain: float or array of length Nx, optional
             drain time for blobs
         blob_factory: BlobFactory, optional
             sets distributions of blob parameters
@@ -67,7 +68,12 @@ class Model:
         )
         self.blob_shape: str = blob_shape
         self.num_blobs: int = num_blobs
-        self.t_drain: float = t_drain
+        self.t_drain: Union[float, NDArray] = t_drain
+
+        assert (
+            isinstance(t_drain, (int, float)) or len(t_drain) == Nx
+        ), "t_drain must be of either length 1 or Nx"
+
         self._blobs: list[Blob] = []
         self._blob_factory = blob_factory
         self._labels = labels
