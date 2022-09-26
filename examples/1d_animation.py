@@ -11,7 +11,7 @@ bm = Model(
     T=10,
     periodic_y=False,
     blob_shape="exp",
-    num_blobs=10,
+    num_blobs=20,
     t_drain=10,
     blob_factory=bf,
 )
