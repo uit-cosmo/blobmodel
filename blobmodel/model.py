@@ -6,6 +6,7 @@ from .blobs import Blob
 from .stochasticality import BlobFactory, DefaultBlobFactory
 from .geometry import Geometry
 from nptyping import NDArray
+import warnings
 
 
 class Model:
@@ -63,11 +64,11 @@ class Model:
         """
         self._one_dimensional = one_dimensional
         if self._one_dimensional and (Ny != 1 or Ly != 0):
-            warnings("Overwritting Ny=1 and Ly=0 to allow one dimensional model")
+            warnings.warn("Overwritting Ny=1 and Ly=0 to allow one dimensional model")
             Ny = 1
             Ly = 0
             if not blob_factory.is_one_dimensional():
-                warnings(
+                warnings.warn(
                     "Using a one dimensional model with a with a blob factory that is not one-dimensional. Are you sure you know what you are doing?"
                 )
 
