@@ -26,6 +26,7 @@ class Model:
         blob_factory: BlobFactory = DefaultBlobFactory(),
         labels: str = "off",
         label_border: float = 0.75,
+        one_dimensional: bool = False,
     ) -> None:
         """
         Attributes
@@ -56,7 +57,20 @@ class Model:
         label_border: float, optional
             defines region of blob as region where density >= label_border * amplitude of Blob
             only used if labels = "same" or "individual"
+        one_dimensional: bool, optional
+            If True, the perpendicular shape of the blobs will be discarded. Parameters
+            for the y-component (Ny and Ly) will be overwritten to Ny=1, Ly=0.
         """
+        self._one_dimensional = one_dimensional
+        if self._one_dimensional and (Ny != 1 or Ly != 0):
+            warnings("Overwritting Ny=1 and Ly=0 to allow one dimensional model")
+            Ny = 1
+            Ly = 0
+            if not blob_factory.is_one_dimensional():
+                warnings(
+                    "Using a one dimensional model with a with a blob factory that is not one-dimensional. Are you sure you know what you are doing?"
+                )
+
         self._geometry: Geometry = Geometry(
             Nx=Nx,
             Ny=Ny,
@@ -184,6 +198,7 @@ class Model:
             t=self._geometry.t_matrix[:, :, _start:_stop],
             periodic_y=self._geometry.periodic_y,
             Ly=self._geometry.Ly,
+            one_dimensional=self._one_dimensional,
         )
 
         self._density[:, :, _start:_stop] += _single_blob

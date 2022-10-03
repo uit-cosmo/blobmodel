@@ -16,6 +16,11 @@ class BlobFactory(ABC):
         """creates list of Blobs used in Model."""
         raise NotImplementedError
 
+    @abstractmethod
+    def is_one_dimensional(self) -> bool:
+        """returns True if the BlobFactory is compatible with a one_dimensional model."""
+        raise NotImplementedError
+
 
 class DefaultBlobFactory(BlobFactory):
     """Default implementation of BlobFactory.
@@ -119,3 +124,7 @@ class DefaultBlobFactory(BlobFactory):
 
         # sort blobs by amplitude
         return np.array(_Blobs)[np.argsort(_amp)]
+
+    def is_one_dimensional(self) -> bool:
+        # Perpendicular width parameters are irrelevant since perp shape should be ignored by the Bolb class.
+        return self.vy_dist == "zeros"
