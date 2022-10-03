@@ -6,7 +6,7 @@ import numpy as np
 # use DefaultBlobFactory to define distribution functions fo random variables
 bf = DefaultBlobFactory(A_dist="deg", W_dist="deg", vx_dist="deg", vy_dist="zeros")
 
-tmp = Model(
+one_dim_model = Model(
     Nx=100,
     Ny=1,
     Lx=10,
@@ -21,11 +21,9 @@ tmp = Model(
     one_dimensional=True,
 )
 
-tmp.make_realization(file_name="test_analytical.nc", speed_up=True, error=1e-2)
 
-
-def test_convergence_to_analytical_solution():
-    ds = xr.open_dataset("test_analytical.nc")
+def test_one_dim():
+    ds = one_dim_model.make_realization(speed_up=True, error=1e-2)
     model_profile = ds.n.isel(y=0).mean(dim=("t"))
 
     x = np.linspace(0, 10, 100)
@@ -43,4 +41,4 @@ def test_convergence_to_analytical_solution():
     assert error < 0.1, "Numerical error too big"
 
 
-test_convergence_to_analytical_solution()
+test_one_dim()
