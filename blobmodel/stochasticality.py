@@ -18,7 +18,8 @@ class BlobFactory(ABC):
 
     @abstractmethod
     def is_one_dimensional(self) -> bool:
-        """returns True if the BlobFactory is compatible with a one_dimensional model."""
+        """returns True if the BlobFactory is compatible with a one_dimensional
+        model."""
         raise NotImplementedError
 
 
