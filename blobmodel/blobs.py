@@ -176,7 +176,7 @@ class Blob:
         if self.blob_shape == "gauss":
             return 1 / np.sqrt(np.pi) * np.exp(-(x_diffs**2 / self.width_prop**2))
         elif self.blob_shape == "exp":
-            return np.exp(x_diffs) * np.heaviside(-1.0 * (x_diffs), 1)
+            return np.exp(x_diffs / self.width_prop) * np.heaviside(-1.0 * (x_diffs), 1)
         else:
             raise NotImplementedError(
                 f"{self.__class__.__name__}.blob_shape not implemented"
