@@ -39,6 +39,9 @@ class CustomBlobFactory(BlobFactory):
             for i in range(num_blobs)
         ]
 
+    def is_one_dimensional(self) -> bool:
+        return False
+
 
 def test_bloblabels_speedup():
     warnings.filterwarnings("ignore")

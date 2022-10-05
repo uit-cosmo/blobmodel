@@ -38,6 +38,9 @@ class CustomBlobFactoryVy0(BlobFactory):
             for i in range(num_blobs)
         ]
 
+    def is_one_dimensional(self) -> bool:
+        return False
+
 
 class CustomBlobFactoryVx0(BlobFactory):
     def __init__(self) -> None:
@@ -73,6 +76,9 @@ class CustomBlobFactoryVx0(BlobFactory):
             )
             for i in range(num_blobs)
         ]
+
+    def is_one_dimensional(self) -> bool:
+        return False
 
 
 bf_vy_0 = CustomBlobFactoryVy0()

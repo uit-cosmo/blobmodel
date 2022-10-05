@@ -16,6 +16,12 @@ class BlobFactory(ABC):
         """creates list of Blobs used in Model."""
         raise NotImplementedError
 
+    @abstractmethod
+    def is_one_dimensional(self) -> bool:
+        """returns True if the BlobFactory is compatible with a one_dimensional
+        model."""
+        raise NotImplementedError
+
 
 class DefaultBlobFactory(BlobFactory):
     """Default implementation of BlobFactory.
@@ -42,7 +48,7 @@ class DefaultBlobFactory(BlobFactory):
         normal: normal distribution with zero mean and `free_parameter` as scale parameter
         uniform: uniorm distribution with mean 1 and `free_parameter` as width
         ray: rayleight distribution with mean 1
-        deg: array on ones
+        deg: degenerate distribution at `free_parameter`
         zeros: array of zeros
         """
         self.A_dist = A_dist
@@ -76,7 +82,7 @@ class DefaultBlobFactory(BlobFactory):
         elif dist_type == "ray":
             return np.random.rayleigh(scale=np.sqrt(2.0 / np.pi), size=num_blobs)
         elif dist_type == "deg":
-            return np.ones(num_blobs)
+            return free_parameter * np.ones(num_blobs)
         elif dist_type == "zeros":
             return np.zeros(num_blobs)
         else:
@@ -119,3 +125,7 @@ class DefaultBlobFactory(BlobFactory):
 
         # sort blobs by amplitude
         return np.array(_Blobs)[np.argsort(_amp)]
+
+    def is_one_dimensional(self) -> bool:
+        # Perpendicular width parameters are irrelevant since perp shape should be ignored by the Bolb class.
+        return self.vy_dist == "zeros"

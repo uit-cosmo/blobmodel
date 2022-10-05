@@ -45,9 +45,10 @@ class Blob:
         t: NDArray,
         Ly: float,
         periodic_y: bool = False,
+        one_dimensional: bool = False,
     ) -> NDArray:
         """
-        Discretize blob on grid
+        Discretize blob on grid. If one_dimensional the perpendicular pulse shape is ignored.
         The following blob shapes are implemented:
                 gauss: 2D gaussian function
                 exp: one sided exponential in x and gaussian in y
@@ -56,14 +57,19 @@ class Blob:
                 -------
                 discretized blob on 3d array with dimensions x,y and t : np.array
         """
+        # If one_dimensional, then Ly should be 0.
+        assert (one_dimensional and Ly == 0) or not one_dimensional
+
         if (self.width_perp > 0.1 * Ly or self.width_prop > 0.1 * Ly) and periodic_y:
             warnings.warn("blob width big compared to Ly")
 
         x_perp, y_perp = self._rotate(
             origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self.theta
         )
-        if not periodic_y:
-            return self._single_blob(x_perp, y_perp, t, Ly, periodic_y)
+        if not periodic_y or one_dimensional:
+            return self._single_blob(
+                x_perp, y_perp, t, Ly, periodic_y, one_dimensional=one_dimensional
+            )
         if np.sin(self.theta) == 0:
             _x_border = Ly - self.pos_y
             _adjusted_Ly = Ly
@@ -92,6 +98,7 @@ class Blob:
                 _number_of_y_propagations,
                 x_offset=Ly * np.sin(self.theta),
                 y_offset=Ly * np.cos(self.theta),
+                one_dimensional=one_dimensional,
             )
             + self._single_blob(
                 x_perp,
@@ -102,6 +109,7 @@ class Blob:
                 _number_of_y_propagations,
                 x_offset=-Ly * np.sin(self.theta),
                 y_offset=-Ly * np.cos(self.theta),
+                one_dimensional=one_dimensional,
             )
         )
 
@@ -115,6 +123,7 @@ class Blob:
         number_of_y_propagations: NDArray = 0,
         x_offset: NDArray = 0,
         y_offset: NDArray = 0,
+        one_dimensional: bool = False,
     ) -> NDArray:
         return (
             self.amplitude
@@ -126,11 +135,15 @@ class Blob:
                 periodic_y,
                 number_of_y_propagations=number_of_y_propagations,
             )
-            * self._perpendicular_direction_shape(
-                y_perp + y_offset,
-                Ly,
-                periodic_y,
-                number_of_y_propagations=number_of_y_propagations,
+            * (
+                1
+                if one_dimensional
+                else self._perpendicular_direction_shape(
+                    y_perp + y_offset,
+                    Ly,
+                    periodic_y,
+                    number_of_y_propagations=number_of_y_propagations,
+                )
             )
             * self._blob_arrival(t)
         )
@@ -161,9 +174,9 @@ class Blob:
             x_diffs = x - self._prop_dir_blob_position(t)
 
         if self.blob_shape == "gauss":
-            return 1 / np.sqrt(np.pi) * np.exp(-(x_diffs ** 2 / self.width_prop ** 2))
+            return 1 / np.sqrt(np.pi) * np.exp(-(x_diffs**2 / self.width_prop**2))
         elif self.blob_shape == "exp":
-            return np.exp(x_diffs) * np.heaviside(-1.0 * (x_diffs), 1)
+            return np.exp(x_diffs / self.width_prop) * np.heaviside(-1.0 * (x_diffs), 1)
         else:
             raise NotImplementedError(
                 f"{self.__class__.__name__}.blob_shape not implemented"
@@ -184,10 +197,10 @@ class Blob:
             )
         else:
             y_diffs = y - self._perp_dir_blob_position()
-        return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs ** 2) / self.width_perp ** 2)
+        return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs**2) / self.width_perp**2)
 
     def _prop_dir_blob_position(self, t: NDArray) -> NDArray:
-        return self.pos_x + (self.v_x ** 2 + self.v_y ** 2) ** 0.5 * (t - self.t_init)
+        return self.pos_x + (self.v_x**2 + self.v_y**2) ** 0.5 * (t - self.t_init)
 
     def _perp_dir_blob_position(self) -> NDArray:
         return self.pos_y
