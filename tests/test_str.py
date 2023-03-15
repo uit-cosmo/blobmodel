@@ -1,5 +1,5 @@
 import pytest
-from blobmodel import Model
+from blobmodel import Model, BlobShapeImpl
 from blobmodel.geometry import Geometry
 
 
@@ -13,7 +13,7 @@ def test_blob_shape_exception():
             dt=0.5,
             T=1,
             periodic_y=False,
-            blob_shape="different_shape",
+            blob_shape=BlobShapeImpl("different_shape"),
             num_blobs=1,
         )
         bm.make_realization(speed_up=True, error=0.1)
@@ -36,10 +36,10 @@ def test_model_str():
         dt=0.5,
         T=1,
         periodic_y=False,
-        blob_shape="exp",
+        blob_shape=BlobShapeImpl("exp"),
         num_blobs=1,
     )
-    assert str(bm) == "2d Blob Model with blob shape:exp, num_blobs:1 and t_drain:10"
+    assert str(bm) == "2d Blob Model with num_blobs:1 and t_drain:10"
 
 
 test_blob_shape_exception()

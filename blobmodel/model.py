@@ -7,6 +7,7 @@ from .stochasticality import BlobFactory, DefaultBlobFactory
 from .geometry import Geometry
 from nptyping import NDArray
 import warnings
+from .pulse_shape import AbstractBlobShape, BlobShapeImpl
 
 
 class Model:
@@ -21,7 +22,7 @@ class Model:
         dt: float = 0.1,
         T: float = 10,
         periodic_y: bool = False,
-        blob_shape: str = "gauss",
+        blob_shape: AbstractBlobShape = BlobShapeImpl("gauss"),
         num_blobs: int = 1000,
         t_drain: Union[float, NDArray] = 10,
         blob_factory: BlobFactory = DefaultBlobFactory(),
@@ -81,7 +82,7 @@ class Model:
             T=T,
             periodic_y=periodic_y,
         )
-        self.blob_shape: str = blob_shape
+        self.blob_shape = BlobShapeImpl(blob_shape) if isinstance(blob_shape, str) else blob_shape
         self.num_blobs: int = num_blobs
         self.t_drain: Union[float, NDArray] = t_drain
 
@@ -98,7 +99,7 @@ class Model:
     def __str__(self) -> str:
         """string representation of Model."""
         return (
-            f"2d Blob Model with blob shape:{self.blob_shape},"
+            f"2d Blob Model with"
             + f" num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
         )
 

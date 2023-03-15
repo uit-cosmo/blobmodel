@@ -3,6 +3,7 @@ import numpy as np
 from nptyping import NDArray, Float
 from typing import Any, List
 from .blobs import Blob
+from .pulse_shape import AbstractBlobShape
 
 
 class BlobFactory(ABC):
@@ -11,7 +12,12 @@ class BlobFactory(ABC):
 
     @abstractmethod
     def sample_blobs(
-        self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
+        self,
+        Ly: float,
+        T: float,
+        num_blobs: int,
+        blob_shape: AbstractBlobShape,
+        t_drain: float,
     ) -> List[Blob]:
         """creates list of Blobs used in Model."""
         raise NotImplementedError
@@ -91,7 +97,12 @@ class DefaultBlobFactory(BlobFactory):
             )
 
     def sample_blobs(
-        self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
+        self,
+        Ly: float,
+        T: float,
+        num_blobs: int,
+        blob_shape: AbstractBlobShape,
+        t_drain: float,
     ) -> List[Blob]:
         _amp = self._draw_random_variables(
             dist_type=self.A_dist, free_parameter=self.A_parameter, num_blobs=num_blobs

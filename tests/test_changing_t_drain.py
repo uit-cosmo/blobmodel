@@ -1,4 +1,4 @@
-from blobmodel import Model, DefaultBlobFactory
+from blobmodel import Model, DefaultBlobFactory, BlobShapeImpl
 import xarray as xr
 import numpy as np
 
@@ -15,7 +15,7 @@ tmp = Model(
     Ly=0,
     dt=1,
     T=1000,
-    blob_shape="exp",
+    blob_shape=BlobShapeImpl("exp"),
     t_drain=t_drain,
     periodic_y=False,
     num_blobs=10000,

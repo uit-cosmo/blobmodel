@@ -1,4 +1,4 @@
-from blobmodel import Model, BlobFactory, Blob
+from blobmodel import Model, BlobFactory, Blob, BlobShapeImpl
 import numpy as np
 import warnings
 from typing import List
@@ -9,7 +9,12 @@ class CustomBlobFactory(BlobFactory):
         pass
 
     def sample_blobs(
-        self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
+        self,
+        Ly: float,
+        T: float,
+        num_blobs: int,
+        blob_shape: BlobShapeImpl,
+        t_drain: float,
     ) -> List[Blob]:
 
         # set custom parameter distributions
@@ -54,7 +59,7 @@ def test_bloblabels_speedup():
         dt=1,
         T=5,
         periodic_y=True,
-        blob_shape="gauss",
+        blob_shape=BlobShapeImpl("gauss"),
         num_blobs=1,
         blob_factory=bf,
         t_drain=1e10,
@@ -87,7 +92,7 @@ def test_bloblabels():
         dt=1,
         T=5,
         periodic_y=True,
-        blob_shape="gauss",
+        blob_shape=BlobShapeImpl("gauss"),
         num_blobs=1,
         blob_factory=bf,
         t_drain=1e10,
