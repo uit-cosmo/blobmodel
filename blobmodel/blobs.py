@@ -72,23 +72,23 @@ class Blob:
                 x_perp, y_perp, t, Ly, periodic_y, one_dimensional=one_dimensional
             )
         if np.sin(self.theta) == 0:
-            _x_border = Ly - self.pos_y
-            _adjusted_Ly = Ly
+            x_border = Ly - self.pos_y
+            adjusted_Ly = Ly
         else:
-            _x_border = (Ly - self.pos_y) / np.sin(self.theta)
-            _adjusted_Ly = Ly / np.sin(self.theta)
+            x_border = (Ly - self.pos_y) / np.sin(self.theta)
+            adjusted_Ly = Ly / np.sin(self.theta)
         if type(t) in [int, float]:
             # t has dimensionality = 0, used for testing
-            _number_of_y_propagations = (
-                self._prop_dir_blob_position(t) + _adjusted_Ly - _x_border
-            ) // _adjusted_Ly
+            number_of_y_propagations = (
+                self._prop_dir_blob_position(t) + adjusted_Ly - x_border
+            ) // adjusted_Ly
         else:
-            _number_of_y_propagations = (
-                self._prop_dir_blob_position(t)[0, 0] + _adjusted_Ly - _x_border
-            ) // _adjusted_Ly
+            number_of_y_propagations = (
+                self._prop_dir_blob_position(t)[0, 0] + adjusted_Ly - x_border
+            ) // adjusted_Ly
         return (
             self._single_blob(
-                x_perp, y_perp, t, Ly, periodic_y, _number_of_y_propagations
+                x_perp, y_perp, t, Ly, periodic_y, number_of_y_propagations
             )
             + self._single_blob(
                 x_perp,
@@ -96,7 +96,7 @@ class Blob:
                 t,
                 Ly,
                 periodic_y,
-                _number_of_y_propagations,
+                number_of_y_propagations,
                 x_offset=Ly * np.sin(self.theta),
                 y_offset=Ly * np.cos(self.theta),
                 one_dimensional=one_dimensional,
@@ -107,7 +107,7 @@ class Blob:
                 t,
                 Ly,
                 periodic_y,
-                _number_of_y_propagations,
+                number_of_y_propagations,
                 x_offset=-Ly * np.sin(self.theta),
                 y_offset=-Ly * np.cos(self.theta),
                 one_dimensional=one_dimensional,

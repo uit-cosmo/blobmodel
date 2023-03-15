@@ -222,14 +222,14 @@ class Model:
 
     def _compute_start_stop(self, blob: Blob, speed_up: bool, error: float):
         if speed_up:
-            _start = int(blob.t_init / self._geometry.dt)
+            start = int(blob.t_init / self._geometry.dt)
             if blob.v_x == 0:
-                _stop = self._geometry.t.size
+                stop = self._geometry.t.size
             else:
                 # ignores t_drain when calculating stop time
-                _stop = np.minimum(
+                stop = np.minimum(
                     self._geometry.t.size,
-                    _start
+                    start
                     + int(
                         (
                             -np.log(error * np.sqrt(np.pi))
@@ -240,10 +240,10 @@ class Model:
                     ),
                 )
         else:
-            _start = 0
-            _stop = self._geometry.t.size
+            start = 0
+            stop = self._geometry.t.size
 
-        return _start, _stop
+        return start, stop
 
     def _reset_fields(self):
         self._density = np.zeros(
