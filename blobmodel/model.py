@@ -22,7 +22,7 @@ class Model:
         dt: float = 0.1,
         T: float = 10,
         periodic_y: bool = False,
-        blob_shape: AbstractBlobShape = BlobShapeImpl("gauss"),
+        blob_shape: Union[AbstractBlobShape, str] = BlobShapeImpl("gauss"),
         num_blobs: int = 1000,
         t_drain: Union[float, NDArray] = 10,
         blob_factory: BlobFactory = DefaultBlobFactory(),
@@ -82,7 +82,9 @@ class Model:
             T=T,
             periodic_y=periodic_y,
         )
-        self.blob_shape = BlobShapeImpl(blob_shape) if isinstance(blob_shape, str) else blob_shape
+        self.blob_shape = (
+            BlobShapeImpl(blob_shape) if isinstance(blob_shape, str) else blob_shape
+        )
         self.num_blobs: int = num_blobs
         self.t_drain: Union[float, NDArray] = t_drain
 

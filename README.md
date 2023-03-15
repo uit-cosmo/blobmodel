@@ -39,11 +39,12 @@ The data can be shown as an animation using the `show_model` function:
 show_model(ds)
 ```
 You can specify the blob parameters with a BlobFactory class. The DefaultBlobFactory class has some of the most common distribution functions implemented. An example would look like this:
+
 ```Python
 from blobmodel import Model, DefaultBlobFactory
 
 # use DefaultBlobFactory to define distribution functions fo random variables
-bf = DefaultBlobFactory(A_dist="exp", W_dist="uniform", vx_dist="deg", vy_dist="normal")
+bf = DefaultBlobFactory(A_dist="exp", wx_dist="uniform", vx_dist="deg", vy_dist="normal")
 
 # pass on bf when creating the Model
 tmp = Model(

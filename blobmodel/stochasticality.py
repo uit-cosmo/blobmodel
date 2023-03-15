@@ -39,11 +39,13 @@ class DefaultBlobFactory(BlobFactory):
     def __init__(
         self,
         A_dist: str = "exp",
-        W_dist: str = "exp",
+        wx_dist: str = "deg",
+        wy_dist: str = "deg",
         vx_dist: str = "deg",
         vy_dist: str = "normal",
         A_parameter: float = 1.0,
-        W_parameter: float = 1.0,
+        wx_parameter: float = 1.0,
+        wy_parameter: float = 1.0,
         vx_parameter: float = 1.0,
         vy_parameter: float = 1.0,
     ) -> None:
@@ -58,11 +60,13 @@ class DefaultBlobFactory(BlobFactory):
         zeros: array of zeros
         """
         self.A_dist = A_dist
-        self.W_dist = W_dist
+        self.wx_dist = wx_dist
+        self.wy_dist = wy_dist
         self.vx_dist = vx_dist
         self.vy_dist = vy_dist
         self.A_parameter = A_parameter
-        self.W_parameter = W_parameter
+        self.wx_parameter = wx_parameter
+        self.wy_parameter = wy_parameter
         self.vx_parameter = vx_parameter
         self.vy_parameter = vy_parameter
 
@@ -104,38 +108,36 @@ class DefaultBlobFactory(BlobFactory):
         blob_shape: AbstractBlobShape,
         t_drain: float,
     ) -> List[Blob]:
-        _amp = self._draw_random_variables(
+        amps = self._draw_random_variables(
             dist_type=self.A_dist, free_parameter=self.A_parameter, num_blobs=num_blobs
         )
-        _width = self._draw_random_variables(self.W_dist, self.W_parameter, num_blobs)
-        _vx = self._draw_random_variables(self.vx_dist, self.vx_parameter, num_blobs)
-        _vy = self._draw_random_variables(self.vy_dist, self.vy_parameter, num_blobs)
-        _posx = np.zeros(num_blobs)
-        _posy = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
-        _t_init = np.random.uniform(low=0, high=T, size=num_blobs)
-
-        # # sort blobs by _t_init
-        # _t_init = np.sort(_t_init)
+        wxs = self._draw_random_variables(self.wx_dist, self.wx_parameter, num_blobs)
+        wys = self._draw_random_variables(self.wy_dist, self.wy_parameter, num_blobs)
+        vxs = self._draw_random_variables(self.vx_dist, self.vx_parameter, num_blobs)
+        vys = self._draw_random_variables(self.vy_dist, self.vy_parameter, num_blobs)
+        posxs = np.zeros(num_blobs)
+        posys = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
+        t_inits = np.random.uniform(low=0, high=T, size=num_blobs)
 
         _Blobs = [
             Blob(
                 blob_id=i,
                 blob_shape=blob_shape,
-                amplitude=_amp[i],
-                width_prop=_width[i],
-                width_perp=_width[i],
-                v_x=_vx[i],
-                v_y=_vy[i],
-                pos_x=_posx[i],
-                pos_y=_posy[i],
-                t_init=_t_init[i],
+                amplitude=amps[i],
+                width_prop=wxs[i],
+                width_perp=wys[i],
+                v_x=vxs[i],
+                v_y=vys[i],
+                pos_x=posxs[i],
+                pos_y=posys[i],
+                t_init=t_inits[i],
                 t_drain=t_drain,
             )
             for i in range(num_blobs)
         ]
 
         # sort blobs by amplitude
-        return np.array(_Blobs)[np.argsort(_amp)]
+        return np.array(_Blobs)[np.argsort(amps)]
 
     def is_one_dimensional(self) -> bool:
         # Perpendicular width parameters are irrelevant since perp shape should be ignored by the Bolb class.
