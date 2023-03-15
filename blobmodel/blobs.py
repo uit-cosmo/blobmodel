@@ -174,7 +174,7 @@ class Blob:
         else:
             x_diffs = x - self._prop_dir_blob_position(t)
         theta_x = x_diffs / self.width_prop
-        return self.blob_shape.pulse_shape_prop(theta_x)
+        return self.blob_shape.get_pulse_shape_prop(theta_x, ...)
 
     def _perpendicular_direction_shape(
         self,
@@ -192,7 +192,7 @@ class Blob:
         else:
             y_diffs = y - self._perp_dir_blob_position()
         theta_y = y_diffs / self.width_perp
-        return self.blob_shape.pulse_shape_perp(theta_y)
+        return self.blob_shape.get_pulse_shape_perp(theta_y, ...)
 
     def _prop_dir_blob_position(self, t: NDArray) -> NDArray:
         return self.pos_x + (self.v_x**2 + self.v_y**2) ** 0.5 * (t - self.t_init)
