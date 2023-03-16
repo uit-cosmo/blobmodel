@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from nptyping import NDArray
-from typing import Callable, Dict
 
 
 class AbstractBlobShape(ABC):
@@ -26,7 +25,7 @@ class BlobShapeImpl(AbstractBlobShape):
     __SHAPE_NAMES__ = {"exp", "gauss", "2-exp", "lorentz", "secant"}
 
     def __init__(self, pulse_shape_prop="gauss", pulse_shape_perp="gauss"):
-        self.__GENERATORS__: Dict[str, Callable[[np.ndarray, dict], np.ndarray]] = {
+        self.__GENERATORS__ = {
             "exp": BlobShapeImpl._get_exponential_shape,
             "gauss": BlobShapeImpl._get_gaussian_shape,
             "2-exp": BlobShapeImpl._get_double_exponential_shape,
