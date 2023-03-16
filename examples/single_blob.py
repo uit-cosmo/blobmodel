@@ -1,4 +1,4 @@
-from blobmodel import Model, show_model, BlobFactory, Blob
+from blobmodel import Model, show_model, BlobFactory, Blob, AbstractBlobShape
 import numpy as np
 
 # here you can define your custom parameter distributions
@@ -7,7 +7,12 @@ class CustomBlobFactory(BlobFactory):
         pass
 
     def sample_blobs(
-        self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
+        self,
+        Ly: float,
+        T: float,
+        num_blobs: int,
+        blob_shape: AbstractBlobShape,
+        t_drain: float,
     ) -> list[Blob]:
 
         # set custom parameter distributions

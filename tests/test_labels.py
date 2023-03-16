@@ -1,4 +1,4 @@
-from blobmodel import Model, BlobFactory, Blob, BlobShapeImpl
+from blobmodel import Model, BlobFactory, Blob, BlobShapeImpl, AbstractBlobShape
 import numpy as np
 import warnings
 from typing import List
@@ -13,7 +13,7 @@ class CustomBlobFactory(BlobFactory):
         Ly: float,
         T: float,
         num_blobs: int,
-        blob_shape: BlobShapeImpl,
+        blob_shape: AbstractBlobShape,
         t_drain: float,
     ) -> List[Blob]:
 

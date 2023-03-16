@@ -56,6 +56,7 @@ class BlobShapeImpl(AbstractBlobShape):
             return BlobShapeImpl._get_gaussian_shape
         if shape_name == "secant":
             return BlobShapeImpl._get_secant_shape
+        raise NotImplementedError("blob_shape not implemented")
 
     @staticmethod
     def _get_exponential_shape(theta: np.ndarray, kwargs) -> np.ndarray:
