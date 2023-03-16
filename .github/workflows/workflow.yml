@@ -30,11 +30,11 @@ jobs:
 
   pytest:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     if: always()
     strategy:
       matrix:
-        python-version: [3.12.0]
+        python-version: [3.10.2]
         pip-packages:
           - "setuptools pip pytest pytest-cov coverage codecov mypy"
       fail-fast: false
