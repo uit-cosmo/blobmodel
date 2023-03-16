@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from blobmodel import Model, show_model, BlobShapeImpl
+from blobmodel import Model, show_model
 import warnings
 
 
@@ -11,7 +11,7 @@ bm_2d = Model(
     dt=0.1,
     T=1,
     periodic_y=False,
-    blob_shape=BlobShapeImpl("exp"),
+    blob_shape="exp",
     num_blobs=1,
 )
 
@@ -33,7 +33,7 @@ bm_1d = Model(
     dt=0.1,
     T=1,
     periodic_y=False,
-    blob_shape=BlobShapeImpl("exp"),
+    blob_shape="exp",
     num_blobs=1,
 )
 

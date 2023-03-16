@@ -221,40 +221,37 @@ class Model:
             ] = (blob.blob_id + 1)
 
     def _compute_start_stop(self, blob: Blob, speed_up: bool, error: float):
-        if speed_up:
-            if blob.v_x == 0:
-                start = 0
-                stop = self._geometry.t.size
-                return start, stop
-            start = int(
+        if not speed_up or blob.v_x == 0:
+            return 0, self._geometry.t.size
+        start = int(
+            (
+                blob.t_init * blob.v_x
+                + blob.width_prop * np.log(error * np.sqrt(np.pi))
+                + blob.pos_x
+            )
+            / (self._geometry.dt * blob.v_x)
+        )
+        # ignores t_drain when calculating stop time
+        stop = np.minimum(
+            self._geometry.t.size,
+            start
+            + int(
                 (
-                    blob.t_init * blob.v_x
-                    + blob.width_prop * np.log(error * np.sqrt(np.pi))
-                    + blob.pos_x
+                    -blob.width_prop * np.log(error * np.sqrt(np.pi))
+                    + self._geometry.Lx
+                    - blob.pos_x
                 )
-                / (self._geometry.dt * blob.v_x)
-            )
-            # ignores t_drain when calculating stop time
-            stop = np.minimum(
-                self._geometry.t.size,
-                start
-                + int(
-                    (
-                        -blob.width_prop * np.log(error * np.sqrt(np.pi))
-                        + self._geometry.Lx
-                        - blob.pos_x
-                    )
-                    / (blob.v_x * self._geometry.dt)
-                ),
-            )
-            return start, stop
-        return 0, self._geometry.t.size
+                / (blob.v_x * self._geometry.dt)
+            ),
+        )
+        return start, stop
 
-    def _reset_fields(self):
-        self._density = np.zeros(
+
+def _reset_fields(self):
+    self._density = np.zeros(
+        shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
+    )
+    if self._labels in {"same", "individual"}:
+        self._labels_field = np.zeros(
             shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
         )
-        if self._labels in {"same", "individual"}:
-            self._labels_field = np.zeros(
-                shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
-            )

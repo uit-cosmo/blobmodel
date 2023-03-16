@@ -3,7 +3,6 @@ from blobmodel import (
     BlobFactory,
     Blob,
     show_model,
-    BlobShapeImpl,
     AbstractBlobShape,
 )
 import numpy as np

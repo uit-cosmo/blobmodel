@@ -119,7 +119,7 @@ class DefaultBlobFactory(BlobFactory):
         posys = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
         t_inits = np.random.uniform(low=0, high=T, size=num_blobs)
 
-        _Blobs = [
+        blobs = [
             Blob(
                 blob_id=i,
                 blob_shape=blob_shape,
@@ -137,7 +137,7 @@ class DefaultBlobFactory(BlobFactory):
         ]
 
         # sort blobs by amplitude
-        return np.array(_Blobs)[np.argsort(amps)]
+        return np.array(blobs)[np.argsort(amps)]
 
     def is_one_dimensional(self) -> bool:
         # Perpendicular width parameters are irrelevant since perp shape should be ignored by the Bolb class.
