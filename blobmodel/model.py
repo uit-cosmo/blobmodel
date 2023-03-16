@@ -246,12 +246,11 @@ class Model:
         )
         return start, stop
 
-
-def _reset_fields(self):
-    self._density = np.zeros(
-        shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
-    )
-    if self._labels in {"same", "individual"}:
-        self._labels_field = np.zeros(
+    def _reset_fields(self):
+        self._density = np.zeros(
             shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
         )
+        if self._labels in {"same", "individual"}:
+            self._labels_field = np.zeros(
+                shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
+            )
