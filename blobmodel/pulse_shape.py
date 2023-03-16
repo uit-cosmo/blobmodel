@@ -24,7 +24,7 @@ class BlobShapeImpl(AbstractBlobShape):
     Implementation of the AbstractPulseShape class.
     """
 
-    __SHAPE_NAMES__ = {"exp", "gauss", "2-exp", "lorentz"}
+    __SHAPE_NAMES__ = {"exp", "gauss", "2-exp", "lorentz", "secant"}
 
     def __init__(self, pulse_shape_prop="gauss", pulse_shape_perp="gauss"):
         self.pulse_shape_prop = pulse_shape_prop
@@ -55,6 +55,8 @@ class BlobShapeImpl(AbstractBlobShape):
             return BlobShapeImpl._get_lorentz_shape
         if shape_name == "gauss":
             return BlobShapeImpl._get_gaussian_shape
+        if shape_name == "secant":
+            return BlobShapeImpl._get_secant_shape
 
     @staticmethod
     def _get_exponential_shape(theta: np.ndarray, kwargs) -> np.ndarray:
@@ -76,3 +78,7 @@ class BlobShapeImpl(AbstractBlobShape):
     @staticmethod
     def _get_gaussian_shape(theta: np.ndarray, kwargs) -> np.ndarray:
         return 1 / np.sqrt(np.pi) * np.exp(-(theta**2))
+
+    @staticmethod
+    def _get_secant_shape(theta: np.ndarray, kwargs) -> np.ndarray:
+        return 2 / np.pi / (np.exp(theta) + np.exp(-theta))

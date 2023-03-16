@@ -146,7 +146,6 @@ class Blob:
                     number_of_y_propagations=number_of_y_propagations,
                 )
             )
-            * self._blob_arrival(t)
         )
 
     def _drain(self, t: NDArray) -> NDArray:
