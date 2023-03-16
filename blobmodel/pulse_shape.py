@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from nptyping import NDArray
-from typing import Callable
+from typing import Callable, Dict
 
 
 class AbstractBlobShape(ABC):
@@ -26,6 +26,13 @@ class BlobShapeImpl(AbstractBlobShape):
     __SHAPE_NAMES__ = {"exp", "gauss", "2-exp", "lorentz", "secant"}
 
     def __init__(self, pulse_shape_prop="gauss", pulse_shape_perp="gauss"):
+        self.__GENERATORS__: Dict[str, Callable[[np.ndarray, dict], np.ndarray]] = {
+            "exp": BlobShapeImpl._get_exponential_shape,
+            "gauss": BlobShapeImpl._get_gaussian_shape,
+            "2-exp": BlobShapeImpl._get_double_exponential_shape,
+            "lorentz": BlobShapeImpl._get_lorentz_shape,
+            "secant": BlobShapeImpl._get_secant_shape,
+        }
         self.pulse_shape_prop = pulse_shape_prop
         self.pulse_shape_perp = pulse_shape_perp
         if (
@@ -37,26 +44,10 @@ class BlobShapeImpl(AbstractBlobShape):
             )
 
     def get_pulse_shape_prop(self, theta: np.ndarray, kwargs) -> np.ndarray:
-        return self._get_generator(self.pulse_shape_prop)(theta, kwargs)
+        return self.__GENERATORS__.get(self.pulse_shape_prop)(theta, kwargs)
 
     def get_pulse_shape_perp(self, theta: np.ndarray, kwargs) -> np.ndarray:
-        return self._get_generator(self.pulse_shape_perp)(theta, kwargs)
-
-    @staticmethod
-    def _get_generator(
-        shape_name: str,
-    ) -> Callable[[np.ndarray, dict], np.ndarray]:
-        if shape_name == "exp":
-            return BlobShapeImpl._get_exponential_shape
-        if shape_name == "2-exp":
-            return BlobShapeImpl._get_double_exponential_shape
-        if shape_name == "lorentz":
-            return BlobShapeImpl._get_lorentz_shape
-        if shape_name == "gauss":
-            return BlobShapeImpl._get_gaussian_shape
-        if shape_name == "secant":
-            return BlobShapeImpl._get_secant_shape
-        raise NotImplementedError("blob_shape not implemented")
+        return self.__GENERATORS__.get(self.pulse_shape_perp)(theta, kwargs)
 
     @staticmethod
     def _get_exponential_shape(theta: np.ndarray, kwargs) -> np.ndarray:
