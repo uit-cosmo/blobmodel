@@ -153,9 +153,6 @@ class Blob:
             return np.exp(-(t - self.t_init) / self.t_drain)
         return np.exp(-(t - self.t_init) / self.t_drain[np.newaxis, :, np.newaxis])
 
-    def _blob_arrival(self, t: NDArray) -> NDArray:
-        return np.heaviside(t - self.t_init, 1)
-
     def _propagation_direction_shape(
         self,
         x: NDArray,
