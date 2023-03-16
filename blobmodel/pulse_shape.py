@@ -5,8 +5,9 @@ from typing import Callable
 
 
 class AbstractBlobShape(ABC):
-    """
-    Abstract class containing the blob pulse shapes. Two-dimensional blob pulse shapes are written in the form
+    """Abstract class containing the blob pulse shapes. Two-dimensional blob
+    pulse shapes are written in the form.
+
     phi(theta_x, theta_y) = phi_x(theta_x) * phi_y(theta_y).
     """
 
@@ -20,9 +21,7 @@ class AbstractBlobShape(ABC):
 
 
 class BlobShapeImpl(AbstractBlobShape):
-    """
-    Implementation of the AbstractPulseShape class.
-    """
+    """Implementation of the AbstractPulseShape class."""
 
     __SHAPE_NAMES__ = {"exp", "gauss", "2-exp", "lorentz", "secant"}
 
