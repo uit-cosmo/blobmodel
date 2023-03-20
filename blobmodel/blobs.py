@@ -76,10 +76,9 @@ class Blob:
         else:
             x_border = (Ly - self.pos_y) / np.sin(self.theta)
             adjusted_Ly = Ly / np.sin(self.theta)
-            # t has dimensionality = 0, used for testing
             prop_dir = (
                 self._prop_dir_blob_position(t)
-                if type(t) in [int, float]
+                if type(t) in [int, float]  # t has dimensionality = 0, used for testing
                 else self._prop_dir_blob_position(t)[0, 0]
             )
             number_of_y_propagations = (
