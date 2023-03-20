@@ -223,13 +223,16 @@ class Model:
     def _compute_start_stop(self, blob: Blob, speed_up: bool, error: float):
         if not speed_up or blob.v_x == 0:
             return 0, self._geometry.t.size
-        start = int(
-            (
-                blob.t_init * blob.v_x
-                + blob.width_prop * np.log(error * np.sqrt(np.pi))
-                + blob.pos_x
-            )
-            / (self._geometry.dt * blob.v_x)
+        start = np.maximum(
+            0,
+            int(
+                (
+                    blob.t_init * blob.v_x
+                    + blob.width_prop * np.log(error * np.sqrt(np.pi))
+                    + blob.pos_x
+                )
+                / (self._geometry.dt * blob.v_x)
+            ),
         )
         # ignores t_drain when calculating stop time
         stop = np.minimum(
