@@ -39,7 +39,7 @@ def test_model_str():
         blob_shape="exp",
         num_blobs=1,
     )
-    assert str(bm) == "2d Blob Model with blob shape:exp, num_blobs:1 and t_drain:10"
+    assert str(bm) == "2d Blob Model with num_blobs:1 and t_drain:10"
 
 
 test_blob_shape_exception()

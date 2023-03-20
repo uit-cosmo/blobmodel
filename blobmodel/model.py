@@ -7,6 +7,7 @@ from .stochasticality import BlobFactory, DefaultBlobFactory
 from .geometry import Geometry
 from nptyping import NDArray
 import warnings
+from .pulse_shape import AbstractBlobShape, BlobShapeImpl
 
 
 class Model:
@@ -21,7 +22,7 @@ class Model:
         dt: float = 0.1,
         T: float = 10,
         periodic_y: bool = False,
-        blob_shape: str = "gauss",
+        blob_shape: Union[AbstractBlobShape, str] = BlobShapeImpl("gauss"),
         num_blobs: int = 1000,
         t_drain: Union[float, NDArray] = 10,
         blob_factory: BlobFactory = DefaultBlobFactory(),
@@ -81,7 +82,9 @@ class Model:
             T=T,
             periodic_y=periodic_y,
         )
-        self.blob_shape: str = blob_shape
+        self.blob_shape = (
+            BlobShapeImpl(blob_shape) if isinstance(blob_shape, str) else blob_shape
+        )
         self.num_blobs: int = num_blobs
         self.t_drain: Union[float, NDArray] = t_drain
 
@@ -98,7 +101,7 @@ class Model:
     def __str__(self) -> str:
         """string representation of Model."""
         return (
-            f"2d Blob Model with blob shape:{self.blob_shape},"
+            f"2d Blob Model with"
             + f" num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
         )
 
@@ -218,29 +221,30 @@ class Model:
             ] = (blob.blob_id + 1)
 
     def _compute_start_stop(self, blob: Blob, speed_up: bool, error: float):
-        if speed_up:
-            _start = int(blob.t_init / self._geometry.dt)
-            if blob.v_x == 0:
-                _stop = self._geometry.t.size
-            else:
-                # ignores t_drain when calculating stop time
-                _stop = np.minimum(
-                    self._geometry.t.size,
-                    _start
-                    + int(
-                        (
-                            -np.log(error * np.sqrt(np.pi))
-                            + self._geometry.Lx
-                            - blob.pos_x
-                        )
-                        / (blob.v_x * self._geometry.dt)
-                    ),
+        if not speed_up or blob.v_x == 0:
+            return 0, self._geometry.t.size
+        start = int(
+            (
+                blob.t_init * blob.v_x
+                + blob.width_prop * np.log(error * np.sqrt(np.pi))
+                + blob.pos_x
+            )
+            / (self._geometry.dt * blob.v_x)
+        )
+        # ignores t_drain when calculating stop time
+        stop = np.minimum(
+            self._geometry.t.size,
+            start
+            + int(
+                (
+                    -blob.width_prop * np.log(error * np.sqrt(np.pi))
+                    + self._geometry.Lx
+                    - blob.pos_x
                 )
-        else:
-            _start = 0
-            _stop = self._geometry.t.size
-
-        return _start, _stop
+                / (blob.v_x * self._geometry.dt)
+            ),
+        )
+        return start, stop
 
     def _reset_fields(self):
         self._density = np.zeros(

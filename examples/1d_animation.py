@@ -1,6 +1,6 @@
 from blobmodel import Model, show_model, DefaultBlobFactory
 
-bf = DefaultBlobFactory(A_dist="deg", W_dist="deg", vx_dist="deg", vy_dist="zeros")
+bf = DefaultBlobFactory(A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="zeros")
 
 bm = Model(
     Nx=100,

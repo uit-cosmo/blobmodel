@@ -1,9 +1,9 @@
-from blobmodel import Blob
+from blobmodel import Blob, BlobShapeImpl
 import numpy as np
 
 blob = Blob(
     blob_id=0,
-    blob_shape="gauss",
+    blob_shape=BlobShapeImpl("gauss"),
     amplitude=1,
     width_prop=1,
     width_perp=1,
@@ -49,7 +49,7 @@ def test_periodicity():
 def test_single_point():
     blob_sp = Blob(
         blob_id=0,
-        blob_shape="gauss",
+        blob_shape=BlobShapeImpl("gauss"),
         amplitude=1,
         width_prop=1,
         width_perp=1,

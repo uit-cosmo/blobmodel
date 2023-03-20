@@ -2,6 +2,7 @@ import warnings
 from typing import Tuple, Union
 from nptyping import NDArray
 import numpy as np
+from .pulse_shape import AbstractBlobShape
 
 
 class Blob:

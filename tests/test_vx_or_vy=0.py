@@ -1,4 +1,4 @@
-from blobmodel import Model, BlobFactory, Blob
+from blobmodel import Model, BlobFactory, Blob, AbstractBlobShape, BlobShapeImpl
 import numpy as np
 from typing import List
 
@@ -8,7 +8,12 @@ class CustomBlobFactoryVy0(BlobFactory):
         pass
 
     def sample_blobs(
-        self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
+        self,
+        Ly: float,
+        T: float,
+        num_blobs: int,
+        blob_shape: AbstractBlobShape,
+        t_drain: float,
     ) -> List[Blob]:
 
         # set custom parameter distributions
@@ -47,7 +52,12 @@ class CustomBlobFactoryVx0(BlobFactory):
         pass
 
     def sample_blobs(
-        self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
+        self,
+        Ly: float,
+        T: float,
+        num_blobs: int,
+        blob_shape: AbstractBlobShape,
+        t_drain: float,
     ) -> List[Blob]:
 
         # set custom parameter distributions
@@ -91,7 +101,7 @@ bm_vy_0 = Model(
     dt=1,
     T=1,
     periodic_y=True,
-    blob_shape="exp",
+    blob_shape=BlobShapeImpl("exp"),
     num_blobs=1,
     blob_factory=bf_vy_0,
     t_drain=1e10,
@@ -107,7 +117,7 @@ bm_vx_0 = Model(
     dt=1,
     T=1,
     periodic_y=True,
-    blob_shape="exp",
+    blob_shape=BlobShapeImpl("exp"),
     num_blobs=1,
     blob_factory=bf_vx_0,
     t_drain=1e10,

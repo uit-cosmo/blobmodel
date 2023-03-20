@@ -1,10 +1,9 @@
 from blobmodel import Model, DefaultBlobFactory
-import xarray as xr
 import numpy as np
 
 
 # use DefaultBlobFactory to define distribution functions fo random variables
-bf = DefaultBlobFactory(A_dist="deg", W_dist="deg", vx_dist="deg", vy_dist="zeros")
+bf = DefaultBlobFactory(A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="zeros")
 
 one_dim_model = Model(
     Nx=100,
