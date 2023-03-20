@@ -30,7 +30,7 @@ jobs:
 
   pytest:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     if: always()
     strategy:
       matrix:

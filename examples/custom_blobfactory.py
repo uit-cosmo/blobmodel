@@ -1,4 +1,10 @@
-from blobmodel import Model, BlobFactory, Blob, show_model
+from blobmodel import (
+    Model,
+    BlobFactory,
+    Blob,
+    show_model,
+    AbstractBlobShape,
+)
 import numpy as np
 
 # create custom class that inherits from BlobFactory
@@ -8,7 +14,12 @@ class CustomBlobFactory(BlobFactory):
         pass
 
     def sample_blobs(
-        self, Ly: float, T: float, num_blobs: int, blob_shape: str, t_drain: float
+        self,
+        Ly: float,
+        T: float,
+        num_blobs: int,
+        blob_shape: AbstractBlobShape,
+        t_drain: float,
     ) -> list[Blob]:
 
         # set custom parameter distributions

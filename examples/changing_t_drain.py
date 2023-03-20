@@ -2,7 +2,7 @@ from blobmodel import Model, DefaultBlobFactory
 import matplotlib.pyplot as plt
 import numpy as np
 
-bf = DefaultBlobFactory(A_dist="deg", W_dist="deg", vx_dist="deg", vy_dist="zeros")
+bf = DefaultBlobFactory(A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="zeros")
 
 t_drain = np.linspace(2, 1, 100)
 
