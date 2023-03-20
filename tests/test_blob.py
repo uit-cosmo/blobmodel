@@ -99,6 +99,8 @@ def test_theta_0():
         x=mesh_x, y=mesh_y, t=t, periodic_y=True, Ly=1
     )
 
+    # The exact analytical expression for the expected values is a bit cumbersome, thus we just check
+    # that the shape is correct
     maxx = np.max(blob_values)
     expected_values = maxx * np.exp(-((mesh_x - 2) ** 2))
     error = np.max(abs(expected_values - blob_values))
