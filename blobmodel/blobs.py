@@ -71,20 +71,18 @@ class Blob:
             return self._single_blob(
                 x_perp, y_perp, t, Ly, periodic_y, one_dimensional=one_dimensional
             )
-        if np.sin(self.theta) == 0:
-            x_border = Ly - self.pos_y
-            adjusted_Ly = Ly
+        if self.theta == 0:
+            number_of_y_propagations = 0
         else:
             x_border = (Ly - self.pos_y) / np.sin(self.theta)
             adjusted_Ly = Ly / np.sin(self.theta)
-        if type(t) in [int, float]:
-            # t has dimensionality = 0, used for testing
+            prop_dir = (
+                self._prop_dir_blob_position(t)
+                if type(t) in [int, float]  # t has dimensionality = 0, used for testing
+                else self._prop_dir_blob_position(t)[0, 0]
+            )
             number_of_y_propagations = (
-                self._prop_dir_blob_position(t) + adjusted_Ly - x_border
-            ) // adjusted_Ly
-        else:
-            number_of_y_propagations = (
-                self._prop_dir_blob_position(t)[0, 0] + adjusted_Ly - x_border
+                prop_dir + adjusted_Ly - x_border
             ) // adjusted_Ly
         return (
             self._single_blob(
