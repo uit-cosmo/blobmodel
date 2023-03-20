@@ -10,7 +10,7 @@ class Blob:
     def __init__(
         self,
         blob_id: int,
-        blob_shape: str,
+        blob_shape: AbstractBlobShape,
         amplitude: float,
         width_prop: float,
         width_perp: float,
@@ -70,24 +70,23 @@ class Blob:
             return self._single_blob(
                 x_perp, y_perp, t, Ly, periodic_y, one_dimensional=one_dimensional
             )
-        if np.sin(self.theta) == 0:
-            _x_border = Ly - self.pos_y
-            _adjusted_Ly = Ly
+        if self.theta == 0:
+            number_of_y_propagations = 0
         else:
-            _x_border = (Ly - self.pos_y) / np.sin(self.theta)
-            _adjusted_Ly = Ly / np.sin(self.theta)
-        if type(t) in [int, float]:
+            x_border = (Ly - self.pos_y) / np.sin(self.theta)
+            adjusted_Ly = Ly / np.sin(self.theta)
             # t has dimensionality = 0, used for testing
-            _number_of_y_propagations = (
-                self._prop_dir_blob_position(t) + _adjusted_Ly - _x_border
-            ) // _adjusted_Ly
-        else:
-            _number_of_y_propagations = (
-                self._prop_dir_blob_position(t)[0, 0] + _adjusted_Ly - _x_border
-            ) // _adjusted_Ly
+            prop_dir = (
+                self._prop_dir_blob_position(t)
+                if type(t) in [int, float]
+                else self._prop_dir_blob_position(t)[0, 0]
+            )
+            number_of_y_propagations = (
+                prop_dir + adjusted_Ly - x_border
+            ) // adjusted_Ly
         return (
             self._single_blob(
-                x_perp, y_perp, t, Ly, periodic_y, _number_of_y_propagations
+                x_perp, y_perp, t, Ly, periodic_y, number_of_y_propagations
             )
             + self._single_blob(
                 x_perp,
@@ -95,7 +94,7 @@ class Blob:
                 t,
                 Ly,
                 periodic_y,
-                _number_of_y_propagations,
+                number_of_y_propagations,
                 x_offset=Ly * np.sin(self.theta),
                 y_offset=Ly * np.cos(self.theta),
                 one_dimensional=one_dimensional,
@@ -106,7 +105,7 @@ class Blob:
                 t,
                 Ly,
                 periodic_y,
-                _number_of_y_propagations,
+                number_of_y_propagations,
                 x_offset=-Ly * np.sin(self.theta),
                 y_offset=-Ly * np.cos(self.theta),
                 one_dimensional=one_dimensional,
@@ -145,16 +144,12 @@ class Blob:
                     number_of_y_propagations=number_of_y_propagations,
                 )
             )
-            * self._blob_arrival(t)
         )
 
     def _drain(self, t: NDArray) -> NDArray:
         if isinstance(self.t_drain, (int, float)):
             return np.exp(-(t - self.t_init) / self.t_drain)
         return np.exp(-(t - self.t_init) / self.t_drain[np.newaxis, :, np.newaxis])
-
-    def _blob_arrival(self, t: NDArray) -> NDArray:
-        return np.heaviside(t - self.t_init, 1)
 
     def _propagation_direction_shape(
         self,
@@ -172,15 +167,8 @@ class Blob:
             )
         else:
             x_diffs = x - self._prop_dir_blob_position(t)
-
-        if self.blob_shape == "gauss":
-            return 1 / np.sqrt(np.pi) * np.exp(-(x_diffs**2 / self.width_prop**2))
-        elif self.blob_shape == "exp":
-            return np.exp(x_diffs / self.width_prop) * np.heaviside(-1.0 * (x_diffs), 1)
-        else:
-            raise NotImplementedError(
-                f"{self.__class__.__name__}.blob_shape not implemented"
-            )
+        theta_x = x_diffs / self.width_prop
+        return self.blob_shape.get_pulse_shape_prop(theta_x, ...)
 
     def _perpendicular_direction_shape(
         self,
@@ -197,17 +185,18 @@ class Blob:
             )
         else:
             y_diffs = y - self._perp_dir_blob_position()
-        return 1 / np.sqrt(np.pi) * np.exp(-(y_diffs**2) / self.width_perp**2)
+        theta_y = y_diffs / self.width_perp
+        return self.blob_shape.get_pulse_shape_perp(theta_y, ...)
 
     def _prop_dir_blob_position(self, t: NDArray) -> NDArray:
         return self.pos_x + (self.v_x**2 + self.v_y**2) ** 0.5 * (t - self.t_init)
 
-    def _perp_dir_blob_position(self) -> NDArray:
+    def _perp_dir_blob_position(self) -> float:
         return self.pos_y
 
     def _rotate(
         self, origin: Tuple[float, float], x: NDArray, y: NDArray, angle: float
-    ) -> Tuple[float, float]:
+    ) -> Tuple[NDArray, NDArray]:
         ox, oy = origin
         px, py = x, y
 

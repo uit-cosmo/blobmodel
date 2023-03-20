@@ -75,6 +75,37 @@ def test_single_point():
     assert error < 1e-10, "Numerical error too big"
 
 
+def test_theta_0():
+    blob_sp = Blob(
+        blob_id=0,
+        blob_shape=BlobShapeImpl("gauss"),
+        amplitude=1,
+        width_prop=1,
+        width_perp=1,
+        v_x=1,
+        v_y=0,
+        pos_x=0,
+        pos_y=6,
+        t_init=0,
+        t_drain=10**100,
+    )
+
+    x = np.arange(0, 10, 0.1)
+    y = 0
+
+    t = np.array(2)
+    mesh_x, mesh_y = np.meshgrid(x, y)
+    blob_values = blob_sp.discretize_blob(
+        x=mesh_x, y=mesh_y, t=t, periodic_y=True, Ly=1
+    )
+
+    maxx = np.max(blob_values)
+    expected_values = maxx * np.exp(-((mesh_x - 2) ** 2))
+    error = np.max(abs(expected_values - blob_values))
+
+    assert error < 1e-10, "Numerical error too big"
+
+
 test_initial_blob()
 test_periodicity()
 test_single_point()
