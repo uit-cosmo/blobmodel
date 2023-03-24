@@ -16,27 +16,27 @@ class CustomBlobFactory(BlobFactory):
     ) -> list[Blob]:
 
         # set custom parameter distributions
-        _amp = np.ones(num_blobs)
-        _width = np.ones(num_blobs)
-        _vx = np.ones(num_blobs)
-        _vy = np.ones(num_blobs)
+        amp = np.ones(num_blobs)
+        width = np.ones(num_blobs)
+        vx = np.ones(num_blobs)
+        vy = np.ones(num_blobs)
 
-        _posx = np.zeros(num_blobs)
-        _posy = np.ones(num_blobs) * Ly / 2
-        _t_init = np.ones(num_blobs) * 0
+        posx = np.zeros(num_blobs)
+        posy = np.ones(num_blobs) * Ly / 2
+        t_init = np.ones(num_blobs) * 0
 
         return [
             Blob(
                 blob_id=i,
                 blob_shape=blob_shape,
-                amplitude=_amp[i],
-                width_prop=_width[i],
-                width_perp=_width[i],
-                v_x=_vx[i],
-                v_y=_vy[i],
-                pos_x=_posx[i],
-                pos_y=_posy[i],
-                t_init=_t_init[i],
+                amplitude=amp[i],
+                width_prop=width[i],
+                width_perp=width[i],
+                v_x=vx[i],
+                v_y=vy[i],
+                pos_x=posx[i],
+                pos_y=posy[i],
+                t_init=t_init[i],
                 t_drain=t_drain,
             )
             for i in range(num_blobs)

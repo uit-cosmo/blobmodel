@@ -23,30 +23,30 @@ class CustomBlobFactory(BlobFactory):
     ) -> list[Blob]:
 
         # set custom parameter distributions
-        _amp = np.linspace(0.01, 1, num=num_blobs)
-        _width = np.linspace(0.01, 1, num=num_blobs)
-        _vx = np.linspace(0.01, 1, num=num_blobs)
-        _vy = np.linspace(0.01, 1, num=num_blobs)
+        amp = np.linspace(0.01, 1, num=num_blobs)
+        width = np.linspace(0.01, 1, num=num_blobs)
+        vx = np.linspace(0.01, 1, num=num_blobs)
+        vy = np.linspace(0.01, 1, num=num_blobs)
 
-        _posx = np.zeros(num_blobs)
-        _posy = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
-        _t_init = np.random.uniform(low=0, high=T, size=num_blobs)
+        posx = np.zeros(num_blobs)
+        posy = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
+        t_init = np.random.uniform(low=0, high=T, size=num_blobs)
 
         # sort blobs by _t_init
-        _t_init = np.sort(_t_init)
+        t_init = np.sort(t_init)
 
         return [
             Blob(
                 blob_id=i,
                 blob_shape=blob_shape,
-                amplitude=_amp[i],
-                width_prop=_width[i],
-                width_perp=_width[i],
-                v_x=_vx[i],
-                v_y=_vy[i],
-                pos_x=_posx[i],
-                pos_y=_posy[i],
-                t_init=_t_init[i],
+                amplitude=amp[i],
+                width_prop=width[i],
+                width_perp=width[i],
+                v_x=vx[i],
+                v_y=vy[i],
+                pos_x=posx[i],
+                pos_y=posy[i],
+                t_init=t_init[i],
                 t_drain=t_drain,
             )
             for i in range(num_blobs)
