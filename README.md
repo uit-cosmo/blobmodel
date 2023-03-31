@@ -4,7 +4,7 @@
 <!--
 [![codecov](https://codecov.io/gh/uit-cosmo/2d_propagating_blobs/branch/main/graph/badge.svg?token=QSS3BYQC6Y)](https://codecov.io/gh/uit-cosmo/2d_propagating_blobs)
 --> 
-# 2d_propagating_blobs
+# blobmodel
 Two dimensional model of advecting and dissipating blobs.
 
 The code has been developed originally to model profiles in the scrape-off layer of fusion experiments but it can be used to model any 1d or 2d system consisting of advecting pulses. Examples for one and two dimensions are shown below:
