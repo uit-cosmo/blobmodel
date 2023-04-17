@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import numpy as np
-from nptyping import NDArray
 
 
 class AbstractBlobShape(ABC):
@@ -11,11 +10,11 @@ class AbstractBlobShape(ABC):
     """
 
     @abstractmethod
-    def get_pulse_shape_prop(self, theta_prop: NDArray, kwargs):
+    def get_pulse_shape_prop(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         raise NotImplementedError
 
     @abstractmethod
-    def get_pulse_shape_perp(self, theta_perp: NDArray, kwargs):
+    def get_pulse_shape_perp(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         raise NotImplementedError
 
 
@@ -23,8 +22,6 @@ class BlobShapeImpl(AbstractBlobShape):
     """Implementation of the AbstractPulseShape class."""
 
     def __init__(self, pulse_shape_prop="gauss", pulse_shape_perp="gauss"):
-        self.pulse_shape_prop = pulse_shape_prop
-        self.pulse_shape_perp = pulse_shape_perp
         if (
             pulse_shape_prop not in BlobShapeImpl.__GENERATORS__.keys()
             or pulse_shape_perp not in BlobShapeImpl.__GENERATORS__.keys()
@@ -32,12 +29,14 @@ class BlobShapeImpl(AbstractBlobShape):
             raise NotImplementedError(
                 f"{self.__class__.__name__}.blob_shape not implemented"
             )
+        self.get_pulse_shape_prop = BlobShapeImpl.__GENERATORS__.get(pulse_shape_prop)
+        self.get_pulse_shape_perp = BlobShapeImpl.__GENERATORS__.get(pulse_shape_perp)
 
     def get_pulse_shape_prop(self, theta: np.ndarray, **kwargs) -> np.ndarray:
-        return BlobShapeImpl.__GENERATORS__.get(self.pulse_shape_prop)(theta, **kwargs)
+        raise NotImplementedError
 
     def get_pulse_shape_perp(self, theta: np.ndarray, **kwargs) -> np.ndarray:
-        return BlobShapeImpl.__GENERATORS__.get(self.pulse_shape_perp)(theta, **kwargs)
+        raise NotImplementedError
 
     @staticmethod
     def _get_exponential_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
