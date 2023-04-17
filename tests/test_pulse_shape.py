@@ -12,7 +12,6 @@ def test_gauss_pulse_shape():
 
 
 def test_throw_unknown_shape():
-    assert False
     with pytest.raises(NotImplementedError):
         BlobShapeImpl("LOL")
 
