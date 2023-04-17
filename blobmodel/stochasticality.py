@@ -43,11 +43,15 @@ class DefaultBlobFactory(BlobFactory):
         wy_dist: str = "deg",
         vx_dist: str = "deg",
         vy_dist: str = "normal",
+        spx_dist: str = "deg",
+        spy_dist: str = "deg",
         A_parameter: float = 1.0,
         wx_parameter: float = 1.0,
         wy_parameter: float = 1.0,
         vx_parameter: float = 1.0,
         vy_parameter: float = 1.0,
+        spx_parameter: float = 0.5,
+        spy_parameter: float = 0.5,
     ) -> None:
         """The following distributions are implemented:
 
@@ -64,11 +68,15 @@ class DefaultBlobFactory(BlobFactory):
         self.wy_dist = wy_dist
         self.vx_dist = vx_dist
         self.vy_dist = vy_dist
+        self.spx_dist = spx_dist
+        self.spy_dist = spy_dist
         self.A_parameter = A_parameter
         self.wx_parameter = wx_parameter
         self.wy_parameter = wy_parameter
         self.vx_parameter = vx_parameter
         self.vy_parameter = vy_parameter
+        self.spx_parameter = spx_parameter
+        self.spy_parameter = spy_parameter
 
     def _draw_random_variables(
         self,
@@ -115,6 +123,11 @@ class DefaultBlobFactory(BlobFactory):
         wys = self._draw_random_variables(self.wy_dist, self.wy_parameter, num_blobs)
         vxs = self._draw_random_variables(self.vx_dist, self.vx_parameter, num_blobs)
         vys = self._draw_random_variables(self.vy_dist, self.vy_parameter, num_blobs)
+        spxs = self._draw_random_variables(self.spx_dist, self.spx_parameter, num_blobs)
+        spys = self._draw_random_variables(self.spy_dist, self.spy_parameter, num_blobs)
+        # For now, only a lambda parameter is implemented
+        spxs = [{"lam": s} for s in spxs]
+        spys = [{"lam": s} for s in spys]
         posxs = np.zeros(num_blobs)
         posys = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
         t_inits = np.random.uniform(low=0, high=T, size=num_blobs)
@@ -132,6 +145,8 @@ class DefaultBlobFactory(BlobFactory):
                 pos_y=posys[i],
                 t_init=t_inits[i],
                 t_drain=t_drain,
+                prop_shape_parameters=spxs[i],
+                perp_shape_parameters=spys[i],
             )
             for i in range(num_blobs)
         ]

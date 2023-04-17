@@ -21,6 +21,8 @@ class Blob:
         pos_y: float,
         t_init: float,
         t_drain: Union[float, NDArray],
+        prop_shape_parameters: dict = None,
+        perp_shape_parameters: dict = None,
     ) -> None:
         self.int = int
         self.blob_id = blob_id
@@ -34,6 +36,12 @@ class Blob:
         self.pos_y = pos_y
         self.t_init = t_init
         self.t_drain = t_drain
+        self.prop_shape_parameters = (
+            {} if prop_shape_parameters is None else prop_shape_parameters
+        )
+        self.perp_shape_parameters = (
+            {} if perp_shape_parameters is None else perp_shape_parameters
+        )
         if self.v_x != 0:
             self.theta = np.arctan(self.v_y / self.v_x)
         else:
@@ -168,7 +176,9 @@ class Blob:
         else:
             x_diffs = x - self._prop_dir_blob_position(t)
         theta_x = x_diffs / self.width_prop
-        return self.blob_shape.get_pulse_shape_prop(theta_x, ...)
+        return self.blob_shape.get_pulse_shape_prop(
+            theta_x, **self.prop_shape_parameters
+        )
 
     def _perpendicular_direction_shape(
         self,
@@ -186,7 +196,9 @@ class Blob:
         else:
             y_diffs = y - self._perp_dir_blob_position()
         theta_y = y_diffs / self.width_perp
-        return self.blob_shape.get_pulse_shape_perp(theta_y, ...)
+        return self.blob_shape.get_pulse_shape_perp(
+            theta_y, **self.perp_shape_parameters
+        )
 
     def _prop_dir_blob_position(self, t: NDArray) -> NDArray:
         return self.pos_x + (self.v_x**2 + self.v_y**2) ** 0.5 * (t - self.t_init)
