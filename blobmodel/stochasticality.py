@@ -63,20 +63,20 @@ class DefaultBlobFactory(BlobFactory):
         deg: degenerate distribution at `free_parameter`
         zeros: array of zeros
         """
-        self.A_dist = A_dist
-        self.wx_dist = wx_dist
-        self.wy_dist = wy_dist
-        self.vx_dist = vx_dist
-        self.vy_dist = vy_dist
-        self.spx_dist = spx_dist
-        self.spy_dist = spy_dist
-        self.A_parameter = A_parameter
-        self.wx_parameter = wx_parameter
-        self.wy_parameter = wy_parameter
-        self.vx_parameter = vx_parameter
-        self.vy_parameter = vy_parameter
-        self.spx_parameter = spx_parameter
-        self.spy_parameter = spy_parameter
+        self.amplitude_dist = A_dist
+        self.width_x_dist = wx_dist
+        self.width_y_dist = wy_dist
+        self.velocity_x_dist = vx_dist
+        self.velocity_y_dist = vy_dist
+        self.shape_param_x_dist = spx_dist
+        self.shape_param_y_dist = spy_dist
+        self.amplitude_parameter = A_parameter
+        self.width_x_parameter = wx_parameter
+        self.width_y_parameter = wy_parameter
+        self.velocity_x_parameter = vx_parameter
+        self.velocity_y_parameter = vy_parameter
+        self.shape_param_x_parameter = spx_parameter
+        self.shape_param_y_parameter = spy_parameter
 
     def _draw_random_variables(
         self,
@@ -117,14 +117,28 @@ class DefaultBlobFactory(BlobFactory):
         t_drain: float,
     ) -> List[Blob]:
         amps = self._draw_random_variables(
-            dist_type=self.A_dist, free_parameter=self.A_parameter, num_blobs=num_blobs
+            dist_type=self.amplitude_dist,
+            free_parameter=self.amplitude_parameter,
+            num_blobs=num_blobs,
         )
-        wxs = self._draw_random_variables(self.wx_dist, self.wx_parameter, num_blobs)
-        wys = self._draw_random_variables(self.wy_dist, self.wy_parameter, num_blobs)
-        vxs = self._draw_random_variables(self.vx_dist, self.vx_parameter, num_blobs)
-        vys = self._draw_random_variables(self.vy_dist, self.vy_parameter, num_blobs)
-        spxs = self._draw_random_variables(self.spx_dist, self.spx_parameter, num_blobs)
-        spys = self._draw_random_variables(self.spy_dist, self.spy_parameter, num_blobs)
+        wxs = self._draw_random_variables(
+            self.width_x_dist, self.width_x_parameter, num_blobs
+        )
+        wys = self._draw_random_variables(
+            self.width_y_dist, self.width_y_parameter, num_blobs
+        )
+        vxs = self._draw_random_variables(
+            self.velocity_x_dist, self.velocity_x_parameter, num_blobs
+        )
+        vys = self._draw_random_variables(
+            self.velocity_y_dist, self.velocity_y_parameter, num_blobs
+        )
+        spxs = self._draw_random_variables(
+            self.shape_param_x_dist, self.shape_param_x_parameter, num_blobs
+        )
+        spys = self._draw_random_variables(
+            self.shape_param_y_dist, self.shape_param_y_parameter, num_blobs
+        )
         # For now, only a lambda parameter is implemented
         spxs = [{"lam": s} for s in spxs]
         spys = [{"lam": s} for s in spys]
@@ -139,8 +153,8 @@ class DefaultBlobFactory(BlobFactory):
                 amplitude=amps[i],
                 width_prop=wxs[i],
                 width_perp=wys[i],
-                v_x=vxs[i],
-                v_y=vys[i],
+                velocity_x=vxs[i],
+                velocity_y=vys[i],
                 pos_x=posxs[i],
                 pos_y=posys[i],
                 t_init=t_inits[i],
@@ -156,4 +170,4 @@ class DefaultBlobFactory(BlobFactory):
 
     def is_one_dimensional(self) -> bool:
         # Perpendicular width parameters are irrelevant since perp shape should be ignored by the Bolb class.
-        return self.vy_dist == "zeros"
+        return self.velocity_y_dist == "zeros"

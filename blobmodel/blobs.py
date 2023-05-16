@@ -15,8 +15,8 @@ class Blob:
         amplitude: float,
         width_prop: float,
         width_perp: float,
-        v_x: float,
-        v_y: float,
+        velocity_x: float,
+        velocity_y: float,
         pos_x: float,
         pos_y: float,
         t_init: float,
@@ -30,8 +30,8 @@ class Blob:
         self.amplitude = amplitude
         self.width_prop = width_prop
         self.width_perp = width_perp
-        self.v_x = v_x
-        self.v_y = v_y
+        self.v_x = velocity_x
+        self.v_y = velocity_y
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.t_init = t_init

@@ -76,8 +76,7 @@ Alternatively, you can specify all blob parameters exactly as you want by writin
             allow periodicity in y-direction 
             
             !!!  this is only a good approximation if Ly is significantly bigger than blobs  !!!
-- `blob_shape`: str, optional,
-            switch between `gauss` and `exp` blob
+- `blob_shape`: AbstractBlobShape or str, optional,
 - `num_blobs`: int, optional
             number of blobs
 - `t_drain`: float, optional,
@@ -109,6 +108,8 @@ Alternatively, you can specify all blob parameters exactly as you want by writin
             `free_parameter` for vx
 - `vy_parameter`: float, optional,
             `free_parameter` for vy
+- `spx_parameter`: float = 0.5,
+- `spy_parameter`: float = 0.5,
             
 The following distributions are implemented:
 

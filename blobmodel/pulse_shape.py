@@ -23,14 +23,14 @@ class BlobShapeImpl(AbstractBlobShape):
 
     def __init__(self, pulse_shape_prop="gauss", pulse_shape_perp="gauss"):
         if (
-            pulse_shape_prop not in BlobShapeImpl.__GENERATORS__.keys()
-            or pulse_shape_perp not in BlobShapeImpl.__GENERATORS__.keys()
+            pulse_shape_prop not in BlobShapeImpl.__GENERATORS.keys()
+            or pulse_shape_perp not in BlobShapeImpl.__GENERATORS.keys()
         ):
             raise NotImplementedError(
                 f"{self.__class__.__name__}.blob_shape not implemented"
             )
-        self.get_pulse_shape_prop = BlobShapeImpl.__GENERATORS__.get(pulse_shape_prop)
-        self.get_pulse_shape_perp = BlobShapeImpl.__GENERATORS__.get(pulse_shape_perp)
+        self.get_pulse_shape_prop = BlobShapeImpl.__GENERATORS.get(pulse_shape_prop)
+        self.get_pulse_shape_perp = BlobShapeImpl.__GENERATORS.get(pulse_shape_perp)
 
     def get_pulse_shape_prop(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         raise NotImplementedError
@@ -63,7 +63,7 @@ class BlobShapeImpl(AbstractBlobShape):
     def _get_secant_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
         return 2 / np.pi / (np.exp(theta) + np.exp(-theta))
 
-    __GENERATORS__ = {
+    __GENERATORS = {
         "exp": _get_exponential_shape,
         "gauss": _get_gaussian_shape,
         "2-exp": _get_double_exponential_shape,
