@@ -50,8 +50,8 @@ class DefaultBlobFactory(BlobFactory):
         wy_parameter: float = 1.0,
         vx_parameter: float = 1.0,
         vy_parameter: float = 1.0,
-        spx_parameter: float = 0.5,
-        spy_parameter: float = 0.5,
+        shape_param_x_parameter: float = 0.5,
+        shape_param_y_parameter: float = 0.5,
     ) -> None:
         """The following distributions are implemented:
 
@@ -75,8 +75,8 @@ class DefaultBlobFactory(BlobFactory):
         self.width_y_parameter = wy_parameter
         self.velocity_x_parameter = vx_parameter
         self.velocity_y_parameter = vy_parameter
-        self.shape_param_x_parameter = spx_parameter
-        self.shape_param_y_parameter = spy_parameter
+        self.shape_param_x_parameter = shape_param_x_parameter
+        self.shape_param_y_parameter = shape_param_y_parameter
 
     def _draw_random_variables(
         self,

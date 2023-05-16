@@ -108,8 +108,8 @@ Alternatively, you can specify all blob parameters exactly as you want by writin
             `free_parameter` for vx
 - `vy_parameter`: float, optional,
             `free_parameter` for vy
-- `spx_parameter`: float = 0.5,
-- `spy_parameter`: float = 0.5,
+- `shape_param_x_parameter`: float = 0.5,
+- `shape_param_y_parameter`: float = 0.5
             
 The following distributions are implemented:
 
