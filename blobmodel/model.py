@@ -45,8 +45,8 @@ class Model:
             Important: only good approximation for Ly >> blob width
         num_blobs:
             number of blobs
-        blob_shape: str, optional
-            see Blob dataclass for available shapes
+        blob_shape: AbstractBlobShape or str, optional
+            see AbstractBlobShape and BlobShapeImpl dataclass for available shapes
         t_drain: float or array of length Nx, optional
             drain time for blobs
         blob_factory: BlobFactory, optional
