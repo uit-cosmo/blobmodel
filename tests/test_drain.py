@@ -1,6 +1,7 @@
 from blobmodel import Blob, BlobShapeImpl
 import numpy as np
 
+
 def test_high_t_drain():
     blob_sp = Blob(
         blob_id=0,
@@ -24,5 +25,6 @@ def test_high_t_drain():
     blob_values = blob_sp.discretize_blob(
         x=mesh_x, y=mesh_y, t=mesh_t, periodic_y=False, Ly=10
     )
+
 
 test_high_t_drain()
