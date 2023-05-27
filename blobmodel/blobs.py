@@ -156,7 +156,7 @@ class Blob:
 
     def _drain(self, t: NDArray) -> NDArray:
         if isinstance(self.t_drain, (int, float)):
-            return np.exp(-(t - self.t_init) / self.t_drain)
+            return np.exp(-(t - self.t_init) / float(self.t_drain))
         return np.exp(-(t - self.t_init) / self.t_drain[np.newaxis, :, np.newaxis])
 
     def _propagation_direction_shape(
