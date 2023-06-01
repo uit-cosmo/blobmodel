@@ -75,6 +75,40 @@ def test_single_point():
     assert error < 1e-10, "Numerical error too big"
 
 
+def test_negative_radial_velocity():
+    vx = -1
+    blob_sp = Blob(
+        blob_id=0,
+        blob_shape=BlobShapeImpl("gauss"),
+        amplitude=1,
+        width_prop=1,
+        width_perp=1,
+        velocity_x=vx,
+        velocity_y=1,
+        pos_x=0,
+        pos_y=6,
+        t_init=0,
+        t_drain=10**100,
+    )
+
+    x = np.arange(-5, 5, 0.1)
+    y = 0
+    t = 2
+
+    mesh_x, mesh_y = np.meshgrid(x, y)
+    blob_values = blob_sp.discretize_blob(
+        x=mesh_x, y=mesh_y, t=t, periodic_y=True, Ly=10
+    )
+
+    # The exact analytical expression for the expected values is a bit cumbersome, thus we just check
+    # that the shape is correct
+    maxx = np.max(blob_values)
+    expected_values = maxx * np.exp(-((mesh_x - vx * t) ** 2))
+    error = np.max(abs(expected_values - blob_values))
+
+    assert error < 1e-10, "Numerical error too big"
+
+
 def test_theta_0():
     blob_sp = Blob(
         blob_id=0,
@@ -137,8 +171,3 @@ def test_kwargs():
     blob_sp.discretize_blob(x=mesh_x, y=mesh_y, t=0, periodic_y=True, Ly=10)
 
     mock_ps.get_pulse_shape_prop.assert_called_with([[0]], lam=0.2)
-
-
-test_initial_blob()
-test_periodicity()
-test_single_point()
