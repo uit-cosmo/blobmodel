@@ -44,6 +44,7 @@ class Blob:
         self.perp_shape_parameters = (
             {} if perp_shape_parameters is None else perp_shape_parameters
         )
+        self.blob_alignment = blob_alignment
         self.theta = cmath.phase(self.v_x + self.v_y * 1j) if blob_alignment else 0.0
 
     def discretize_blob(
