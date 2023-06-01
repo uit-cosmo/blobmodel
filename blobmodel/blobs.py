@@ -3,6 +3,7 @@ from typing import Tuple, Union
 from nptyping import NDArray
 import numpy as np
 from .pulse_shape import AbstractBlobShape
+import cmath
 
 
 class Blob:
@@ -43,12 +44,7 @@ class Blob:
         self.perp_shape_parameters = (
             {} if perp_shape_parameters is None else perp_shape_parameters
         )
-        self.theta = 0
-        self.blob_alignment = blob_alignment
-        if blob_alignment:
-            import cmath
-
-            self.theta = cmath.phase(self.v_x + self.v_y * 1j)
+        self.theta = cmath.phase(self.v_x + self.v_y * 1j) if blob_alignment else 0.0
 
     def discretize_blob(
         self,
