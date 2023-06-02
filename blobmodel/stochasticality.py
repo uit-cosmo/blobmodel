@@ -65,6 +65,8 @@ class DefaultBlobFactory(BlobFactory):
         zeros: array of zeros
 
         blob_alignment: bool = True, optional, If True, the blobs are aligned with their velocity.
+            If blob_aligment == True, the blob shapes are rotated in the propagation direction of the blob.
+            If blob_aligment == False, the blob shapes are independent of the propagation direction.
         """
         self.amplitude_dist = A_dist
         self.width_x_dist = wx_dist

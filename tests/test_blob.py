@@ -1,5 +1,6 @@
-from blobmodel import Blob, BlobShapeImpl
+from blobmodel import Blob, BlobShapeImpl, AbstractBlobShape
 import numpy as np
+from unittest.mock import MagicMock
 
 blob = Blob(
     blob_id=0,
@@ -27,6 +28,33 @@ def test_initial_blob():
     error = np.max(abs(expected_values - blob_values))
 
     assert error < 1e-10, "Numerical error too big"
+
+
+def test_blob_non_alignment():
+    # Dead pixels have already been preprocessed and have an array of nans at their site
+    blob = Blob(
+        blob_id=0,
+        blob_shape=BlobShapeImpl("exp", "exp"),
+        amplitude=1,
+        width_prop=1,
+        width_perp=1,
+        velocity_x=1,
+        velocity_y=1,
+        pos_x=0,
+        pos_y=0,
+        t_init=0,
+        t_drain=10**10,
+        blob_alignment=False,
+    )
+    x = np.arange(0, 10, 0.1)
+    y = np.array([0, 1])
+
+    mesh_x, mesh_y = np.meshgrid(x, y)
+    mock = MagicMock(return_value=mesh_x)
+    blob.blob_shape.get_pulse_shape_prop = mock
+    blob.discretize_blob(x=mesh_x, y=mesh_y, t=0, periodic_y=False, Ly=10)
+
+    np.testing.assert_array_equal(mesh_x, mock.call_args[0][0])
 
 
 def test_periodicity():
