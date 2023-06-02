@@ -1,4 +1,4 @@
-from blobmodel import Blob, BlobShapeImpl, AbstractBlobShape
+from blobmodel import Blob, BlobShapeImpl
 import numpy as np
 from unittest.mock import MagicMock
 
