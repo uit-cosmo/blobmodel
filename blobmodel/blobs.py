@@ -8,36 +8,7 @@ from .pulse_shape import AbstractBlobShape
 
 
 class Blob:
-    """A single blob.
-
-    Parameters
-    ----------
-    blob_id : int
-        Identifier for the blob.
-    blob_shape : AbstractBlobShape
-        Shape of the blob.
-    amplitude : float
-        Amplitude of the blob.
-    width_prop : float
-        Width of the blob in the propagation direction.
-    width_perp : float
-        Width of the blob in the perpendicular direction.
-    velocity_x : float
-        Velocity of the blob in the x-direction.
-    velocity_y : float
-        Velocity of the blob in the y-direction.
-    pos_x : float
-        Initial position of the blob in the x-direction.
-    pos_y : float
-        Initial position of the blob in the y-direction.
-    t_init : float
-        Initial time of the blob.
-    t_drain : Union[float, NDArray]
-        Time scale for the blob to drain.
-    prop_shape_parameters : dict, optional
-        Additional shape parameters for the propagation direction (default: None).
-    perp_shape_parameters : dict, optional
-        Additional shape parameters for the perpendicular direction (default: None).
+    """Define a single blob.
 
     Attributes
     ----------
@@ -70,28 +41,6 @@ class Blob:
     theta : float
         Angle of the blob's velocity vector with the x-axis.
 
-    Methods
-    -------
-    discretize_blob(x, y, t, Ly, periodic_y=False, one_dimensional=False)
-        Discretize blob on grid.
-
-    Private Methods
-    ---------------
-    _single_blob(x_perp, y_perp, t, Ly, periodic_y, number_of_y_propagations=0, x_offset=0, y_offset=0, one_dimensional=False)
-        Calculate the discretized blob for a single blob instance.
-    _drain(t)
-        Calculate the drain factor for the blob.
-    _propagation_direction_shape(x, t, Ly, periodic_y, number_of_y_propagations)
-        Calculate the shape in the propagation direction.
-    _perpendicular_direction_shape(y, Ly, periodic_y, number_of_y_propagations)
-        Calculate the shape in the perpendicular direction.
-    _prop_dir_blob_position(t)
-        Calculate the position of the blob in the propagation direction.
-    _perp_dir_blob_position()
-        Calculate the position of the blob in the perpendicular direction.
-    _rotate(origin, x, y, angle)
-        Rotate the coordinates around a given origin point.
-
     """
 
     def __init__(
@@ -101,8 +50,8 @@ class Blob:
         amplitude: float,
         width_prop: float,
         width_perp: float,
-        velocity_x: float,
-        velocity_y: float,
+        v_x: float,
+        v_y: float,
         pos_x: float,
         pos_y: float,
         t_init: float,
@@ -110,14 +59,15 @@ class Blob:
         prop_shape_parameters: dict = None,
         perp_shape_parameters: dict = None,
     ) -> None:
+
         self.int = int
         self.blob_id = blob_id
         self.blob_shape = blob_shape
         self.amplitude = amplitude
         self.width_prop = width_prop
         self.width_perp = width_perp
-        self.v_x = velocity_x
-        self.v_y = velocity_y
+        self.v_x = v_x
+        self.v_y = v_y
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.t_init = t_init
