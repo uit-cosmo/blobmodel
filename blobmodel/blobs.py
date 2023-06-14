@@ -28,6 +28,8 @@ class Blob:
     ) -> None:
 
         """
+        Initialize a single blob.
+
         Attributes
         ----------
         blob_id : int

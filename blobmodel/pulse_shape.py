@@ -26,7 +26,7 @@ class BlobShapeImpl(AbstractBlobShape):
     def __init__(self, pulse_shape_prop="gauss", pulse_shape_perp="gauss"):
         """Initialize the BlobShapeImpl object.
 
-        Parameters
+        Attributes
         ----------
         pulse_shape_prop : str, optional
             Type of pulse shape in the propagation direction, by default "gauss".
