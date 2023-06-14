@@ -1,3 +1,5 @@
+"""This module defines a Blob class and related functions for discretizing and manipulating blobs."""
+
 import warnings
 from typing import Tuple, Union
 from nptyping import NDArray
@@ -6,7 +8,91 @@ from .pulse_shape import AbstractBlobShape
 
 
 class Blob:
-    """A single blob."""
+    """A single blob.
+
+    Parameters
+    ----------
+    blob_id : int
+        Identifier for the blob.
+    blob_shape : AbstractBlobShape
+        Shape of the blob.
+    amplitude : float
+        Amplitude of the blob.
+    width_prop : float
+        Width of the blob in the propagation direction.
+    width_perp : float
+        Width of the blob in the perpendicular direction.
+    velocity_x : float
+        Velocity of the blob in the x-direction.
+    velocity_y : float
+        Velocity of the blob in the y-direction.
+    pos_x : float
+        Initial position of the blob in the x-direction.
+    pos_y : float
+        Initial position of the blob in the y-direction.
+    t_init : float
+        Initial time of the blob.
+    t_drain : Union[float, NDArray]
+        Time scale for the blob to drain.
+    prop_shape_parameters : dict, optional
+        Additional shape parameters for the propagation direction (default: None).
+    perp_shape_parameters : dict, optional
+        Additional shape parameters for the perpendicular direction (default: None).
+
+    Attributes
+    ----------
+    blob_id : int
+        Identifier for the blob.
+    blob_shape : AbstractBlobShape
+        Shape of the blob.
+    amplitude : float
+        Amplitude of the blob.
+    width_prop : float
+        Width of the blob in the propagation direction.
+    width_perp : float
+        Width of the blob in the perpendicular direction.
+    v_x : float
+        Velocity of the blob in the x-direction.
+    v_y : float
+        Velocity of the blob in the y-direction.
+    pos_x : float
+        Initial position of the blob in the x-direction.
+    pos_y : float
+        Initial position of the blob in the y-direction.
+    t_init : float
+        Initial time of the blob.
+    t_drain : Union[float, NDArray]
+        Time scale for the blob to drain.
+    prop_shape_parameters : dict
+        Additional shape parameters for the propagation direction.
+    perp_shape_parameters : dict
+        Additional shape parameters for the perpendicular direction.
+    theta : float
+        Angle of the blob's velocity vector with the x-axis.
+
+    Methods
+    -------
+    discretize_blob(x, y, t, Ly, periodic_y=False, one_dimensional=False)
+        Discretize blob on grid.
+
+    Private Methods
+    ---------------
+    _single_blob(x_perp, y_perp, t, Ly, periodic_y, number_of_y_propagations=0, x_offset=0, y_offset=0, one_dimensional=False)
+        Calculate the discretized blob for a single blob instance.
+    _drain(t)
+        Calculate the drain factor for the blob.
+    _propagation_direction_shape(x, t, Ly, periodic_y, number_of_y_propagations)
+        Calculate the shape in the propagation direction.
+    _perpendicular_direction_shape(y, Ly, periodic_y, number_of_y_propagations)
+        Calculate the shape in the perpendicular direction.
+    _prop_dir_blob_position(t)
+        Calculate the position of the blob in the propagation direction.
+    _perp_dir_blob_position()
+        Calculate the position of the blob in the perpendicular direction.
+    _rotate(origin, x, y, angle)
+        Rotate the coordinates around a given origin point.
+
+    """
 
     def __init__(
         self,
@@ -58,13 +144,27 @@ class Blob:
     ) -> NDArray:
         """
         Discretize blob on grid. If one_dimensional the perpendicular pulse shape is ignored.
-        The following blob shapes are implemented:
-                gauss: 2D gaussian function
-                exp: one sided exponential in x and gaussian in y
 
-                Returns
-                -------
-                discretized blob on 3d array with dimensions x,y and t : np.array
+        Parameters
+        ----------
+        x : NDArray
+            Grid coordinates in the x-direction.
+        y : NDArray
+            Grid coordinates in the y-direction.
+        t : NDArray
+            Time coordinates.
+        Ly : float
+            Length of domain in the y-direction.
+        periodic_y : bool, optional
+            Flag indicating periodicity in the y-direction (default: False).
+        one_dimensional : bool, optional
+            Flag indicating a one-dimensional blob (default: False).
+
+        Returns
+        -------
+        discretized_blob : NDArray
+            Discretized blob on a 3D array with dimensions (x, y, t).
+
         """
         # If one_dimensional, then Ly should be 0.
         assert (one_dimensional and Ly == 0) or not one_dimensional
@@ -122,7 +222,7 @@ class Blob:
 
     def _single_blob(
         self,
-        x_perp: NDArray,
+        x_prop: NDArray,
         y_perp: NDArray,
         t: NDArray,
         Ly: float,
@@ -132,11 +232,41 @@ class Blob:
         y_offset: NDArray = 0,
         one_dimensional: bool = False,
     ) -> NDArray:
+        """
+        Calculate the discretized blob for a single blob instance.
+
+        Parameters
+        ----------
+        x_prop : NDArray
+            Propagation direction coordinates.
+        y_perp : NDArray
+            Perpendicular coordinates.
+        t : NDArray
+            Time coordinates.
+        Ly : float
+            Length of domain in the y-direction.
+        periodic_y : bool
+            Flag indicating periodicity in the y-direction.
+        number_of_y_propagations : NDArray, optional
+            Number of times the blob propagates through the domain in y-direction (default: 0).
+        x_offset : NDArray, optional
+            Offset in the x-direction (default: 0).
+        y_offset : NDArray, optional
+            Offset in the y-direction (default: 0).
+        one_dimensional : bool, optional
+            Flag indicating a one-dimensional blob (default: False).
+
+        Returns
+        -------
+        blob : NDArray
+            Discretized blob.
+
+        """
         return (
             self.amplitude
             * self._drain(t)
             * self._propagation_direction_shape(
-                x_perp + x_offset,
+                x_prop + x_offset,
                 t,
                 Ly,
                 periodic_y,
@@ -155,6 +285,20 @@ class Blob:
         )
 
     def _drain(self, t: NDArray) -> NDArray:
+        """
+        Calculate the drain factor for the blob.
+
+        Parameters
+        ----------
+        t : NDArray
+            Time coordinates.
+
+        Returns
+        -------
+        drain_factor : NDArray
+            Drain factor.
+
+        """
         if isinstance(self.t_drain, (int, float)):
             return np.exp(-(t - self.t_init) / float(self.t_drain))
         return np.exp(-(t - self.t_init) / self.t_drain[np.newaxis, :, np.newaxis])
@@ -167,6 +311,28 @@ class Blob:
         periodic_y: bool,
         number_of_y_propagations: NDArray,
     ) -> NDArray:
+        """
+        Calculate the shape in the propagation direction.
+
+        Parameters
+        ----------
+        x : NDArray
+            Coordinates in the x-direction.
+        t : NDArray
+            Time coordinates.
+        Ly : float
+            Length of domain in the y-direction.
+        periodic_y : bool
+            Flag indicating periodicity in the y-direction.
+        number_of_y_propagations : NDArray
+            Number of times the blob propagates through the domain in y-direction.
+
+        Returns
+        -------
+        shape : NDArray
+            Shape in the propagation direction.
+
+        """
         if periodic_y:
             x_diffs = (
                 x
@@ -187,6 +353,26 @@ class Blob:
         periodic_y: bool,
         number_of_y_propagations: NDArray,
     ) -> NDArray:
+        """
+        Calculate the shape in the perpendicular direction.
+
+        Parameters
+        ----------
+        y : NDArray
+            Coordinates in the y-direction.
+        Ly : float
+            Length of domain in the y-direction.
+        periodic_y : bool
+            Flag indicating periodicity in the y-direction.
+        number_of_y_propagations : NDArray
+            Number of times the blob propagates through the domain in y-direction.
+
+        Returns
+        -------
+        shape : NDArray
+            Blob shape in the perpendicular direction.
+
+        """
         if periodic_y:
             y_diffs = (
                 y
@@ -201,14 +387,57 @@ class Blob:
         )
 
     def _prop_dir_blob_position(self, t: NDArray) -> NDArray:
+        """
+        Calculate the position of the blob in the propagation direction.
+
+        Parameters
+        ----------
+        t : NDArray
+            Time coordinates.
+
+        Returns
+        -------
+        position : NDArray
+            Position of the blob in the propagation direction.
+
+        """
         return self.pos_x + (self.v_x**2 + self.v_y**2) ** 0.5 * (t - self.t_init)
 
     def _perp_dir_blob_position(self) -> float:
+        """
+        Return the position of the blob in the perpendicular direction.
+
+        Returns
+        -------
+        position : float
+            Position of the blob in the perpendicular direction.
+
+        """
         return self.pos_y
 
     def _rotate(
         self, origin: Tuple[float, float], x: NDArray, y: NDArray, angle: float
     ) -> Tuple[NDArray, NDArray]:
+        """
+        Rotate the coordinates around a given origin point.
+
+        Parameters
+        ----------
+        origin : Tuple[float, float]
+            Origin point of rotation.
+        x : NDArray
+            Coordinates in the x-direction.
+        y : NDArray
+            Coordinates in the y-direction.
+        angle : float
+            Rotation angle.
+
+        Returns
+        -------
+        rotated_coordinates : Tuple[NDArray, NDArray]
+            Rotated coordinates.
+
+        """
         ox, oy = origin
         px, py = x, y
 
