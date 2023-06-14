@@ -8,40 +8,7 @@ from .pulse_shape import AbstractBlobShape
 
 
 class Blob:
-    """Define a single blob.
-
-    Attributes
-    ----------
-    blob_id : int
-        Identifier for the blob.
-    blob_shape : AbstractBlobShape
-        Shape of the blob.
-    amplitude : float
-        Amplitude of the blob.
-    width_prop : float
-        Width of the blob in the propagation direction.
-    width_perp : float
-        Width of the blob in the perpendicular direction.
-    v_x : float
-        Velocity of the blob in the x-direction.
-    v_y : float
-        Velocity of the blob in the y-direction.
-    pos_x : float
-        Initial position of the blob in the x-direction.
-    pos_y : float
-        Initial position of the blob in the y-direction.
-    t_init : float
-        Initial time of the blob.
-    t_drain : Union[float, NDArray]
-        Time scale for the blob to drain.
-    prop_shape_parameters : dict
-        Additional shape parameters for the propagation direction.
-    perp_shape_parameters : dict
-        Additional shape parameters for the perpendicular direction.
-    theta : float
-        Angle of the blob's velocity vector with the x-axis.
-
-    """
+    """Define a single blob."""
 
     def __init__(
         self,
@@ -60,6 +27,39 @@ class Blob:
         perp_shape_parameters: dict = None,
     ) -> None:
 
+        """
+        Attributes
+        ----------
+        blob_id : int
+            Identifier for the blob.
+        blob_shape : AbstractBlobShape
+            Shape of the blob.
+        amplitude : float
+            Amplitude of the blob.
+        width_prop : float
+            Width of the blob in the propagation direction.
+        width_perp : float
+            Width of the blob in the perpendicular direction.
+        v_x : float
+            Velocity of the blob in the x-direction.
+        v_y : float
+            Velocity of the blob in the y-direction.
+        pos_x : float
+            Initial position of the blob in the x-direction.
+        pos_y : float
+            Initial position of the blob in the y-direction.
+        t_init : float
+            Initial time of the blob.
+        t_drain : Union[float, NDArray]
+            Time scale for the blob to drain.
+        prop_shape_parameters : dict
+            Additional shape parameters for the propagation direction.
+        perp_shape_parameters : dict
+            Additional shape parameters for the perpendicular direction.
+        theta : float
+            Angle of the blob's velocity vector with the x-axis.
+
+        """
         self.int = int
         self.blob_id = blob_id
         self.blob_shape = blob_shape

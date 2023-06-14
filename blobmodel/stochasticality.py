@@ -53,15 +53,54 @@ class DefaultBlobFactory(BlobFactory):
         shape_param_x_parameter: float = 0.5,
         shape_param_y_parameter: float = 0.5,
     ) -> None:
-        """The following distributions are implemented:
 
-        exp: exponential distribution with mean 1
-        gamma: gamma distribution with `free_parameter` as shape parameter and mean 1
-        normal: normal distribution with zero mean and `free_parameter` as scale parameter
-        uniform: uniorm distribution with mean 1 and `free_parameter` as width
-        ray: rayleight distribution with mean 1
-        deg: degenerate distribution at `free_parameter`
-        zeros: array of zeros
+        """
+        Default implementation of BlobFactory.
+
+        Generates blob parameters for different possible random distributions.
+        All random variables are independent from each other.
+
+        Parameters
+        ----------
+        A_dist : str, optional
+            Distribution type for amplitude, by default "exp"
+        wx_dist : str, optional
+            Distribution type for width in the x-direction, by default "deg"
+        wy_dist : str, optional
+            Distribution type for width in the y-direction, by default "deg"
+        vx_dist : str, optional
+            Distribution type for velocity in the x-direction, by default "deg"
+        vy_dist : str, optional
+            Distribution type for velocity in the y-direction, by default "normal"
+        spx_dist : str, optional
+            Distribution type for shape parameter in the x-direction, by default "deg"
+        spy_dist : str, optional
+            Distribution type for shape parameter in the y-direction, by default "deg"
+        A_parameter : float, optional
+            Free parameter for the amplitude distribution, by default 1.0
+        wx_parameter : float, optional
+            Free parameter for the width distribution in the x-direction, by default 1.0
+        wy_parameter : float, optional
+            Free parameter for the width distribution in the y-direction, by default 1.0
+        vx_parameter : float, optional
+            Free parameter for the velocity distribution in the x-direction, by default 1.0
+        vy_parameter : float, optional
+            Free parameter for the velocity distribution in the y-direction, by default 1.0
+        shape_param_x_parameter : float, optional
+            Free parameter for the shape parameter distribution in the x-direction, by default 0.5
+        shape_param_y_parameter : float, optional
+            Free parameter for the shape parameter distribution in the y-direction, by default 0.5
+
+        Notes
+        -----
+        - The following distributions are implemented:
+            - exp: exponential distribution with mean 1
+            - gamma: gamma distribution with `free_parameter` as shape parameter and mean 1
+            - normal: normal distribution with zero mean and `free_parameter` as scale parameter
+            - uniform: uniorm distribution with mean 1 and `free_parameter` as width
+            - ray: rayleight distribution with mean 1
+            - deg: degenerate distribution at `free_parameter`
+            - zeros: array of zeros
         """
         self.amplitude_dist = A_dist
         self.width_x_dist = wx_dist
@@ -84,7 +123,23 @@ class DefaultBlobFactory(BlobFactory):
         free_parameter: float,
         num_blobs: int,
     ) -> NDArray[Any, Float[64]]:
+        """
+        Draws random variables from a specified distribution.
 
+        Parameters
+        ----------
+        dist_type : str
+            Type of distribution.
+        free_parameter : float
+            Free parameter for the distribution.
+        num_blobs : int
+            Number of random variables to draw.
+
+        Returns
+        -------
+        NDArray[Any, Float[64]]
+            Array of random variables drawn from the specified distribution.
+        """
         if dist_type == "exp":
             return np.random.exponential(scale=1, size=num_blobs)
         elif dist_type == "gamma":
@@ -116,6 +171,27 @@ class DefaultBlobFactory(BlobFactory):
         blob_shape: AbstractBlobShape,
         t_drain: float,
     ) -> List[Blob]:
+        """
+        Creates a list of Blobs used in the Model.
+
+        Parameters
+        ----------
+        Ly : float
+            Size of the domain in the y-direction.
+        T : float
+            Total time duration.
+        num_blobs : int
+            Number of blobs to generate.
+        blob_shape : AbstractBlobShape
+            Object representing the shape of the blobs.
+        t_drain : float
+            Time at which the blobs start draining.
+
+        Returns
+        -------
+        List[Blob]
+            List of Blob objects generated for the Model.
+        """
         amps = self._draw_random_variables(
             dist_type=self.amplitude_dist,
             free_parameter=self.amplitude_parameter,
@@ -169,5 +245,18 @@ class DefaultBlobFactory(BlobFactory):
         return np.array(blobs)[np.argsort(amps)]
 
     def is_one_dimensional(self) -> bool:
-        # Perpendicular width parameters are irrelevant since perp shape should be ignored by the Bolb class.
+        """
+        Returns True if the BlobFactory is compatible with a one-dimensional model.
+
+        Returns
+        -------
+        bool
+            True if the BlobFactory is compatible with a one-dimensional model,
+            False otherwise.
+
+        Notes
+        -----
+        - Perpendicular width parameters are irrelevant since perp shape should be ignored by the Bolb class.
+
+        """
         return self.velocity_y_dist == "zeros"
