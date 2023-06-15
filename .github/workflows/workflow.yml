@@ -24,9 +24,6 @@ jobs:
     - name: Check formatting with black
       run: |
         poetry run black --check .
-    - name: Docformatter
-      run: |
-        poetry run docformatter --check -r blobmodel/
 
   pytest:
 
