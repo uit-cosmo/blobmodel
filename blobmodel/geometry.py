@@ -21,7 +21,7 @@ class Geometry:
         """
         Initialize a Geometry object.
 
-        Attributes
+        Parameters
         ----------
         Nx : int
             Number of grid points in the x-direction.

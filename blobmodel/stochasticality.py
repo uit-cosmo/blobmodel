@@ -63,7 +63,7 @@ class DefaultBlobFactory(BlobFactory):
         Generates blob parameters for different possible random distributions.
         All random variables are independent from each other.
 
-        Attributes
+        Parameters
         ----------
         A_dist : str, optional
             Distribution type for amplitude, by default "exp"

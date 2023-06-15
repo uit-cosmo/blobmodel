@@ -35,7 +35,7 @@ class Model:
         """
         Initialize the 2D Model of propagating blobs.
 
-        Attributes
+        Parameters
         ----------
         Nx : int, optional
             Number of grid points in x.

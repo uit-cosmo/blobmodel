@@ -32,7 +32,7 @@ class Blob:
         """
         Initialize a single blob.
 
-        Attributes
+        Parameters
         ----------
         blob_id : int
             Identifier for the blob.
@@ -63,8 +63,6 @@ class Blob:
         blob_alignment : bool, optional
             If blob_aligment == True, the blob shapes are rotated in the propagation direction of the blob
             If blob_aligment == False, the blob shapes are independent of the propagation direction
-        theta : float
-            Angle of the blob's velocity vector with the x-axis.
 
         """
         self.int = int
@@ -86,7 +84,7 @@ class Blob:
             {} if perp_shape_parameters is None else perp_shape_parameters
         )
         self.blob_alignment = blob_alignment
-        self.theta = cmath.phase(self.v_x + self.v_y * 1j) if blob_alignment else 0.0
+        self._theta = cmath.phase(self.v_x + self.v_y * 1j) if blob_alignment else 0.0
 
     def discretize_blob(
         self,
@@ -128,17 +126,17 @@ class Blob:
             warnings.warn("blob width big compared to Ly")
 
         x_perp, y_perp = self._rotate(
-            origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self.theta
+            origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self._theta
         )
         if not periodic_y or one_dimensional:
             return self._single_blob(
                 x_perp, y_perp, t, Ly, periodic_y, one_dimensional=one_dimensional
             )
-        if self.theta == 0:
+        if self._theta == 0:
             number_of_y_propagations = 0
         else:
-            x_border = (Ly - self.pos_y) / np.sin(self.theta)
-            adjusted_Ly = Ly / np.sin(self.theta)
+            x_border = (Ly - self.pos_y) / np.sin(self._theta)
+            adjusted_Ly = Ly / np.sin(self._theta)
             prop_dir = (
                 self._prop_dir_blob_position(t)
                 if type(t) in [int, float]  # t has dimensionality = 0, used for testing
@@ -158,8 +156,8 @@ class Blob:
                 Ly,
                 periodic_y,
                 number_of_y_propagations,
-                x_offset=Ly * np.sin(self.theta),
-                y_offset=Ly * np.cos(self.theta),
+                x_offset=Ly * np.sin(self._theta),
+                y_offset=Ly * np.cos(self._theta),
                 one_dimensional=one_dimensional,
             )
             + self._single_blob(
@@ -169,8 +167,8 @@ class Blob:
                 Ly,
                 periodic_y,
                 number_of_y_propagations,
-                x_offset=-Ly * np.sin(self.theta),
-                y_offset=-Ly * np.cos(self.theta),
+                x_offset=-Ly * np.sin(self._theta),
+                y_offset=-Ly * np.cos(self._theta),
                 one_dimensional=one_dimensional,
             )
         )
@@ -293,7 +291,7 @@ class Blob:
             x_diffs = (
                 x
                 - self._prop_dir_blob_position(t)
-                + number_of_y_propagations * Ly * np.sin(self.theta)
+                + number_of_y_propagations * Ly * np.sin(self._theta)
             )
         else:
             x_diffs = x - self._prop_dir_blob_position(t)
@@ -334,7 +332,7 @@ class Blob:
             y_diffs = (
                 y
                 - self._perp_dir_blob_position(t)
-                + number_of_y_propagations * Ly * np.cos(self.theta)
+                + number_of_y_propagations * Ly * np.cos(self._theta)
             )
         else:
             y_diffs = y - self._perp_dir_blob_position(t)
