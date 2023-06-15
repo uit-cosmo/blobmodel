@@ -3,6 +3,7 @@ from typing import Tuple, Union
 from nptyping import NDArray
 import numpy as np
 from .pulse_shape import AbstractBlobShape
+import cmath
 
 
 class Blob:
@@ -23,6 +24,7 @@ class Blob:
         t_drain: Union[float, NDArray],
         prop_shape_parameters: dict = None,
         perp_shape_parameters: dict = None,
+        blob_alignment: bool = True,
     ) -> None:
         self.int = int
         self.blob_id = blob_id
@@ -42,10 +44,8 @@ class Blob:
         self.perp_shape_parameters = (
             {} if perp_shape_parameters is None else perp_shape_parameters
         )
-        if self.v_x != 0:
-            self.theta = np.arctan(self.v_y / self.v_x)
-        else:
-            self.theta = np.pi / 2 * np.sign(self.v_y)
+        self.blob_alignment = blob_alignment
+        self.theta = cmath.phase(self.v_x + self.v_y * 1j) if blob_alignment else 0.0
 
     def discretize_blob(
         self,
@@ -87,7 +87,7 @@ class Blob:
             prop_dir = (
                 self._prop_dir_blob_position(t)
                 if type(t) in [int, float]  # t has dimensionality = 0, used for testing
-                else self._prop_dir_blob_position(t)[0, 0]
+                else self._prop_dir_blob_position(t[0, 0])
             )
             number_of_y_propagations = (
                 prop_dir + adjusted_Ly - x_border
@@ -147,6 +147,7 @@ class Blob:
                 if one_dimensional
                 else self._perpendicular_direction_shape(
                     y_perp + y_offset,
+                    t,
                     Ly,
                     periodic_y,
                     number_of_y_propagations=number_of_y_propagations,
@@ -183,6 +184,7 @@ class Blob:
     def _perpendicular_direction_shape(
         self,
         y: NDArray,
+        t: NDArray,
         Ly: float,
         periodic_y: bool,
         number_of_y_propagations: NDArray,
@@ -190,21 +192,29 @@ class Blob:
         if periodic_y:
             y_diffs = (
                 y
-                - self._perp_dir_blob_position()
+                - self._perp_dir_blob_position(t)
                 + number_of_y_propagations * Ly * np.cos(self.theta)
             )
         else:
-            y_diffs = y - self._perp_dir_blob_position()
+            y_diffs = y - self._perp_dir_blob_position(t)
         theta_y = y_diffs / self.width_perp
         return self.blob_shape.get_pulse_shape_perp(
             theta_y, **self.perp_shape_parameters
         )
 
     def _prop_dir_blob_position(self, t: NDArray) -> NDArray:
-        return self.pos_x + (self.v_x**2 + self.v_y**2) ** 0.5 * (t - self.t_init)
+        return (
+            self.pos_x + (self.v_x**2 + self.v_y**2) ** 0.5 * (t - self.t_init)
+            if self.blob_alignment
+            else self.pos_x + self.v_x * (t - self.t_init)
+        )
 
-    def _perp_dir_blob_position(self) -> float:
-        return self.pos_y
+    def _perp_dir_blob_position(self, t: NDArray) -> float:
+        return (
+            self.pos_y
+            if self.blob_alignment
+            else self.pos_y + self.v_y * (t - self.t_init)
+        )
 
     def _rotate(
         self, origin: Tuple[float, float], x: NDArray, y: NDArray, angle: float
