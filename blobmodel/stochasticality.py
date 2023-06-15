@@ -1,3 +1,5 @@
+"""This module defines a class for generating blob parameters."""
+
 from abc import ABC, abstractmethod
 import numpy as np
 from nptyping import NDArray, Float
