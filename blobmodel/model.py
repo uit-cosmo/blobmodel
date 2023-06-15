@@ -1,3 +1,5 @@
+"""This module defines a 2D model of propagating blobs."""
+
 import numpy as np
 import xarray as xr
 from tqdm import tqdm
@@ -31,37 +33,60 @@ class Model:
         one_dimensional: bool = False,
     ) -> None:
         """
-        Attributes
-        ----------
-        Nx: int, grid points in x
-        Ny: int, grid points in y
-        Lx: float, length of grid in x
-        Ly: float, length of grid in y
-        dt: float, time step
-        T: float, time length
-        periodic_y: bool, optional
-            allow periodicity in y-direction
+        Initialize the 2D Model of propagating blobs.
 
+        Parameters
+        ----------
+        Nx : int, optional
+            Number of grid points in x.
+        Ny : int, optional
+            Number of grid points in y.
+        Lx : float, optional
+            Length of the domain in x.
+        Ly : float, optional
+            Length of the domain in y.
+        dt : float, optional
+            Time step.
+        T : float, optional
+            Time length.
+        periodic_y : bool, optional
+            Allow periodicity in the y-direction.
             Important: only good approximation for Ly >> blob width
-        num_blobs:
-            number of blobs
-        blob_shape: AbstractBlobShape or str, optional
-            see AbstractBlobShape and BlobShapeImpl dataclass for available shapes
-        t_drain: float or array of length Nx, optional
-            drain time for blobs
-        blob_factory: BlobFactory, optional
-            sets distributions of blob parameters
-        labels: str, optional
+        blob_shape : AbstractBlobShape or str, optional
+            Shape of the blobs. Can be an instance of AbstractBlobShape or a string
+            specifying the shape.
+        num_blobs : int, optional
+            Number of blobs.
+        t_drain : float or array-like, optional
+            Drain time for the blobs. Can be a single float value or an array-like
+            of length Nx.
+        blob_factory : BlobFactory, optional
+            BlobFactory instance for setting blob parameter distributions.
+        labels : str, optional
+            Blob label setting. Possible values: "off", "same", "individual".
             "off": no blob labels returned
             "same": regions where blobs are present are set to label 1
             "individual": different blobs return individual labels
-            used for creating training data for supervised machine learning algorithms
-        label_border: float, optional
-            defines region of blob as region where density >= label_border * amplitude of Blob
-            only used if labels = "same" or "individual"
-        one_dimensional: bool, optional
-            If True, the perpendicular shape of the blobs will be discarded. Parameters
-            for the y-component (Ny and Ly) will be overwritten to Ny=1, Ly=0.
+            Used for creating training data for supervised machine learning algorithms
+        label_border : float, optional
+            Defines region of blob as region where density >= label_border * amplitude of Blob
+            Only used if labels = "same" or "individual"
+        one_dimensional : bool, optional
+            If True, the perpendicular shape of the blobs will be discarded.
+            Parameters for the y-component (Ny and Ly) will be overwritten to Ny=1, Ly=0.
+
+        Raises
+        ------
+        AssertionError
+            If t_drain is not a single value or an array-like of length Nx.
+
+        Warns
+        -----
+        UserWarning
+            If the model is one-dimensional and Ny and Ly are not appropriate.
+
+        UserWarning
+            If the model is one-dimensional and the blob factory is not one-dimensional.
         """
         self._one_dimensional = one_dimensional
         if self._one_dimensional and (Ny != 1 or Ly != 0):
@@ -99,17 +124,32 @@ class Model:
         self._reset_fields()
 
     def __str__(self) -> str:
-        """string representation of Model."""
+        """
+        Return a string representation of the Model.
+
+        Returns
+        -------
+        str
+            String representation of the Model.
+        """
         return (
             f"2d Blob Model with"
             + f" num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
         )
 
     def get_blobs(self) -> List[Blob]:
-        """Returns blobs list.
+        """
+        Return the list of blobs.
 
-        Note that if Model.sample_blobs has not been called, the list
-        will be empty
+        Returns
+        -------
+        List[Blob]
+            List of Blob objects.
+
+        Notes
+        -----
+        - Note that if Model.sample_blobs has not been called, the list will be empty
+
         """
         return self._blobs
 
@@ -119,24 +159,27 @@ class Model:
         speed_up: bool = False,
         error: float = 1e-10,
     ) -> xr.Dataset:
-        """Integrate Model over time and write out data as xarray dataset.
+        """
+        Integrate the Model over time and write out data as an xarray dataset.
 
         Parameters
         ----------
-        file_name: str, optional
-            file name for .nc file containing data as xarray dataset
-        speed_up: bool, optional
-            speeding up code by discretizing each single blob at smaller time window
+        file_name : str, optional
+            File name for the .nc file containing data as an xarray dataset.
+        speed_up : bool, optional
+            Flag for speeding up the code by discretizing each single blob at smaller time window
             when blob values fall under given error value the blob gets discarded
-            !!!  this is only a good approximation for blob_shape='exp' !!!
-
-        error: float, optional
-            numerical error at x = Lx when blob gets truncated
-            only used if speed_up = True
+        error : float, optional
+            Numerical error at x = Lx when the blob gets truncated.
 
         Returns
-        ----------
-            xarray dataset with result data
+        -------
+        xr.Dataset
+            xarray dataset with the resulting data.
+
+        Notes
+        -----
+        - speed_up is only a good approximation for blob_shape="exp"
         """
 
         # Reset density field
@@ -161,6 +204,14 @@ class Model:
         return dataset
 
     def _create_xr_dataset(self) -> xr.Dataset:
+        """
+        Create an xarray dataset from the density field.
+
+        Returns
+        -------
+        xr.Dataset
+            xarray dataset with the density field data.
+        """
         if self._geometry.Ly == 0:
             dataset = xr.Dataset(
                 data_vars=dict(
@@ -195,6 +246,18 @@ class Model:
         speed_up: bool,
         error: float,
     ):
+        """
+        Sum up the contribution of a single blob to the density field.
+
+        Parameters
+        ----------
+        blob : Blob
+            Blob object.
+        speed_up : bool
+            Flag for speeding up the code by discretizing each single blob at a smaller time window.
+        error : float
+            Numerical error when the blob gets truncated.
+        """
         _start, _stop = self._compute_start_stop(blob, speed_up, error)
         _single_blob = blob.discretize_blob(
             x=self._geometry.x_matrix[:, :, _start:_stop],
@@ -221,6 +284,23 @@ class Model:
             ] = (blob.blob_id + 1)
 
     def _compute_start_stop(self, blob: Blob, speed_up: bool, error: float):
+        """
+        Compute the start and stop indices for summing up the contribution of a single blob.
+
+        Parameters
+        ----------
+        blob : Blob
+            Blob object.
+        speed_up : bool
+            Flag for speeding up the code by discretizing each single blob at a smaller time window.
+        error : float
+            Numerical error when the blob gets truncated.
+
+        Returns
+        -------
+        Tuple[int, int]
+            Start and stop indices.
+        """
         if not speed_up or blob.v_x == 0:
             return 0, self._geometry.t.size
         start = np.maximum(
@@ -250,6 +330,7 @@ class Model:
         return start, stop
 
     def _reset_fields(self):
+        """Reset the density and labels fields."""
         self._density = np.zeros(
             shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
         )

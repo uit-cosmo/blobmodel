@@ -1,3 +1,5 @@
+"""This module defines the Geometry class for creating a grid for the Model."""
+
 from typing import Any
 from nptyping import NDArray, Float
 import numpy as np
@@ -17,16 +19,24 @@ class Geometry:
         periodic_y: bool,
     ) -> None:
         """
-        Attributes
+        Initialize a Geometry object.
+
+        Parameters
         ----------
-        Nx: int, grid points in x
-        Ny: int, grid points in y
-        Lx: float, length of grid in x
-        Ly: float, length of grid in y
-        dt: float, time step
-        T: float, time length
-        periodic_y: bool, optional
-            allow periodicity in y-direction
+        Nx : int
+            Number of grid points in the x-direction.
+        Ny : int
+            Number of grid points in the y-direction.
+        Lx : float
+            Length of domain in the x-direction.
+        Ly : float
+            Length of domain in the y-direction.
+        dt : float
+            Time step.
+        T : float
+            Time length.
+        periodic_y : bool
+            Flag indicating whether periodicity is allowed in the y-direction.
         """
         self.Nx = Nx
         self.Ny = Ny
@@ -48,7 +58,14 @@ class Geometry:
         )
 
     def __str__(self) -> str:
-        """string representation of Geometry."""
+        """
+        Return a string representation of the Geometry object.
+
+        Returns
+        -------
+        str
+            String representation of the Geometry object.
+        """
         return (
             f"Geometry parameters:  Nx:{self.Nx},  Ny:{self.Ny}, Lx:{self.Lx}, Ly:{self.Ly}, "
             + f"dt:{self.dt}, T:{self.T}, y-periodicity:{self.periodic_y}"
