@@ -1,5 +1,6 @@
 from blobmodel import Blob, BlobShapeImpl
 import numpy as np
+from unittest.mock import MagicMock
 
 blob = Blob(
     blob_id=0,
@@ -27,6 +28,33 @@ def test_initial_blob():
     error = np.max(abs(expected_values - blob_values))
 
     assert error < 1e-10, "Numerical error too big"
+
+
+def test_blob_non_alignment():
+    # Dead pixels have already been preprocessed and have an array of nans at their site
+    blob = Blob(
+        blob_id=0,
+        blob_shape=BlobShapeImpl("exp", "exp"),
+        amplitude=1,
+        width_prop=1,
+        width_perp=1,
+        v_x=1,
+        v_y=1,
+        pos_x=0,
+        pos_y=0,
+        t_init=0,
+        t_drain=10**10,
+        blob_alignment=False,
+    )
+    x = np.arange(0, 10, 0.1)
+    y = np.array([0, 1])
+
+    mesh_x, mesh_y = np.meshgrid(x, y)
+    mock = MagicMock(return_value=mesh_x)
+    blob.blob_shape.get_pulse_shape_prop = mock
+    blob.discretize_blob(x=mesh_x, y=mesh_y, t=0, periodic_y=False, Ly=10)
+
+    np.testing.assert_array_equal(mesh_x, mock.call_args[0][0])
 
 
 def test_periodicity():
@@ -70,6 +98,40 @@ def test_single_point():
     )
 
     expected_values = 1 / np.pi * np.exp(-(mesh_x**2)) * np.exp(-(4**2))
+    error = np.max(abs(expected_values - blob_values))
+
+    assert error < 1e-10, "Numerical error too big"
+
+
+def test_negative_radial_velocity():
+    vx = -1
+    blob_sp = Blob(
+        blob_id=0,
+        blob_shape=BlobShapeImpl("gauss"),
+        amplitude=1,
+        width_prop=1,
+        width_perp=1,
+        v_x=vx,
+        v_y=1,
+        pos_x=0,
+        pos_y=6,
+        t_init=0,
+        t_drain=10**100,
+    )
+
+    x = np.arange(-5, 5, 0.1)
+    y = 0
+    t = 2
+
+    mesh_x, mesh_y = np.meshgrid(x, y)
+    blob_values = blob_sp.discretize_blob(
+        x=mesh_x, y=mesh_y, t=t, periodic_y=True, Ly=10
+    )
+
+    # The exact analytical expression for the expected values is a bit cumbersome, thus we just check
+    # that the shape is correct
+    maxx = np.max(blob_values)
+    expected_values = maxx * np.exp(-((mesh_x - vx * t) ** 2))
     error = np.max(abs(expected_values - blob_values))
 
     assert error < 1e-10, "Numerical error too big"
@@ -137,8 +199,3 @@ def test_kwargs():
     blob_sp.discretize_blob(x=mesh_x, y=mesh_y, t=0, periodic_y=True, Ly=10)
 
     mock_ps.get_pulse_shape_prop.assert_called_with([[0]], lam=0.2)
-
-
-test_initial_blob()
-test_periodicity()
-test_single_point()

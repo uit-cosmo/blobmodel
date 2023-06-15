@@ -54,6 +54,7 @@ class DefaultBlobFactory(BlobFactory):
         vy_parameter: float = 1.0,
         shape_param_x_parameter: float = 0.5,
         shape_param_y_parameter: float = 0.5,
+        blob_alignment: bool = True,
     ) -> None:
 
         """
@@ -92,6 +93,9 @@ class DefaultBlobFactory(BlobFactory):
             Free parameter for the shape parameter distribution in the x-direction, by default 0.5
         shape_param_y_parameter : float, optional
             Free parameter for the shape parameter distribution in the y-direction, by default 0.5
+        blob_alignment : bool, optional
+            If blob_aligment == True, the blob shapes are rotated in the propagation direction of the blob
+            If blob_aligment == False, the blob shapes are independent of the propagation direction
 
         Notes
         -----
@@ -103,6 +107,7 @@ class DefaultBlobFactory(BlobFactory):
             - ray: rayleight distribution with mean 1
             - deg: degenerate distribution at `free_parameter`
             - zeros: array of zeros
+
         """
         self.amplitude_dist = A_dist
         self.width_x_dist = wx_dist
@@ -118,6 +123,7 @@ class DefaultBlobFactory(BlobFactory):
         self.velocity_y_parameter = vy_parameter
         self.shape_param_x_parameter = shape_param_x_parameter
         self.shape_param_y_parameter = shape_param_y_parameter
+        self.blob_alignment = blob_alignment
 
     def _draw_random_variables(
         self,
@@ -239,6 +245,7 @@ class DefaultBlobFactory(BlobFactory):
                 t_drain=t_drain,
                 prop_shape_parameters=spxs[i],
                 perp_shape_parameters=spys[i],
+                blob_alignment=self.blob_alignment,
             )
             for i in range(num_blobs)
         ]

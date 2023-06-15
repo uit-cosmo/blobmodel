@@ -307,11 +307,11 @@ class Model:
             0,
             int(
                 (
-                    blob.t_init * blob.v_x
+                    np.abs(blob.t_init * blob.v_x)
                     + blob.width_prop * np.log(error * np.sqrt(np.pi))
                     + blob.pos_x
                 )
-                / (self._geometry.dt * blob.v_x)
+                / np.abs(self._geometry.dt * blob.v_x)
             ),
         )
         # ignores t_drain when calculating stop time
@@ -324,7 +324,7 @@ class Model:
                     + self._geometry.Lx
                     - blob.pos_x
                 )
-                / (blob.v_x * self._geometry.dt)
+                / np.abs(blob.v_x * self._geometry.dt)
             ),
         )
         return start, stop
