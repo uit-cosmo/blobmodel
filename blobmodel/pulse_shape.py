@@ -8,7 +8,7 @@ class AbstractBlobShape(ABC):
     """Abstract class containing the blob pulse shapes. Two-dimensional blob
     pulse shapes are written in the form.
 
-    phi(theta_x, theta_y) = phi_x(theta_x) * phi_y(theta_y).
+    `phi(theta_x, theta_y) = phi_x(theta_x) * phi_y(theta_y)`.
     """
 
     @abstractmethod
