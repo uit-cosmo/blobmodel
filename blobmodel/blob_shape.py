@@ -6,17 +6,17 @@ import numpy as np
 
 class AbstractBlobShape(ABC):
     """Abstract class containing the blob pulse shapes. Two-dimensional blob
-    pulse shapes are written in the form.
+    pulse shapes are written in the form:
 
-    `phi(theta_x, theta_y) = phi_x(theta_x) * phi_y(theta_y)`.
+    ``phi(theta_x, theta_y) = phi_x(theta_x) * phi_y(theta_y)``
     """
 
     @abstractmethod
-    def get_pulse_shape_prop(self, theta: np.ndarray, **kwargs) -> np.ndarray:
+    def get_blob_shape_prop(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         raise NotImplementedError
 
     @abstractmethod
-    def get_pulse_shape_perp(self, theta: np.ndarray, **kwargs) -> np.ndarray:
+    def get_blob_shape_perp(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         raise NotImplementedError
 
 
@@ -40,17 +40,17 @@ class BlobShapeImpl(AbstractBlobShape):
             raise NotImplementedError(
                 f"{self.__class__.__name__}.blob_shape not implemented"
             )
-        self.get_pulse_shape_prop = BlobShapeImpl.__GENERATORS.get(pulse_shape_prop)
-        self.get_pulse_shape_perp = BlobShapeImpl.__GENERATORS.get(pulse_shape_perp)
+        self.get_blob_shape_prop = BlobShapeImpl.__GENERATORS.get(pulse_shape_prop)
+        self.get_blob_shape_perp = BlobShapeImpl.__GENERATORS.get(pulse_shape_perp)
 
-    def get_pulse_shape_prop(self, theta: np.ndarray, **kwargs) -> np.ndarray:
+    def get_blob_shape_prop(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the pulse shape in the propagation direction.
 
         Parameters
         ----------
         theta : np.ndarray
             Array of theta values.
-        **kwargs
+        kwargs
             Additional keyword arguments.
 
         Returns
@@ -60,14 +60,14 @@ class BlobShapeImpl(AbstractBlobShape):
         """
         raise NotImplementedError
 
-    def get_pulse_shape_perp(self, theta: np.ndarray, **kwargs) -> np.ndarray:
+    def get_blob_shape_perp(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the pulse shape perpendicular to the propagation direction.
 
         Parameters
         ----------
         theta : np.ndarray
             Array of theta values.
-        **kwargs
+        kwargs
             Additional keyword arguments.
 
         Returns
@@ -85,7 +85,7 @@ class BlobShapeImpl(AbstractBlobShape):
         ----------
         theta : np.ndarray
             Array of theta values.
-        **kwargs
+        kwargs
             Additional keyword arguments.
 
         Returns
@@ -103,7 +103,7 @@ class BlobShapeImpl(AbstractBlobShape):
         ----------
         theta : np.ndarray
             Array of theta values.
-        **kwargs
+        kwargs
             Additional keyword arguments.
 
         Returns
@@ -121,7 +121,7 @@ class BlobShapeImpl(AbstractBlobShape):
         ----------
         theta : np.ndarray
             Array of theta values.
-        **kwargs
+        kwargs
             Additional keyword arguments.
             lam : float
                 Asymmetry parameter controlling the shape.
@@ -146,7 +146,7 @@ class BlobShapeImpl(AbstractBlobShape):
         ----------
         theta : np.ndarray
             Array of theta values.
-        **kwargs
+        kwargs
             Additional keyword arguments.
 
         Returns
@@ -164,7 +164,7 @@ class BlobShapeImpl(AbstractBlobShape):
         ----------
         theta : np.ndarray
             Array of theta values.
-        **kwargs
+        kwargs
             Additional keyword arguments.
 
         Returns

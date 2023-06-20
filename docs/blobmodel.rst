@@ -4,6 +4,14 @@ blobmodel package
 Submodules
 ----------
 
+blobmodel.blob\_shape module
+----------------------------
+
+.. automodule:: blobmodel.blob_shape
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 blobmodel.blobs module
 ----------------------
 
@@ -32,14 +40,6 @@ blobmodel.plotting module
 -------------------------
 
 .. automodule:: blobmodel.plotting
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-blobmodel.pulse\_shape module
------------------------------
-
-.. automodule:: blobmodel.pulse_shape
    :members:
    :undoc-members:
    :show-inheritance:
