@@ -6,12 +6,21 @@
 blobmodel Documentation
 =====================================
 
+.. image:: ../readme_gifs/2d_blobs.gif
+   :alt: StreamPlayer
+   :align: center
+
+.. image:: ../readme_gifs/1d_blobs.gif
+   :alt: StreamPlayer
+   :align: center
+
 .. toctree::
    :caption: Contents
    :maxdepth: 1
 
    Installing <install>
    getting_started
+
 
 .. toctree::
    :maxdepth: 2
