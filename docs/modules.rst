@@ -1,4 +1,4 @@
-2d_propagating_blobs
+Python Module Index
 ====================
 
 .. toctree::

@@ -3,16 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to blobmodel's documentation!
+blobmodel Documentation
 =====================================
 
 .. toctree::
+   :caption: Contents
+   :maxdepth: 1
+
+   Installing <install>
+   getting_started
+
+.. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: modules
 
    modules
-
-
 
 Indices and tables
 ==================
