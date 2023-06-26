@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 blobmodel Documentation
-=====================================
+=======================
 
 .. image:: ../readme_gifs/2d_blobs.gif
    :alt: StreamPlayer
@@ -20,6 +20,14 @@ blobmodel Documentation
 
    Installing <install>
    getting_started
+   visualize_model
+   model_geometry
+   blob_shapes
+   parameter_distributions
+   blob_labels
+   drainage_time
+   blob_alignment
+   contributor_guide
 
 
 .. toctree::
