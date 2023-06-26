@@ -32,7 +32,7 @@ blobmodel Documentation
 
 .. toctree::
    :maxdepth: 2
-   :caption: modules
+   :caption: API reference
 
    modules
 
