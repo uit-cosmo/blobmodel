@@ -1,3 +1,5 @@
+.. _contributor-guide:
+
 Contributor Guide
 =================
 
