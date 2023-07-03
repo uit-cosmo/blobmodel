@@ -81,5 +81,3 @@ ax = plt.gca()
 ax.set_aspect('equal', adjustable='box')
 plt.savefig("logo.png", bbox_inches='tight')
 plt.show()
-
-show_model(dataset=ds)
