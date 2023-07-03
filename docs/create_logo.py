@@ -23,14 +23,14 @@ class CustomBlobFactory(BlobFactory):
     ) -> list[Blob]:
 
         # set custom parameter distributions
-        amp = [1,1,1]#np.linspace(0.01, 1, num=num_blobs)
-        width = [2,1,1]#np.linspace(0.01, 1, num=num_blobs)
-        vx = [1,1,1] #np.linspace(0.01, 1, num=num_blobs)
-        vy = [0,0,0]#np.linspace(0.01, 1, num=num_blobs)
+        amp = [1, 1, 1]  # np.linspace(0.01, 1, num=num_blobs)
+        width = [2, 1, 1]  # np.linspace(0.01, 1, num=num_blobs)
+        vx = [1, 1, 1]  # np.linspace(0.01, 1, num=num_blobs)
+        vy = [0, 0, 0]  # np.linspace(0.01, 1, num=num_blobs)
 
         posx = np.zeros(num_blobs)
-        posy = [5,2.5,7.5]#np.random.uniform(low=0.0, high=Ly, size=num_blobs)
-        t_init = [0,2,5]#np.random.uniform(low=0, high=T, size=num_blobs)
+        posy = [5, 2.5, 7.5]  # np.random.uniform(low=0.0, high=Ly, size=num_blobs)
+        t_init = [0, 2, 5]  # np.random.uniform(low=0, high=T, size=num_blobs)
 
         # sort blobs by _t_init
         t_init = np.sort(t_init)
@@ -74,10 +74,11 @@ tmp = Model(
 ds = tmp.make_realization(speed_up=True, error=1e-1)
 
 import matplotlib.pyplot as plt
+
 logo = ds.n.isel(t=7).values
-plt.contourf(logo,32)
-plt.axis('off')
+plt.contourf(logo, 32)
+plt.axis("off")
 ax = plt.gca()
-ax.set_aspect('equal', adjustable='box')
-plt.savefig("logo.png", bbox_inches='tight')
+ax.set_aspect("equal", adjustable="box")
+plt.savefig("logo.png", bbox_inches="tight")
 plt.show()
