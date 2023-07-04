@@ -1,3 +1,5 @@
+.. _blobmodel-geometry:
+
 Model Geometry
 ==============
 

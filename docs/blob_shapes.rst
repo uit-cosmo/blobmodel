@@ -1,3 +1,6 @@
+.. _blob-shapes:
+   
+
 Blob Shapes
 ===========
 

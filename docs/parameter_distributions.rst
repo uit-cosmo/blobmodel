@@ -1,3 +1,5 @@
+.. _parameter-distributions:
+
 Parameter Distributions
 =======================
 
