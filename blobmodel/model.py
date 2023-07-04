@@ -95,7 +95,7 @@ class Model:
             Ly = 0
             if not blob_factory.is_one_dimensional():
                 warnings.warn(
-                    "Using a one dimensional model with a with a blob factory that is not one-dimensional. Are you sure you know what you are doing?"
+                    "Using a one dimensional model with a blob factory that is not one-dimensional. Are you sure you know what you are doing?"
                 )
 
         self._geometry: Geometry = Geometry(
