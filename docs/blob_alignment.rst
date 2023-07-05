@@ -1,3 +1,5 @@
+.. _blob-alignment:
+
 Blob Alignment
 ==============
 
