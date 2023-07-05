@@ -3,6 +3,10 @@
 Getting Started
 ===============
 
+++++++++++++++++
+Creating a model
+++++++++++++++++
+
 We create a grid on which the blobs are discretized with using the ``Model`` class. Here, we specify the geometry of the model by the number of grid points, the lengths of the domain, the time step and the time length of our realization.
 
 In addition, we can specify the blob shape, drainage time and the number of blobs when creating a ``Model`` object. For more details about the geometry, take a look at the :ref:`blobmodel-geometry` section.
@@ -22,6 +26,11 @@ In addition, we can specify the blob shape, drainage time and the number of blob
       t_drain=100,
       num_blobs=100,
   )
+
+
++++++++++++++++++
+Superposing blobs
++++++++++++++++++
 
 We can now call the ``make_realization()`` method to sum up the individual blobs. The blob parameters are sampled from the according distribution functions (see :ref:`parameter-distributions` for further details).
 If we provide a ``file_name`` to the ``make_realization`` method, it will store the realization under this name on your machine. 
