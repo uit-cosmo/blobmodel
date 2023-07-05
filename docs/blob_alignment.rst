@@ -3,4 +3,13 @@
 Blob Alignment
 ==============
 
-Content comming soon
+.. image:: alignment_true.gif
+   :alt: StreamPlayer
+   :align: center
+   :scale: 80%
+
+.. image:: alignment_false.gif
+   :alt: StreamPlayer
+   :align: center
+   :scale: 80%
+
