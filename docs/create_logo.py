@@ -24,14 +24,14 @@ class CustomBlobFactory(BlobFactory):
     ) -> List[Blob]:
 
         # set custom parameter distributions
-        amp = [1, 1, 1]  # np.linspace(0.01, 1, num=num_blobs)
-        width = [2, 1, 1]  # np.linspace(0.01, 1, num=num_blobs)
-        vx = [1, 1, 1]  # np.linspace(0.01, 1, num=num_blobs)
-        vy = [0, 0, 0]  # np.linspace(0.01, 1, num=num_blobs)
+        amp = [1, 1, 1]  
+        width = [2, 1, 1]
+        vx = [1, 1, 1]
+        vy = [0, 0, 0]
 
         posx = np.zeros(num_blobs)
-        posy = [5, 2.5, 7.5]  # np.random.uniform(low=0.0, high=Ly, size=num_blobs)
-        t_init = [0.0, 2.0, 5.0]  # np.random.uniform(low=0, high=T, size=num_blobs)
+        posy = [5, 2.5, 7.5]
+        t_init = [0.0, 2.0, 5.0]
 
         # sort blobs by _t_init
         t_init = np.sort(t_init)
