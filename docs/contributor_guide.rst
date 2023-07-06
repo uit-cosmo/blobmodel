@@ -91,3 +91,10 @@ In order to check whether all your new code is covered by tests, run:
    coverage html
 
 You can now open `htmlcov/index.html` with your browser to check whether all of your lines are covered by tests.
+
+As a last point, we recommend adding type hints to your new functions and classes, which ensures that you’re using variables and functions in your code correctly. 
+We use `mypy <https://mypy.readthedocs.io/en/stable/>`_ for this purpose. Check your code by running:
+
+.. code-block:: bash
+
+   mypy  --ignore-missing-imports .
