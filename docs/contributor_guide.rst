@@ -59,7 +59,7 @@ After the package is installed, we can startthe cycle of making changes:
 6. Add a descriptive title and a description of the pull request, then select :guilabel:`Create pull request`.  
 
 ++++++++++++++++
-Formatting guide
+Formatting Guide
 ++++++++++++++++
 
 :py:mod:`blobmodel` uses `Black <https://github.com/psf/black>`_ for code formatting. Make sure to run 
@@ -70,4 +70,24 @@ Formatting guide
 
 on all edited and added python files in your pull request. For documentation we recomend following the `numpy style guide <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
 
++++++++++++++
+Testing Guide
++++++++++++++
 
+Any new code contributed to :py:mod:`blobmodel` requires testing before it can be merged. All tests are located in the subdirectory `tests/`. 
+After you added your tests to this directory you can run
+
+.. code-block:: bash
+  
+   pytest
+
+to check whether all tests pass. 
+
+In order to check whether all your new code is covered by tests, run:
+
+.. code-block:: bash
+
+   pytest --cov
+   coverage html
+
+You can now open `htmlcov/index.html` with your browser to check whether all of your lines are covered by tests.
