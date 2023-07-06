@@ -6,6 +6,7 @@ from blobmodel import (
     AbstractBlobShape,
 )
 import numpy as np
+from typing import List
 
 # create custom class that inherits from BlobFactory
 # here you can define your custom parameter distributions
@@ -20,7 +21,7 @@ class CustomBlobFactory(BlobFactory):
         num_blobs: int,
         blob_shape: AbstractBlobShape,
         t_drain: float,
-    ) -> list[Blob]:
+    ) -> List[Blob]:
 
         # set custom parameter distributions
         amp = [1, 1, 1]  # np.linspace(0.01, 1, num=num_blobs)
