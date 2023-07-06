@@ -29,4 +29,31 @@ The :py:mod:`-e` specifies that this will be an `editable installation <https://
 Code Contribution Workflow
 ++++++++++++++++++++++++++
 
+After the package is installed, we can startthe cycle of making changes:
 
+1. Edit or create the files and save the changes.
+2. In a terminal, run:
+
+  .. code-block:: bash
+   
+    git add filename
+    
+  replace `filename` with the name of the edited file(s).
+
+3. Commit the changes:
+
+  .. code-block:: bash
+
+    git commit -m "commit message"
+
+  replace `commit message` with a description of the commited changes.
+
+4. Push the changes to GitHub:
+
+  .. code-block:: bash
+
+    git push
+          
+5. If you now go back to your GitHub repository of :py:mod:`blobmodel`, a pale yellow box will appear near the top of the screen, there click on :guilabel:`Compare & pull request`.
+
+6. Add a descriptive title and a description of the pull request, then select :guilabel:`Create pull request`.  
