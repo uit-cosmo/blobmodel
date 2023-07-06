@@ -9,7 +9,7 @@ Thanks for your interest in contributing to :py:mod:`blobmodel`! Any contributio
 Install development version
 +++++++++++++++++++++++++++
 
-If you want to contribute code to :py:mod:`blobmodel`, we reccomend first forking the `GitHub repository <https://github.com/uit-cosmo/blobmodel/tree/main>`_.
+If you want to contribute code to :py:mod:`blobmodel`, we recommend first forking the `GitHub repository <https://github.com/uit-cosmo/blobmodel/tree/main>`_.
 Next, install the package in development mode:
 
 .. code-block:: bash
@@ -38,7 +38,7 @@ After the package is installed, we can startthe cycle of making changes:
    
     git add filename
     
-  replace `filename` with the name of the edited file(s).
+  Replace `filename` with the name of the edited file(s).
 
 3. Commit the changes:
 
@@ -46,7 +46,7 @@ After the package is installed, we can startthe cycle of making changes:
 
     git commit -m "commit message"
 
-  replace `commit message` with a description of the commited changes.
+  Replace `commit message` with a description of the committed changes.
 
 4. Push the changes to GitHub:
 

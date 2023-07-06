@@ -13,7 +13,7 @@ An example of a rotated blob is shown below.
    :scale: 80%
 
 Alternatively, we can force :math:`\theta = 0` for all blobs. The blob propagation direction won't be affected but the blob shape stays orientated towards x and y.
-We achieve this by setting ``blob_alignment`` to False when the ``Blob`` object is instanciated. 
+We achieve this by setting ``blob_alignment`` to False when the ``Blob`` object is instantiated. 
 If you want to implement a whole ``Model`` with unaligned blobs you need to use the ``CustomBlobFactory`` since blob alignment is not handled on a ``Model`` level.
 
 Instantiating a single blob as follows results in a unaligned blob:

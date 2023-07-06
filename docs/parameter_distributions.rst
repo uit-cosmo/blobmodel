@@ -4,7 +4,7 @@ Parameter Distributions
 =======================
 
 While instantiating a ``Model`` object, we define the distribution functions used to sample blob parameters from. 
-So far we have only used the default distrubutions but in this section we cover how change these.
+So far we have only used the default distributions but in this section we cover how change these.
 
 ++++++++++++++++++
 DefaultBlobFactory
@@ -15,7 +15,7 @@ We can use ``DefaultBlobFactory`` class in order to change the distribution func
 * Amplitudes
 * widths in x
 * widths in y
-* velcities in x
+* velocities in x
 * velocities in y
 
 The distributions for these parameters are set with the ``*_dist`` arguments. The following distribution functions are implemented:
@@ -34,10 +34,10 @@ The distributions for these parameters are set with the ``*_dist`` arguments. Th
      - normal distribution with zero mean and ``free_parameter`` as scale parameter
 
    * - "uniform"
-     - uniorm distribution with mean 1 and ``free_parameter`` as width
+     - uniform distribution with mean 1 and ``free_parameter`` as width
 
    * - "ray"
-     - rayleight distribution with mean 1
+     - Rayleight distribution with mean 1
 
    * - "deg"
      - degenerate distribution at ``free_parameter``
@@ -45,7 +45,7 @@ The distributions for these parameters are set with the ``*_dist`` arguments. Th
    * - "zeros"
      - array of zeros
 
-As you can see, some of these distribution require an additional ``free_parameter`` to specify the distribution.
+As you can see, some of these distributions require an additional ``free_parameter`` to specify the distribution.
 This is done by the ``*_parameter`` arguments.
 
 Let's take a look at an example. Let's assume we want to sample the blob amplitudes from normal distribution with 5 as the scale parameter. 
@@ -78,7 +78,7 @@ CustomBlobFactory
 +++++++++++++++++
 
 But what if you want to use a distribution function that is not implemented? Or maybe you even want to change the initial position and arrival time of each blob?
-In this case you can use the ``CustomBlobFactory`` class to define all blob parameters individually. An example could look tike this:
+In this case you can use the ``CustomBlobFactory`` class to define all blob parameters individually. An example could look like this:
 
 .. code-block:: python
 
@@ -156,7 +156,7 @@ In this case you can use the ``CustomBlobFactory`` class to define all blob para
 
     ds = tmp.make_realization()
 
-By assigning an array like to the variables ``amp``, ``width``, ``vx``, ``vy``, ``posx``, ``posy`` and ``t_init`` we can exactly define every single blob parameter of everysingle blob.
+By assigning an array like to the variables ``amp``, ``width``, ``vx``, ``vy``, ``posx``, ``posy`` and ``t_init`` we can exactly define every single blob parameter of every single blob.
 
 .. note::
 
