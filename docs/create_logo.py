@@ -24,7 +24,7 @@ class CustomBlobFactory(BlobFactory):
     ) -> List[Blob]:
 
         # set custom parameter distributions
-        amp = [1, 1, 1]  
+        amp = [1, 1, 1]
         width = [2, 1, 1]
         vx = [1, 1, 1]
         vy = [0, 0, 0]
@@ -34,7 +34,7 @@ class CustomBlobFactory(BlobFactory):
         t_init = [0.0, 2.0, 5.0]
 
         # sort blobs by _t_init
-        t_init = np.sort(t_init)
+        t_init = np.sort(t_init).tolist()
 
         return [
             Blob(
