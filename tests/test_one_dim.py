@@ -43,24 +43,21 @@ def test_one_dim():
 
 def test_1d_warning():
     with pytest.warns(UserWarning):
-        bf = DefaultBlobFactory(
-            A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="deg"
-        )
-        one_dim_model = Model(
-            Nx=100,
-            Ny=100,
-            Lx=10,
-            Ly=10,
-            dt=1,
-            T=1000,
-            blob_shape="exp",
-            t_drain=2,
-            periodic_y=False,
-            num_blobs=1,
-            blob_factory=bf,
-            one_dimensional=True,
-        )
-
-
-test_one_dim()
-test_1d_warning()
+        for vy_dist in ["deg", "zeros"]:
+            bf = DefaultBlobFactory(
+                A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist=vy_dist
+            )
+            one_dim_model = Model(
+                Nx=100,
+                Ny=100,
+                Lx=10,
+                Ly=10,
+                dt=1,
+                T=1000,
+                blob_shape="exp",
+                t_drain=2,
+                periodic_y=False,
+                num_blobs=1,
+                blob_factory=bf,
+                one_dimensional=True,
+            )

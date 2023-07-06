@@ -1,4 +1,4 @@
-from blobmodel import Blob, BlobShapeImpl
+from blobmodel import Model, DefaultBlobFactory, Blob, BlobShapeImpl
 import numpy as np
 from unittest.mock import MagicMock
 
@@ -199,3 +199,22 @@ def test_kwargs():
     blob_sp.discretize_blob(x=mesh_x, y=mesh_y, t=0, periodic_y=True, Ly=10)
 
     mock_ps.get_pulse_shape_prop.assert_called_with([[0]], lam=0.2)
+
+
+def test_get_blobs():
+    bf = DefaultBlobFactory(A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="deg")
+    one_blob = Model(
+        Nx=100,
+        Ny=100,
+        Lx=10,
+        Ly=10,
+        dt=1,
+        T=1,
+        blob_shape="exp",
+        t_drain=1e10,
+        periodic_y=False,
+        num_blobs=1,
+        blob_factory=bf,
+    )
+    _ = one_blob.make_realization()
+    _ = one_blob.get_blobs()

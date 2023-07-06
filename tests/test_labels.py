@@ -1,3 +1,4 @@
+import pytest
 from blobmodel import Model, BlobFactory, Blob, BlobShapeImpl, AbstractBlobShape
 import numpy as np
 import warnings
@@ -81,7 +82,8 @@ def test_bloblabels_speedup():
     assert np.max(diff) < 0.00001
 
 
-def test_bloblabels():
+@pytest.mark.parametrize("labels", [("individual"), ("same")])
+def test_bloblabels(labels):
     warnings.filterwarnings("ignore")
     bf = CustomBlobFactory()
     bm = Model(
@@ -96,7 +98,7 @@ def test_bloblabels():
         num_blobs=1,
         blob_factory=bf,
         t_drain=1e10,
-        labels="same",
+        labels=labels,
     )
     ds = bm.make_realization(speed_up=False)
     correct_labels = np.array(
@@ -112,7 +114,3 @@ def test_bloblabels():
     )
     diff = ds["blob_labels"].values - correct_labels
     assert np.max(diff) < 0.00001
-
-
-test_bloblabels_speedup()
-test_bloblabels()
