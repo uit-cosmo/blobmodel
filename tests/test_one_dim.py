@@ -1,3 +1,4 @@
+import pytest
 from blobmodel import Model, DefaultBlobFactory
 import numpy as np
 
@@ -40,4 +41,26 @@ def test_one_dim():
     assert error < 0.1, "Numerical error too big"
 
 
+def test_1d_warning():
+    with pytest.warns(UserWarning):
+        bf = DefaultBlobFactory(
+            A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="deg"
+        )
+        one_dim_model = Model(
+            Nx=100,
+            Ny=100,
+            Lx=10,
+            Ly=10,
+            dt=1,
+            T=1000,
+            blob_shape="exp",
+            t_drain=2,
+            periodic_y=False,
+            num_blobs=1,
+            blob_factory=bf,
+            one_dimensional=True,
+        )
+
+
 test_one_dim()
+test_1d_warning()
