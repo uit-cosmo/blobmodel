@@ -31,7 +31,7 @@ class CustomBlobFactory(BlobFactory):
 
         posx = np.zeros(num_blobs)
         posy = [5, 2.5, 7.5]  # np.random.uniform(low=0.0, high=Ly, size=num_blobs)
-        t_init = [0, 2, 5]  # np.random.uniform(low=0, high=T, size=num_blobs)
+        t_init = [0.0, 2.0, 5.0]  # np.random.uniform(low=0, high=T, size=num_blobs)
 
         # sort blobs by _t_init
         t_init = np.sort(t_init)
