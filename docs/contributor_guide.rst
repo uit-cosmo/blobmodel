@@ -57,3 +57,17 @@ After the package is installed, we can startthe cycle of making changes:
 5. If you now go back to your GitHub repository of :py:mod:`blobmodel`, a pale yellow box will appear near the top of the screen, there click on :guilabel:`Compare & pull request`.
 
 6. Add a descriptive title and a description of the pull request, then select :guilabel:`Create pull request`.  
+
+++++++++++++++++
+Formatting guide
+++++++++++++++++
+
+:py:mod:`blobmodel` uses `Black <https://github.com/psf/black>`_ for code formatting. Make sure to run 
+
+.. code-block:: bash
+
+   black edited/new file
+
+on all edited and added python files in your pull request. For documentation we recomend following the `numpy style guide <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
+
+
