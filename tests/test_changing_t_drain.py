@@ -43,6 +43,3 @@ def test_decreasing_t_drain():
         1 / np.sqrt(np.pi) * t_d / t_w * amp * np.exp(-x / (v_p * t_loss))
     )
     assert (model_profile.values[2:] < analytical_profile[2:]).all()
-
-
-test_decreasing_t_drain()

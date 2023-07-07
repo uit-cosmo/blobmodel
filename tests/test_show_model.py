@@ -45,7 +45,3 @@ ds_1d = bm_1d.make_realization()
 def test_plot_1d(mock_show):
     warnings.filterwarnings("ignore")
     show_model(dataset=ds_1d, interval=100, save=False, fps=10)
-
-
-test_plot_2d()
-test_plot_1d()
