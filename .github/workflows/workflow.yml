@@ -50,7 +50,7 @@ jobs:
       run: |
         python -m poetry install
     - name: Install pytest-cov
-      run: pytest-cov
+      run: pip install pytest-cov
     - name: Test with pytest
       run: |
         pytest --cov .
