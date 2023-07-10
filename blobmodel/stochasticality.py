@@ -176,7 +176,7 @@ class DefaultBlobFactory(BlobFactory):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: float,
+        t_drain: Union[float, NDArray],
     ) -> List[Blob]:
         """
         Creates a list of Blobs used in the Model.
