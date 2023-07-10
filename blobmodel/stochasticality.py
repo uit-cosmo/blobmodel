@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 import numpy as np
-from nptyping import NDArray, Float
+from nptyping import NDArray, Float, Union
 from typing import Any, List
 from .blobs import Blob
 from .pulse_shape import AbstractBlobShape
@@ -19,7 +19,7 @@ class BlobFactory(ABC):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: float,
+        t_drain: Union[float, NDArray],
     ) -> List[Blob]:
         """creates list of Blobs used in Model."""
         raise NotImplementedError
