@@ -28,7 +28,6 @@ class Blob:
         perp_shape_parameters: dict = None,
         blob_alignment: bool = True,
     ) -> None:
-
         """
         Initialize a single blob.
 

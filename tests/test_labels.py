@@ -4,6 +4,7 @@ import numpy as np
 import warnings
 from typing import List
 
+
 # here you can define your custom parameter distributions
 class CustomBlobFactory(BlobFactory):
     def __init__(self) -> None:
@@ -17,7 +18,6 @@ class CustomBlobFactory(BlobFactory):
         blob_shape: AbstractBlobShape,
         t_drain: float,
     ) -> List[Blob]:
-
         # set custom parameter distributions
         _amp = np.ones(num_blobs)
         _width = np.ones(num_blobs)

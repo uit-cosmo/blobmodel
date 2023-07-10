@@ -56,7 +56,6 @@ class DefaultBlobFactory(BlobFactory):
         shape_param_y_parameter: float = 0.5,
         blob_alignment: bool = True,
     ) -> None:
-
         """
         Default implementation of BlobFactory.
 
@@ -130,7 +129,8 @@ class DefaultBlobFactory(BlobFactory):
         dist_type: str,
         free_parameter: float,
         num_blobs: int,
-    ) -> NDArray[Any, Float[64]]:
+        # ) -> NDArray[Any, Float[64]]:
+    ) -> np.ndarray:
         """
         Draws random variables from a specified distribution.
 

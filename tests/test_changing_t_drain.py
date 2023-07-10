@@ -27,7 +27,6 @@ tmp.make_realization(file_name="test_t_drain.nc", speed_up=True, error=1e-2)
 
 
 def test_decreasing_t_drain():
-
     ds = xr.open_dataset("test_t_drain.nc")
     model_profile = ds.n.isel(y=0).mean(dim=("t"))
 

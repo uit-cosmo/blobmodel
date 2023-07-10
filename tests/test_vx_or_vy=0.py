@@ -15,7 +15,6 @@ class CustomBlobFactoryVy0(BlobFactory):
         blob_shape: AbstractBlobShape,
         t_drain: float,
     ) -> List[Blob]:
-
         # set custom parameter distributions
         _amp = np.ones(num_blobs)
         _width = np.ones(num_blobs)
@@ -59,7 +58,6 @@ class CustomBlobFactoryVx0(BlobFactory):
         blob_shape: AbstractBlobShape,
         t_drain: float,
     ) -> List[Blob]:
-
         # set custom parameter distributions
         _amp = np.ones(num_blobs)
         _width = np.ones(num_blobs)

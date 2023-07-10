@@ -18,6 +18,7 @@ bm_2d = Model(
 # create data
 ds_2d = bm_2d.make_realization()
 
+
 # warnings are supressed since plt complains about animation blocked
 @patch("matplotlib.pyplot.show")
 def test_plot_2d(mock_show):
@@ -39,6 +40,7 @@ bm_1d = Model(
 
 # create data
 ds_1d = bm_1d.make_realization()
+
 
 # warnings are supressed since plt complains about animation blocked
 @patch("matplotlib.pyplot.show")
