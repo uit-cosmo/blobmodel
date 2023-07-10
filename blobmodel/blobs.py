@@ -24,8 +24,8 @@ class Blob:
         pos_y: float,
         t_init: float,
         t_drain: Union[float, NDArray],
-        prop_shape_parameters: dict = None,
-        perp_shape_parameters: dict = None,
+        prop_shape_parameters: Union[dict, None] = None,
+        perp_shape_parameters: Union[dict, None] = None,
         blob_alignment: bool = True,
     ) -> None:
         """

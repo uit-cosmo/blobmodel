@@ -117,7 +117,7 @@ class Model:
             isinstance(t_drain, (int, float)) or len(t_drain) == Nx
         ), "t_drain must be of either length 1 or Nx"
 
-        self._blobs: list[Blob] = []
+        self._blobs: List[Blob] = []
         self._blob_factory = blob_factory
         self._labels = labels
         self._label_border = label_border
@@ -155,7 +155,7 @@ class Model:
 
     def make_realization(
         self,
-        file_name: str = None,
+        file_name: Union[str, None] = None,
         speed_up: bool = False,
         error: float = 1e-10,
     ) -> xr.Dataset:

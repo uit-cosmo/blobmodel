@@ -129,7 +129,6 @@ class DefaultBlobFactory(BlobFactory):
         dist_type: str,
         free_parameter: float,
         num_blobs: int,
-        # ) -> NDArray[Any, Float[64]]:
     ) -> np.ndarray:
         """
         Draws random variables from a specified distribution.
