@@ -50,7 +50,7 @@ class Geometry:
         # calculate x, y and t coordinates
         self.x: NDArray[Literal[64], Any] = np.arange(0, self.Lx, self.Lx / self.Nx)
         if self.Ly == 0:
-            self.y: NDArray[Literal[64], Any] = 0
+            self.y: NDArray[Literal[64], Any] = np.array([0])
         else:
             self.y = np.arange(0, self.Ly, self.Ly / self.Ny)
         self.t: NDArray[Literal[64], Any] = np.arange(0, self.T, self.dt)
