@@ -55,4 +55,4 @@ jobs:
 
     - name: Type checking with mypy
       run: |
-        poetry run mypy  --ignore-missing-imports blobmodel
+        mypy  --ignore-missing-imports blobmodel
