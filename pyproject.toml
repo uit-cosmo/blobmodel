@@ -15,7 +15,9 @@ dependencies = [
     "numpy",
     "xarray",
     "tqdm",
-    "nptyping"
+    "nptyping",
+    "matplotlib",
+    "netcdf4",
 ]
 
 [tool.setuptools]
