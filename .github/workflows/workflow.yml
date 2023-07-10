@@ -25,6 +25,17 @@ jobs:
       run: |
         pytest --cov .
 
+    - name: Upload coverage to Codecov
+      # uses: codecov/codecov-action@v2
+      run: |
+        curl -Os https://uploader.codecov.io/latest/linux/codecov
+        chmod +x codecov
+        ./codecov -t ${CODECOV_TOKEN}
+
+    - name: Type checking with mypy
+      run: |
+        mypy  --ignore-missing-imports blobmodel
+
   pytest:
 
     runs-on: ubuntu-latest
