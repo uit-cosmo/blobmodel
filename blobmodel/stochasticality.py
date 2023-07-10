@@ -2,8 +2,8 @@
 
 from abc import ABC, abstractmethod
 import numpy as np
-from nptyping import NDArray, Float, Union
-from typing import Any, List
+from nptyping import NDArray, Float
+from typing import Any, List, Union
 from .blobs import Blob
 from .pulse_shape import AbstractBlobShape
 
