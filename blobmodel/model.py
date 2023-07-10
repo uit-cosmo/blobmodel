@@ -26,7 +26,7 @@ class Model:
         periodic_y: bool = False,
         blob_shape: Union[AbstractBlobShape, str] = BlobShapeImpl("gauss"),
         num_blobs: int = 1000,
-        t_drain: Union[float, NDArray] = 10.0,
+        t_drain: Union[float, NDArray, int] = 10.0,
         blob_factory: BlobFactory = DefaultBlobFactory(),
         labels: str = "off",
         label_border: float = 0.75,
