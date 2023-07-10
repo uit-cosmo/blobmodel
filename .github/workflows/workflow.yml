@@ -21,15 +21,19 @@ jobs:
       run: |
         black --check .
 
+    - name: Test with pytest
+      run: |
+        pytest --cov .
+
   pytest:
 
     runs-on: ubuntu-latest
     if: always()
-    strategy:
-      matrix:
-        pip-packages:
-          - "setuptools pip pytest pytest-cov coverage codecov mypy"
-      fail-fast: false
+    # strategy:
+    #   matrix:
+    #     pip-packages:
+    #       - "setuptools pip pytest pytest-cov coverage codecov mypy"
+    #   fail-fast: false
 
     steps:
     - uses: actions/checkout@v1
