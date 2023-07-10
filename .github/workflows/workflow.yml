@@ -13,17 +13,13 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
 
-    - name: Install Poetry
-      run: |
-        pip install poetry
-        poetry --version
-
     - name: Install dependencies
       run: |
-        python -m poetry install
+        python -m pip install .
+
     - name: Check formatting with black
       run: |
-        poetry run black --check .
+        black --check .
 
   pytest:
 
