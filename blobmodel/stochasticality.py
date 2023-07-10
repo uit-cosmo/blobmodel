@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from nptyping import NDArray, Float
-from typing import Any, List, Union
+from typing import Any, List, Union, Dict
 from .blobs import Blob
 from .pulse_shape import AbstractBlobShape
 
@@ -148,23 +148,27 @@ class DefaultBlobFactory(BlobFactory):
             Array of random variables drawn from the specified distribution.
         """
         if dist_type == "exp":
-            return np.random.exponential(scale=1, size=num_blobs)
+            return np.random.exponential(scale=1, size=num_blobs).astype(np.float64)
         elif dist_type == "gamma":
             return np.random.gamma(
                 shape=free_parameter, scale=1 / free_parameter, size=num_blobs
-            )
+            ).astype(np.float64)
         elif dist_type == "normal":
-            return np.random.normal(loc=0, scale=free_parameter, size=num_blobs)
+            return np.random.normal(loc=0, scale=free_parameter, size=num_blobs).astype(
+                np.float64
+            )
         elif dist_type == "uniform":
             return np.random.uniform(
                 low=1 - free_parameter / 2, high=1 + free_parameter / 2, size=num_blobs
-            )
+            ).astype(np.float64)
         elif dist_type == "ray":
-            return np.random.rayleigh(scale=np.sqrt(2.0 / np.pi), size=num_blobs)
+            return np.random.rayleigh(
+                scale=np.sqrt(2.0 / np.pi), size=num_blobs
+            ).astype(np.float64)
         elif dist_type == "deg":
-            return free_parameter * np.ones(num_blobs)
+            return free_parameter * np.ones(num_blobs).astype(np.float64)
         elif dist_type == "zeros":
-            return np.zeros(num_blobs)
+            return np.zeros(num_blobs).astype(np.float64)
         else:
             raise NotImplementedError(
                 self.__class__.__name__ + ".distribution function not implemented"
@@ -250,7 +254,7 @@ class DefaultBlobFactory(BlobFactory):
         ]
 
         # sort blobs by amplitude
-        return np.array(blobs)[np.argsort(amps)]
+        return sorted(blobs, key=lambda x: x.amplitude)
 
     def is_one_dimensional(self) -> bool:
         """
