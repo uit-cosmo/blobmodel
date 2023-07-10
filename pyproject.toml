@@ -11,6 +11,7 @@ authors = [
 ]
 license = { file = "LICENSE" }
 readme = "README.md"
+requires-python = ">=3.10"
 dependencies = [
     "numpy",
     "xarray",
@@ -18,6 +19,9 @@ dependencies = [
     "nptyping",
     "matplotlib",
     "netcdf4",
+    "pytest-cov",
+    "black",
+    "mypy",
 ]
 
 [tool.setuptools]
