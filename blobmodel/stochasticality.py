@@ -129,7 +129,7 @@ class DefaultBlobFactory(BlobFactory):
         dist_type: str,
         free_parameter: float,
         num_blobs: int,
-    ) -> np.ndarray:
+    ) -> Union[np.ndarray, List[Dict[str, Any]]]:
         """
         Draws random variables from a specified distribution.
 
