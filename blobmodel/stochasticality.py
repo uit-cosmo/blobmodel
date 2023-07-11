@@ -129,7 +129,7 @@ class DefaultBlobFactory(BlobFactory):
         dist_type: str,
         free_parameter: float,
         num_blobs: int,
-    ) -> Union[np.ndarray, List[Dict[str, Any]]]:
+    ) -> np.ndarray:
         """
         Draws random variables from a specified distribution.
 
@@ -227,8 +227,8 @@ class DefaultBlobFactory(BlobFactory):
             self.shape_param_y_dist, self.shape_param_y_parameter, num_blobs
         )
         # For now, only a lambda parameter is implemented
-        spxs = [{"lam": s} for s in spxs]
-        spys = [{"lam": s} for s in spys]
+        spxs_dict = [{"lam": s} for s in spxs]
+        spys_dict = [{"lam": s} for s in spys]
         posxs = np.zeros(num_blobs)
         posys = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
         t_inits = np.random.uniform(low=0, high=T, size=num_blobs)
@@ -246,8 +246,8 @@ class DefaultBlobFactory(BlobFactory):
                 pos_y=posys[i],
                 t_init=t_inits[i],
                 t_drain=t_drain,
-                prop_shape_parameters=spxs[i],
-                perp_shape_parameters=spys[i],
+                prop_shape_parameters=spxs_dict[i],
+                perp_shape_parameters=spys_dict[i],
                 blob_alignment=self.blob_alignment,
             )
             for i in range(num_blobs)
