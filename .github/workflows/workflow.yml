@@ -23,16 +23,8 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest --cov=./ --cov-report=xml
+        pytest --cov=./ --cov-report=xml:coverage.xml
 
-    # - name: Upload coverage to Codecov
-    #   # uses: codecov/codecov-action@v2
-    #   uses: codecov/codecov-action@v3
-    #   run: |
-    #     curl -Os https://uploader.codecov.io/latest/linux/codecov
-    #     chmod +x codecov
-    #     ./codecov -t ${CODECOV_TOKEN}
-    #
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
