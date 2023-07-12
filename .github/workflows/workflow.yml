@@ -23,18 +23,18 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest --cov=./ --cov-report=xml:coverage.xml
+        pytest --cov blobmodel
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        # directory: ./coverage/reports/
-        env_vars: OS,PYTHON
-        fail_ci_if_error: true
-        files: ./coverage.xml,!./cache
-        name: codecov-umbrella
-        verbose: true
+      # with:
+      #   token: ${{ secrets.CODECOV_TOKEN }}
+      #   # directory: ./coverage/reports/
+      #   env_vars: OS,PYTHON
+      #   fail_ci_if_error: true
+      #   files: ./coverage.xml,!./cache
+      #   name: codecov-umbrella
+      #   verbose: true
 
     - name: Type checking with mypy
       run: |
