@@ -5,14 +5,31 @@
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Documentation Status](https://readthedocs.org/projects/blobmodel/badge/?version=latest)](https://blobmodel.readthedocs.io/en/latest/?badge=latest)
 
 Two dimensional model of advecting and dissipating blobs.
 
 The code has been developed originally to model profiles in the scrape-off layer of fusion experiments but it can be used to model any 1d or 2d system consisting of advecting pulses. Examples for one and two dimensions are shown below:
-<div style="display: flex;">
-    <img src="readme_gifs/2d_blobs.gif" alt="GIF 1" style="flex: 1; max-width: 50%;" />
-    <img src="readme_gifs/1d_blobs.gif" alt="GIF 2" style="flex: 1; max-width: 50%;" />
-</div>
+
+<table>
+<tr>
+<th> 2D </th>
+<th> 1D </th>
+</tr>
+<tr>
+<td>
+<img src="readme_gifs/2d_blobs.gif" alt="Density evolution" style="max-width: 50%;" />
+
+
+</td>
+<td>
+
+<img src="readme_gifs/1d_blobs.gif" alt="Density evolution" style="max-width: 50%;" />
+
+
+</td>
+</tr>
+</table>
 
 ## Installation
 The package is published to PyPI and can be installed with
