@@ -20,13 +20,13 @@ Examples for one and two dimensions are shown below:
 </tr>
 <tr>
 <td>
-<img src="readme_gifs/2d_blobs.gif" alt="Density evolution" style="max-width: 50%;" />
+<img src="readme_gifs/2d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
 
 
 </td>
 <td>
 
-<img src="readme_gifs/1d_blobs.gif" alt="Density evolution" style="max-width: 50%;" />
+<img src="readme_gifs/1d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
 
 
 </td>
