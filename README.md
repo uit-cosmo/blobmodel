@@ -1,9 +1,7 @@
+[![codecov](https://codecov.io/github/uit-cosmo/blobmodel/branch/main/graph/badge.svg?token=QSS3BYQC6Y)](https://codecov.io/github/uit-cosmo/blobmodel)
 ![Tests](https://github.com/uit-cosmo/2d_propagating_blobs/actions/workflows/workflow.yml/badge.svg)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Sourcery](https://img.shields.io/badge/Sourcery-enabled-brightgreen)](https://sourcery.ai)
-<!--
-[![codecov](https://codecov.io/gh/uit-cosmo/2d_propagating_blobs/branch/main/graph/badge.svg?token=QSS3BYQC6Y)](https://codecov.io/gh/uit-cosmo/2d_propagating_blobs)
---> 
 # blobmodel
 Two dimensional model of advecting and dissipating blobs.
 
