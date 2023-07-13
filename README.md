@@ -9,9 +9,11 @@
 Two dimensional model of advecting and dissipating blobs.
 
 The code has been developed originally to model profiles in the scrape-off layer of fusion experiments but it can be used to model any 1d or 2d system consisting of advecting pulses. Examples for one and two dimensions are shown below:
-![Density evolution](readme_gifs/2d_blobs.gif)
+<div style="display: flex;">
+    <img src="readme_gifs/2d_blobs.gif" alt="GIF 1" style="flex: 1; max-width: 50%;" />
+    <img src="readme_gifs/1d_blobs.gif" alt="GIF 2" style="flex: 1; max-width: 50%;" />
+</div>
 
-![Density evolution](readme_gifs/1d_blobs.gif)
 ## Installation
 The package is published to PyPI and can be installed with
 ```sh
@@ -22,9 +24,9 @@ If you want the development version you must first clone the repo to your local 
 then install the project in development mode:
 
 ```sh
-git clone git@github.com:uit-cosmo/2d-propagating-blobs.git
-cd 2d-propagating-blobs
-poetry install
+git clone https://github.com/uit-cosmo/blobmodel.git
+cd blobmodel
+python -m pip install -e .
 ```
 
 ## Usage
