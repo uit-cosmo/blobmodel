@@ -7,9 +7,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation Status](https://readthedocs.org/projects/blobmodel/badge/?version=latest)](https://blobmodel.readthedocs.io/en/latest/?badge=latest)
 
-Two dimensional model of advecting and dissipating blobs.
+This package provides realizations of advecting and dissipating blobs in up to two dimensions. 
 
-The code has been developed originally to model profiles in the scrape-off layer of fusion experiments but it can be used to model any 1d or 2d system consisting of advecting pulses. Examples for one and two dimensions are shown below:
+All blob parameters can be choosen freely, and multiple blob shapes are implemented. Originally, the model is developed for studying the scrape-off layer of fusion experiments, but it can be applicable to many 1d or 2d systems. See the [blobmodel documentation](https://blobmodel.readthedocs.io/en/latest/?badge=latest) for further details.
+
+Examples for one and two dimensions are shown below:
 
 <table>
 <tr>
@@ -47,7 +49,7 @@ python -m pip install -e .
 ```
 
 ## Usage
-Create the grid on which the blobs are discretized with using the `Model` class. The `make_realization()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:
+Create a grid on which the blobs are discretized using the `Model` class. The `make_realization()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:
 
 ```Python
 from blobmodel import Model, show_model
