@@ -86,3 +86,7 @@ tmp = Model(
 )
 ```
 Alternatively, you can specify all blob parameters exactly as you want by writing your own class which inherits from BlobFactory. See `examples/custom_blobfactory.py` as an example or take a look at the [blobmodel documentation](https://blobmodel.readthedocs.io/en/latest/?badge=latest).
+
+## Contributing
+
+Feel free to raise issues about anything. Contributions through pull requests are also very welcome. Please take a look at our [Contributor guide](https://blobmodel.readthedocs.io/en/latest/contributor_guide.html) for further details.
