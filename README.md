@@ -1,9 +1,11 @@
+# blobmodel  <img align="left" src="./readme_gifs/logo.png" width="100px" >
+
 [![codecov](https://codecov.io/github/uit-cosmo/blobmodel/branch/main/graph/badge.svg?token=QSS3BYQC6Y)](https://codecov.io/github/uit-cosmo/blobmodel)
 ![Tests](https://github.com/uit-cosmo/2d_propagating_blobs/actions/workflows/workflow.yml/badge.svg)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-# blobmodel ![](./readme_gifs/logo.png)
+
 Two dimensional model of advecting and dissipating blobs.
 
 The code has been developed originally to model profiles in the scrape-off layer of fusion experiments but it can be used to model any 1d or 2d system consisting of advecting pulses. Examples for one and two dimensions are shown below:
