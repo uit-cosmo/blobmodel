@@ -67,7 +67,7 @@ You can specify the blob parameters with a BlobFactory class. The DefaultBlobFac
 ```Python
 from blobmodel import Model, DefaultBlobFactory
 
-# use DefaultBlobFactory to define distribution functions fo random variables
+# use DefaultBlobFactory to define distribution functions of random variables
 bf = DefaultBlobFactory(A_dist="exp", wx_dist="uniform", vx_dist="deg", vy_dist="normal")
 
 # pass on bf when creating the Model
