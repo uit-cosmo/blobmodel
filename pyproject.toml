@@ -22,6 +22,8 @@ dependencies = [
     "pytest-cov",
     "black",
     "mypy",
+    "sphinx",
+    "sphinx-rtd-theme",
 ]
 
 [tool.setuptools]

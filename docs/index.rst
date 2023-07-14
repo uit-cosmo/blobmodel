@@ -38,14 +38,14 @@ Each blob has an individual velocity in x and y, :math:`v_x` and :math:`v_y`, an
 
 A 2D example of the model is shown below:
 
-.. image:: ../readme_gifs/2d_blobs.gif
+.. image:: ../readme_files/2d_blobs.gif
    :alt: StreamPlayer
    :align: center
    :scale: 80%
 
 The model can also be reduced to one spatial dimension as shown in the following example:
 
-.. image:: ../readme_gifs/1d_blobs.gif
+.. image:: ../readme_files/1d_blobs.gif
    :alt: StreamPlayer
    :align: center
    :scale: 80%
