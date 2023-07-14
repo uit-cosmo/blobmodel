@@ -1,7 +1,7 @@
 """This module defines a Blob class and related functions for discretizing and manipulating blobs."""
 
 import warnings
-from typing import Tuple, Union
+from typing import Tuple, Union, Any
 from nptyping import NDArray
 import numpy as np
 from .blob_shape import AbstractBlobShape
@@ -24,11 +24,10 @@ class Blob:
         pos_y: float,
         t_init: float,
         t_drain: Union[float, NDArray],
-        prop_shape_parameters: dict = None,
-        perp_shape_parameters: dict = None,
+        prop_shape_parameters: Union[dict, None] = None,
+        perp_shape_parameters: Union[dict, None] = None,
         blob_alignment: bool = True,
     ) -> None:
-
         """
         Initialize a single blob.
 
@@ -175,14 +174,14 @@ class Blob:
 
     def _single_blob(
         self,
-        x_prop: NDArray,
-        y_perp: NDArray,
-        t: NDArray,
+        x_prop: Union[int, NDArray],
+        y_perp: Union[int, NDArray],
+        t: Union[int, NDArray],
         Ly: float,
         periodic_y: bool,
-        number_of_y_propagations: NDArray = 0,
-        x_offset: NDArray = 0,
-        y_offset: NDArray = 0,
+        number_of_y_propagations: Union[NDArray, int] = 0,
+        x_offset: Union[NDArray, int] = 0,
+        y_offset: Union[NDArray, int] = 0,
         one_dimensional: bool = False,
     ) -> NDArray:
         """
@@ -238,7 +237,7 @@ class Blob:
             )
         )
 
-    def _drain(self, t: NDArray) -> NDArray:
+    def _drain(self, t: Union[int, NDArray]) -> NDArray:
         """
         Calculate the drain factor for the blob.
 
@@ -259,11 +258,11 @@ class Blob:
 
     def _propagation_direction_shape(
         self,
-        x: NDArray,
-        t: NDArray,
+        x: Union[int, NDArray],
+        t: Union[int, NDArray],
         Ly: float,
         periodic_y: bool,
-        number_of_y_propagations: NDArray,
+        number_of_y_propagations: Union[int, NDArray],
     ) -> NDArray:
         """
         Calculate the shape in the propagation direction.
@@ -302,11 +301,11 @@ class Blob:
 
     def _perpendicular_direction_shape(
         self,
-        y: NDArray,
-        t: NDArray,
+        y: Union[int, NDArray],
+        t: Union[int, NDArray],
         Ly: float,
         periodic_y: bool,
-        number_of_y_propagations: NDArray,
+        number_of_y_propagations: Union[int, NDArray],
     ) -> NDArray:
         """
         Calculate the shape in the perpendicular direction.
@@ -341,7 +340,7 @@ class Blob:
             theta_y, **self.perp_shape_parameters
         )
 
-    def _prop_dir_blob_position(self, t: NDArray) -> NDArray:
+    def _prop_dir_blob_position(self, t: Union[int, NDArray]) -> NDArray:
         """
         Calculate the position of the blob in the propagation direction.
 
@@ -362,7 +361,7 @@ class Blob:
             else self.pos_x + self.v_x * (t - self.t_init)
         )
 
-    def _perp_dir_blob_position(self, t: NDArray) -> float:
+    def _perp_dir_blob_position(self, t: Union[int, NDArray]) -> Any:
         """
         Return the position of the blob in the perpendicular direction.
 

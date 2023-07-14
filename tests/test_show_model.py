@@ -18,11 +18,12 @@ bm_2d = Model(
 # create data
 ds_2d = bm_2d.make_realization()
 
+
 # warnings are supressed since plt complains about animation blocked
 @patch("matplotlib.pyplot.show")
 def test_plot_2d(mock_show):
     warnings.filterwarnings("ignore")
-    show_model(dataset=ds_2d, interval=100, save=False, fps=10)
+    show_model(dataset=ds_2d, interval=100, gif_name=None, fps=10)
 
 
 bm_1d = Model(
@@ -40,12 +41,9 @@ bm_1d = Model(
 # create data
 ds_1d = bm_1d.make_realization()
 
+
 # warnings are supressed since plt complains about animation blocked
 @patch("matplotlib.pyplot.show")
 def test_plot_1d(mock_show):
     warnings.filterwarnings("ignore")
-    show_model(dataset=ds_1d, interval=100, save=False, fps=10)
-
-
-test_plot_2d()
-test_plot_1d()
+    show_model(dataset=ds_1d, interval=100, gif_name=None, fps=10)

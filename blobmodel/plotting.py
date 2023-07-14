@@ -5,14 +5,14 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 import xarray as xr
 from matplotlib import animation
+from typing import Union
 
 
 def show_model(
     dataset: xr.Dataset,
     variable: str = "n",
     interval: int = 100,
-    save: bool = False,
-    gif_name: str = "blobs.gif",
+    gif_name: Union[str, None] = None,
     fps: int = 10,
 ) -> None:
     """
@@ -26,10 +26,8 @@ def show_model(
         Variable to be animated (default: "n").
     interval : int, optional
         Time interval between frames in milliseconds (default: 100).
-    save : bool, optional
-        If True, save the animation as a GIF (default: False).
     gif_name : str, optional
-        Set the name for the saved GIF (default: "blobs.gif").
+        If not None, save the animation as a GIF and name it acoridingly.
     fps : int, optional
         Set the frames per second for the saved GIF (default: 10).
 
@@ -103,7 +101,7 @@ def show_model(
             fig, animate_2d, frames=dataset["t"].values.size, interval=interval
         )
 
-    if save:
+    if gif_name:
         ani.save(gif_name, writer="ffmpeg", fps=fps)
     plt.show()
 

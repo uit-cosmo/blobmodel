@@ -17,4 +17,4 @@ bm = Model(
 )
 
 ds = bm.make_realization(speed_up=True, error=1e-2)
-show_model(dataset=ds, interval=100, save=True)
+show_model(dataset=ds, interval=100, gif_name="1d_animation.gif")

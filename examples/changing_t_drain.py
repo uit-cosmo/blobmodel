@@ -24,7 +24,6 @@ ds = tmp.make_realization(file_name="profile_comparison.nc", speed_up=True, erro
 
 
 def plot_cahnging_t_drain(ds):
-
     x = np.linspace(0, 10, 100)
     t_p = 1
     t_w = 1 / 10
