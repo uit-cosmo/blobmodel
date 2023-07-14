@@ -8,6 +8,7 @@ from blobmodel import (
 import numpy as np
 from typing import List
 
+
 # create custom class that inherits from BlobFactory
 # here you can define your custom parameter distributions
 class CustomBlobFactory(BlobFactory):
@@ -22,7 +23,6 @@ class CustomBlobFactory(BlobFactory):
         blob_shape: AbstractBlobShape,
         t_drain: float,
     ) -> List[Blob]:
-
         # set custom parameter distributions
         amp = [1, 1, 1]
         width = [2, 1, 1]
