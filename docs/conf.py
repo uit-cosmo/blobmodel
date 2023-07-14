@@ -30,6 +30,9 @@ templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 autodoc_mock_imports = ["numpy"]
 autodoc_mock_imports = ["xarray"]
+from unittest.mock import MagicMock
+
+sys.modules["blobmodel"] = MagicMock()
 autodoc_mock_imports = ["blobmodel"]
 
 # -- Options for HTML output -------------------------------------------------
