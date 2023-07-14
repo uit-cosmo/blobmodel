@@ -13,7 +13,6 @@ release = "0.1.1"
 
 import os
 import sys
-import blobmodel
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -31,10 +30,10 @@ templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 autodoc_mock_imports = ["numpy"]
 autodoc_mock_imports = ["xarray"]
-# from unittest.mock import MagicMock
-#
-# sys.modules["blobmodel"] = MagicMock()
-# autodoc_mock_imports = ["blobmodel"]
+from unittest.mock import MagicMock
+
+sys.modules["blobmodel"] = MagicMock()
+autodoc_mock_imports = ["blobmodel"]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
