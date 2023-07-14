@@ -37,10 +37,10 @@ def test_abstract_mehtods():
     my_obj = MyShape()
 
     with pytest.raises(NotImplementedError):
-        my_obj.get_pulse_shape_prop([0, 1, 2])
+        my_obj.get_blob_shape_prop([0, 1, 2])
 
     with pytest.raises(NotImplementedError):
-        my_obj.get_pulse_shape_perp([0, 1, 2])
+        my_obj.get_blob_shape_perp([0, 1, 2])
 
 
 def test__get_double_exponential_shape():

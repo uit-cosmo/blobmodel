@@ -217,4 +217,3 @@ def test_get_blobs():
     )
     _ = one_blob.make_realization()
     _ = one_blob.get_blobs()
->>>>>>> add_tests
