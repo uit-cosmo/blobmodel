@@ -1,5 +1,7 @@
-# blobmodel  <img align="left" src="./readme_gifs/logo.png" width="100px" >
+# blobmodel  <img align="left" src="./readme_files/logo.png" width="100px" >
 
+[![Python version](./readme_files/tmpe_e7dom4.svg)](https://www.python.org/)
+[![Pypi](./readme_files/tmpp0mi4n8p.svg)](https://pypi.org/project/blobmodel/#description)
 [![codecov](https://codecov.io/github/uit-cosmo/blobmodel/branch/main/graph/badge.svg?token=QSS3BYQC6Y)](https://codecov.io/github/uit-cosmo/blobmodel)
 ![Tests](https://github.com/uit-cosmo/2d_propagating_blobs/actions/workflows/workflow.yml/badge.svg)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
@@ -20,13 +22,13 @@ Examples for one and two dimensions are shown below:
 </tr>
 <tr>
 <td>
-<img src="readme_gifs/2d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
+<img src="readme_files/2d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
 
 
 </td>
 <td>
 
-<img src="readme_gifs/1d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
+<img src="readme_files/1d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
 
 
 </td>
