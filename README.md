@@ -1,16 +1,40 @@
+# blobmodel  <img align="left" src="./readme_files/logo.png" width="100px" >
+
+[![Python version](./readme_files/tmp5kfvrjp5.svg)](https://www.python.org/)
+[![Pypi](./readme_files/tmpp0mi4n8p.svg)](https://pypi.org/project/blobmodel/#description)
+[![codecov](https://codecov.io/github/uit-cosmo/blobmodel/branch/main/graph/badge.svg?token=QSS3BYQC6Y)](https://codecov.io/github/uit-cosmo/blobmodel)
 ![Tests](https://github.com/uit-cosmo/2d_propagating_blobs/actions/workflows/workflow.yml/badge.svg)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
-[![Sourcery](https://img.shields.io/badge/Sourcery-enabled-brightgreen)](https://sourcery.ai)
-<!--
-[![codecov](https://codecov.io/gh/uit-cosmo/2d_propagating_blobs/branch/main/graph/badge.svg?token=QSS3BYQC6Y)](https://codecov.io/gh/uit-cosmo/2d_propagating_blobs)
---> 
-# blobmodel
-Two dimensional model of advecting and dissipating blobs.
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Documentation Status](https://readthedocs.org/projects/blobmodel/badge/?version=latest)](https://blobmodel.readthedocs.io/en/latest/?badge=latest)
 
-The code has been developed originally to model profiles in the scrape-off layer of fusion experiments but it can be used to model any 1d or 2d system consisting of advecting pulses. Examples for one and two dimensions are shown below:
-![Density evolution](readme_gifs/2d_blobs.gif)
+This package provides realizations of advecting and dissipating blobs in up to two dimensions. 
 
-![Density evolution](readme_gifs/1d_blobs.gif)
+All blob parameters can be choosen freely, and multiple blob shapes are implemented. Originally, the model is developed for studying the scrape-off layer of fusion experiments, but it can be applicable to many 1d or 2d systems. See the [blobmodel documentation](https://blobmodel.readthedocs.io/en/latest/?badge=latest) for further details.
+
+Examples for one and two dimensions are shown below:
+
+<table>
+<tr>
+<th> 2D </th>
+<th> 1D </th>
+</tr>
+<tr>
+<td>
+<img src="readme_files/2d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
+
+
+</td>
+<td>
+
+<img src="readme_files/1d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
+
+
+</td>
+</tr>
+</table>
+
 ## Installation
 The package is published to PyPI and can be installed with
 ```sh
@@ -21,13 +45,13 @@ If you want the development version you must first clone the repo to your local 
 then install the project in development mode:
 
 ```sh
-git clone git@github.com:uit-cosmo/2d-propagating-blobs.git
-cd 2d-propagating-blobs
-poetry install
+git clone https://github.com/uit-cosmo/blobmodel.git
+cd blobmodel
+python -m pip install -e .
 ```
 
 ## Usage
-Create the grid on which the blobs are discretized with using the `Model` class. The `make_realization()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:
+Create a grid on which the blobs are discretized using the `Model` class. The `make_realization()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:
 
 ```Python
 from blobmodel import Model, show_model
@@ -45,7 +69,7 @@ You can specify the blob parameters with a BlobFactory class. The DefaultBlobFac
 ```Python
 from blobmodel import Model, DefaultBlobFactory
 
-# use DefaultBlobFactory to define distribution functions fo random variables
+# use DefaultBlobFactory to define distribution functions of random variables
 bf = DefaultBlobFactory(A_dist="exp", wx_dist="uniform", vx_dist="deg", vy_dist="normal")
 
 # pass on bf when creating the Model
@@ -63,85 +87,8 @@ tmp = Model(
     blob_factory=bf,
 )
 ```
-Alternatively, you can specify all blob parameters exactly as you want by writing your own class which inherits from BlobFactory. See `examples/custom_blobfactory.py` as an example. 
-## Input parameters
-### `Model()`
-- `Nx`: int, grid points in x
-- `Ny`: int, grid points in y
-- `Lx`: float, length of grid in x
-- `Ly`: float, length of grid in y
-- `dt`: float, time step 
-- `T`: float, time length 
-- `periodic_y`: bool, optional,
-            allow periodicity in y-direction 
-            
-            !!!  this is only a good approximation if Ly is significantly bigger than blobs  !!!
-- `blob_shape`: AbstractBlobShape or str, optional,
-- `num_blobs`: int, optional
-            number of blobs
-- `t_drain`: float, optional,
-            drain time for blobs 
-- `blob_factory`: BlobFactory, optional,
-            object containing blob parameters
-- `labels`: str, optional,
-            "off": no blob labels returned,
-            "same": regions where blobs are present are set to label 1,
-            "individual": different blobs return individual labels,
-            used for creating training data for supervised machine learning algorithms
-- `label_border`: float, optional,
-            defines region of blob as region where density >= label_border * amplitude of Blob
-            only used if labels = True
-### `DefaultBlobFactory()`
-- `A_dist`: str, optional,
-            distribution of blob amplitudes
-- `W_dist`: str, optional,
-            distribution of blob widths
-- `vx_dist`: str, optinal,
-            distribution of blob velocities in x-dimension
-- `vy_dist`: str, optinal,
-            distribution of blob velocities in y-dimension
-- `A_parameter`: float, optional,
-            `free_parameter` for amplitudes
-- `W_parameter`: float, optional,
-            `free_parameter` for widths
-- `vx_parameter`: float, optional,
-            `free_parameter` for vx
-- `vy_parameter`: float, optional,
-            `free_parameter` for vy
-- `shape_param_x_parameter`: float = 0.5,
-- `shape_param_y_parameter`: float = 0.5
-            
-The following distributions are implemented:
+Alternatively, you can specify all blob parameters exactly as you want by writing your own class which inherits from BlobFactory. See `examples/custom_blobfactory.py` as an example or take a look at the [blobmodel documentation](https://blobmodel.readthedocs.io/en/latest/?badge=latest).
 
-- `exp`: exponential distribution with mean 1
-- `gamma`: gamma distribution with `free_parameter` as shape parameter and mean 1
-- `normal`: normal distribution with zero mean and `free_parameter` as scale parameter
-- `uniform`: uniorm distribution with mean 1 and `free_parameter` as width
-- `ray`: rayleight distribution with mean 1
-- `deg`: array on ones
-- `zeros`: array of zeros
-### `make_realization()`
-- `file_name`: str, optional, 
-            file name for .nc file containing data as xarray dataset
-- `speed_up`: bool, optional,
-            speeding up code by discretizing each single blob at smaller time window 
-            when blob values fall under given error value the blob gets discarded 
+## Contributing
 
-            !!!  this is only a good approximation for blob_shape='exp' !!!
-- `error`: float, optional,
-            numerical error at x = Lx when blob gets truncated 
-### `show_model()`
-- `ds`: xarray Dataset,
-            Model data
-- `interval`: int, optional,
-            time interval between frames in ms
-- `save`: bool, optional,
-            if True save animation as gif
-- `gif_name`: str, optional,
-            set name for gif
-- `fps`: int, optional,
-            set fps for gif
-
-## Contact
-If you have questions, suggestions or other comments you can contact me under gregor.decristoforo@uit.no
-
+Feel free to raise issues about anything. Contributions through pull requests are also very welcome. Please take a look at our [Contributor guide](https://blobmodel.readthedocs.io/en/latest/contributor_guide.html) for further details.

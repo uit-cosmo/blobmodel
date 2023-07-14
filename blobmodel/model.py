@@ -26,7 +26,7 @@ class Model:
         periodic_y: bool = False,
         blob_shape: Union[AbstractBlobShape, str] = BlobShapeImpl("gauss"),
         num_blobs: int = 1000,
-        t_drain: Union[float, NDArray] = 10,
+        t_drain: Union[float, NDArray, int] = 10,
         blob_factory: BlobFactory = DefaultBlobFactory(),
         labels: str = "off",
         label_border: float = 0.75,
@@ -95,7 +95,7 @@ class Model:
             Ly = 0
             if not blob_factory.is_one_dimensional():
                 warnings.warn(
-                    "Using a one dimensional model with a with a blob factory that is not one-dimensional. Are you sure you know what you are doing?"
+                    "Using a one dimensional model with a blob factory that is not one-dimensional. Are you sure you know what you are doing?"
                 )
 
         self._geometry: Geometry = Geometry(
@@ -117,7 +117,7 @@ class Model:
             isinstance(t_drain, (int, float)) or len(t_drain) == Nx
         ), "t_drain must be of either length 1 or Nx"
 
-        self._blobs: list[Blob] = []
+        self._blobs: List[Blob] = []
         self._blob_factory = blob_factory
         self._labels = labels
         self._label_border = label_border
@@ -155,7 +155,7 @@ class Model:
 
     def make_realization(
         self,
-        file_name: str = None,
+        file_name: Union[str, None] = None,
         speed_up: bool = False,
         error: float = 1e-10,
     ) -> xr.Dataset:
