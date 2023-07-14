@@ -5,7 +5,7 @@ import numpy as np
 from nptyping import NDArray, Float
 from typing import Any, List, Union, Dict
 from .blobs import Blob
-from .pulse_shape import AbstractBlobShape
+from .blob_shape import AbstractBlobShape
 
 
 class BlobFactory(ABC):

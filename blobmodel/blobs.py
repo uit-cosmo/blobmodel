@@ -4,7 +4,7 @@ import warnings
 from typing import Tuple, Union, Any
 from nptyping import NDArray
 import numpy as np
-from .pulse_shape import AbstractBlobShape
+from .blob_shape import AbstractBlobShape
 import cmath
 
 
@@ -295,7 +295,7 @@ class Blob:
         else:
             x_diffs = x - self._prop_dir_blob_position(t)
         theta_x = x_diffs / self.width_prop
-        return self.blob_shape.get_pulse_shape_prop(
+        return self.blob_shape.get_blob_shape_prop(
             theta_x, **self.prop_shape_parameters
         )
 
@@ -336,7 +336,7 @@ class Blob:
         else:
             y_diffs = y - self._perp_dir_blob_position(t)
         theta_y = y_diffs / self.width_perp
-        return self.blob_shape.get_pulse_shape_perp(
+        return self.blob_shape.get_blob_shape_perp(
             theta_y, **self.perp_shape_parameters
         )
 

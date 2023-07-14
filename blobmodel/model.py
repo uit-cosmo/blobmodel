@@ -9,7 +9,7 @@ from .stochasticality import BlobFactory, DefaultBlobFactory
 from .geometry import Geometry
 from nptyping import NDArray
 import warnings
-from .pulse_shape import AbstractBlobShape, BlobShapeImpl
+from .blob_shape import AbstractBlobShape, BlobShapeImpl
 
 
 class Model:

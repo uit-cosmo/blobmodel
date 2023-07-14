@@ -51,7 +51,7 @@ def test_blob_non_alignment():
 
     mesh_x, mesh_y = np.meshgrid(x, y)
     mock = MagicMock(return_value=mesh_x)
-    blob.blob_shape.get_pulse_shape_prop = mock
+    blob.blob_shape.get_blob_shape_prop = mock
     blob.discretize_blob(x=mesh_x, y=mesh_y, t=0, periodic_y=False, Ly=10)
 
     np.testing.assert_array_equal(mesh_x, mock.call_args[0][0])
@@ -174,7 +174,7 @@ def test_kwargs():
     from unittest.mock import MagicMock
 
     mock_ps = BlobShapeImpl("2-exp", "2-exp")
-    mock_ps.get_pulse_shape_prop = MagicMock()
+    mock_ps.get_blob_shape_prop = MagicMock()
 
     blob_sp = Blob(
         blob_id=0,
@@ -197,8 +197,7 @@ def test_kwargs():
 
     mesh_x, mesh_y = np.meshgrid(x, y)
     blob_sp.discretize_blob(x=mesh_x, y=mesh_y, t=0, periodic_y=True, Ly=10)
-
-    mock_ps.get_pulse_shape_prop.assert_called_with([[0]], lam=0.2)
+    mock_ps.get_blob_shape_prop.assert_called_with([[0]], lam=0.2)
 
 
 def test_get_blobs():
