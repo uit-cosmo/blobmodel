@@ -1,6 +1,6 @@
 # blobmodel  <img align="left" src="./readme_files/logo.png" width="100px" >
 
-[![Python version](./readme_files/tmpe_e7dom4.svg)](https://www.python.org/)
+[![Python version](./readme_files/tmpdg7q4ift.svg)](https://www.python.org/)
 [![Pypi](./readme_files/tmpp0mi4n8p.svg)](https://pypi.org/project/blobmodel/#description)
 [![codecov](https://codecov.io/github/uit-cosmo/blobmodel/branch/main/graph/badge.svg?token=QSS3BYQC6Y)](https://codecov.io/github/uit-cosmo/blobmodel)
 ![Tests](https://github.com/uit-cosmo/2d_propagating_blobs/actions/workflows/workflow.yml/badge.svg)
