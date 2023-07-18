@@ -13,6 +13,7 @@ release = "0.1.1"
 
 import os
 import sys
+import blobmodel
 
 sys.path.insert(0, os.path.abspath(".."))
 
