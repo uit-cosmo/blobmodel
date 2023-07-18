@@ -16,6 +16,7 @@ import sys
 import blobmodel
 
 sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath("../blobmodel"))
 
 
 # -- General configuration ---------------------------------------------------
