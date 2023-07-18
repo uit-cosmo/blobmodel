@@ -15,8 +15,7 @@ import os
 import sys
 import blobmodel
 
-sys.path.insert(0, os.path.abspath(".."))
-
+sys.path.insert(0, os.path.abspath("../"))
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
