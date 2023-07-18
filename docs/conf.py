@@ -31,9 +31,8 @@ autodoc_mock_imports = ["numpy"]
 autodoc_mock_imports = ["xarray"]
 from unittest.mock import MagicMock
 
-import blobmodel
-sys.modules["blobmodel"] = MagicMock()
-autodoc_mock_imports = ["blobmodel"]
+# sys.modules["blobmodel"] = MagicMock()
+# autodoc_mock_imports = ["blobmodel"]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
