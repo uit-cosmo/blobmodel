@@ -1,4 +1,4 @@
-# blobmodel  <img align="left" src="./readme_files/logo.png" width="100px" >
+# blobmodel  <img align="left" src="./readme_files/logo.png" width="120px" >
 
 [![Python version](./readme_files/tmp5kfvrjp5.svg)](https://www.python.org/)
 [![Pypi](./readme_files/tmpp0mi4n8p.svg)](https://pypi.org/project/blobmodel/#description)
