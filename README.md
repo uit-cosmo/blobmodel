@@ -17,18 +17,18 @@ Examples for one and two dimensions are shown below:
 
 <table>
 <tr>
-<th> 2D </th>
 <th> 1D </th>
+<th> 2D </th>
 </tr>
 <tr>
 <td>
-<img src="readme_files/2d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
+<img src="readme_files/1d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
 
 
 </td>
 <td>
 
-<img src="readme_files/1d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
+<img src="readme_files/2d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
 
 
 </td>
