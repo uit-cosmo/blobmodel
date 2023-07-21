@@ -27,7 +27,6 @@ tmp.make_realization(file_name="test_t_drain.nc", speed_up=True, error=1e-2)
 
 
 def test_decreasing_t_drain():
-
     ds = xr.open_dataset("test_t_drain.nc")
     model_profile = ds.n.isel(y=0).mean(dim=("t"))
 
@@ -43,6 +42,3 @@ def test_decreasing_t_drain():
         1 / np.sqrt(np.pi) * t_d / t_w * amp * np.exp(-x / (v_p * t_loss))
     )
     assert (model_profile.values[2:] < analytical_profile[2:]).all()
-
-
-test_decreasing_t_drain()

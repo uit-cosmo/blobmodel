@@ -42,6 +42,3 @@ def test_convergence_to_analytical_solution():
     error = np.mean(abs(model_profile.values - analytical_profile))
 
     assert error < 0.1, "Numerical error too big"
-
-
-test_convergence_to_analytical_solution()

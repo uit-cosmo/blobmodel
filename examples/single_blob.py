@@ -1,6 +1,7 @@
 from blobmodel import Model, show_model, BlobFactory, Blob, AbstractBlobShape
 import numpy as np
 
+
 # here you can define your custom parameter distributions
 class CustomBlobFactory(BlobFactory):
     def __init__(self) -> None:
@@ -14,7 +15,6 @@ class CustomBlobFactory(BlobFactory):
         blob_shape: AbstractBlobShape,
         t_drain: float,
     ) -> list[Blob]:
-
         # set custom parameter distributions
         amp = np.ones(num_blobs)
         width = np.ones(num_blobs)
@@ -66,4 +66,4 @@ bm = Model(
 ds = bm.make_realization(speed_up=True, error=1e-2)
 
 # show animation and save as gif
-show_model(dataset=ds, interval=100, save=True, gif_name="example.gif", fps=10)
+show_model(dataset=ds, interval=100, gif_name="example.gif", fps=10)

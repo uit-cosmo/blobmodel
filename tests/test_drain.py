@@ -25,6 +25,3 @@ def test_high_t_drain():
     blob_values = blob_sp.discretize_blob(
         x=mesh_x, y=mesh_y, t=mesh_t, periodic_y=False, Ly=10
     )
-
-
-test_high_t_drain()

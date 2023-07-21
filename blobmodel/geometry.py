@@ -1,7 +1,8 @@
 """This module defines the Geometry class for creating a grid for the Model."""
 
 from typing import Any
-from nptyping import NDArray, Float
+from nptyping import NDArray
+from typing_extensions import Literal
 import numpy as np
 
 
@@ -47,12 +48,12 @@ class Geometry:
         self.periodic_y = periodic_y
 
         # calculate x, y and t coordinates
-        self.x: NDArray[Any, Float[64]] = np.arange(0, self.Lx, self.Lx / self.Nx)
+        self.x: NDArray[Literal[64], Any] = np.arange(0, self.Lx, self.Lx / self.Nx)
         if self.Ly == 0:
-            self.y: NDArray[Any, Float[64]] = 0
+            self.y: NDArray[Literal[64], Any] = np.array([0])
         else:
             self.y = np.arange(0, self.Ly, self.Ly / self.Ny)
-        self.t: NDArray[Any, Float[64]] = np.arange(0, self.T, self.dt)
+        self.t: NDArray[Literal[64], Any] = np.arange(0, self.T, self.dt)
         self.x_matrix, self.y_matrix, self.t_matrix = np.meshgrid(
             self.x, self.y, self.t
         )
