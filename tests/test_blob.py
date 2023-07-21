@@ -212,8 +212,9 @@ def test_get_blobs():
         blob_shape="exp",
         t_drain=1e10,
         periodic_y=False,
-        num_blobs=1,
+        num_blobs=3,
         blob_factory=bf,
     )
-    _ = one_blob.make_realization()
-    _ = one_blob.get_blobs()
+    ds = one_blob.make_realization()
+    blob_list = one_blob.get_blobs()
+    assert len(blob_list) == 3
