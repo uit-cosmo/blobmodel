@@ -1,4 +1,4 @@
-# blobmodel  <img align="left" src="./readme_files/logo.png" width="100px" >
+# blobmodel  <img align="left" src="./readme_files/logo.png" width="120px" >
 
 [![Python version](./readme_files/tmp5kfvrjp5.svg)](https://www.python.org/)
 [![Pypi](./readme_files/tmpp0mi4n8p.svg)](https://pypi.org/project/blobmodel/#description)
@@ -17,18 +17,18 @@ Examples for one and two dimensions are shown below:
 
 <table>
 <tr>
-<th> 2D </th>
 <th> 1D </th>
+<th> 2D </th>
 </tr>
 <tr>
 <td>
-<img src="readme_files/2d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
+<img src="readme_files/1d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
 
 
 </td>
 <td>
 
-<img src="readme_files/1d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
+<img src="readme_files/2d_blobs.gif" alt="Density evolution" style="max-width: 40%;" />
 
 
 </td>
