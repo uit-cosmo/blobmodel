@@ -1,8 +1,8 @@
 # blobmodel  <img align="left" src="https://github.com/uit-cosmo/blobmodel/blob/main/readme_files/logo.png" width="120px" >
 
 [![Python version](./readme_files/tmp5kfvrjp5.svg)](https://www.python.org/)
-[![Pypi](https://github.com/uit-cosmo/blobmodel/blob/main/readme_files/tmp5kfvrjp5.svg)](https://pypi.org/project/blobmodel/#description)
-[![codecov](https://github.com/uit-cosmo/blobmodel/blob/main/readme_files/tmpp0mi4n8p.svg)](https://codecov.io/github/uit-cosmo/blobmodel)
+[![Pypi](https://github.com/uit-cosmo/blobmodel/blob/main/readme_files/tmpp0mi4n8p.svg)](https://pypi.org/project/blobmodel/#description)
+[![codecov](https://codecov.io/github/uit-cosmo/blobmodel/branch/main/graph/badge.svg?token=QSS3BYQC6Y)](https://codecov.io/github/uit-cosmo/blobmodel)
 ![Tests](https://github.com/uit-cosmo/2d_propagating_blobs/actions/workflows/workflow.yml/badge.svg)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
