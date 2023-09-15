@@ -9,7 +9,7 @@ an existing Python environment, open a terminal and run:
 
 .. code-block:: bash
 
-   pip install plasmapy
+   pip install blobmodel
 
 If you want the development version you must first clone the repository to your local machine, then install the project in development mode:
  
