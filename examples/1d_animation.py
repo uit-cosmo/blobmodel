@@ -14,6 +14,7 @@ bm = Model(
     num_blobs=20,
     t_drain=10,
     blob_factory=bf,
+    one_dimensional=True,
 )
 
 ds = bm.make_realization(speed_up=True, error=1e-2)
