@@ -4,10 +4,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 import xarray as xr
-
-# from matplotlib import animation
-from matplotlib.animation import FuncAnimation, Artist
-from typing import Union
+from matplotlib import animation
+from typing import Union, Any
 
 
 def show_model(
@@ -52,7 +50,7 @@ def show_model(
         frame = dataset[variable].sel(t=timestep).values
         frames.append(frame)
 
-    def animate_1d(i: int) -> Artist:
+    def animate_1d(i: int) -> Any:
         """
         Create the 1D plot for each frame of the animation.
 
@@ -71,7 +69,7 @@ def show_model(
         line.set_data(x, y)
         plt.title(f"t = {i*dt:.2f}")
 
-    def animate_2d(i: int) -> Artist:
+    def animate_2d(i: int) -> Any:
         """
         Create the 2D plot for each frame of the animation.
 
@@ -94,12 +92,12 @@ def show_model(
 
     if dataset.y.size == 1:
         line, tx = _setup_1d_plot(dataset=dataset, variable=variable)
-        ani = FuncAnimation(
+        ani = animation.FuncAnimation(
             fig, animate_1d, frames=dataset["t"].values.size, interval=interval
         )
     else:
         im, tx = _setup_2d_plot(fig=fig, cv0=frames[0])
-        ani = FuncAnimation(
+        ani = animation.FuncAnimation(
             fig, animate_2d, frames=dataset["t"].values.size, interval=interval
         )
 
