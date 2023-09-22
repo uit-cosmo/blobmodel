@@ -1,8 +1,8 @@
 [run]
 branch = True
 source = blobmodel
+omit = blobmodel/plotting.py
 
 [report]
 omit =
     tests/*
-    blobmodel/plotting.py
