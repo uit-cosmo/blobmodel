@@ -5,3 +5,4 @@ source = blobmodel
 [report]
 omit =
     tests/*
+    blobmodel/plotting.py
