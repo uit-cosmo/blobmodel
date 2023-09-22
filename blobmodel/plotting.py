@@ -87,6 +87,7 @@ def show_model(
         vmax = np.max(arr)
         vmin = np.min(arr)
         im.set_data(arr)
+        im.set_extent((dataset.x[0], dataset.x[-1], dataset.y[0], dataset.y[-1]))
         im.set_clim(vmin, vmax)
         tx.set_text(f"t = {i*dt:.2f}")
 
