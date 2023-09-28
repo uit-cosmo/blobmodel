@@ -173,7 +173,7 @@ class BlobShapeImpl(AbstractBlobShape):
             Array representing the secant pulse shape.
         """
         return 2 / np.pi / (np.exp(theta) + np.exp(-theta))
-    
+
     @staticmethod
     def _get_dipole_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the diople pulse shape as a derivative of a gaussian pulse shape.
@@ -190,7 +190,7 @@ class BlobShapeImpl(AbstractBlobShape):
         np.ndarray
             Array representing the dipole pulse shape.
         """
-        return -2*theta / np.sqrt(np.pi) * np.exp(-(theta**2))
+        return -2 * theta / np.sqrt(np.pi) * np.exp(-(theta**2))
 
     __GENERATORS = {
         "exp": _get_exponential_shape,
