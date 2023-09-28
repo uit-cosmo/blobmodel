@@ -62,3 +62,9 @@ def test__get_lorentz_shape():
     theta = np.array([1, 2, 3])
     expected_result = np.array([0.15915494, 0.06366198, 0.03183099])
     assert np.allclose(BlobShapeImpl._get_lorentz_shape(theta), expected_result)
+
+
+def test__get_dipole_shape():
+    theta = np.array([1, 2, 3])
+    expected_result = np.array([-0.4151074974, -0.0413339707, -0.0004177592])
+    assert np.allclose(BlobShapeImpl._get_dipole_shape(theta), expected_result)
