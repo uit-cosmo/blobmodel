@@ -12,21 +12,24 @@ The propagation direction is calculated from vx and vy of each individual blob (
 You can choose one of the following blob shapes for the propagation and perpendicular direction:
 
 .. list-table:: 
-   :widths: 10 10 10 10
+   :widths: 10 10 10 10 10
    :header-rows: 1
 
    * - "exp"
      - "gauss"
      - "lorentz"
      - "secant"
+     - "dipole"
    * - Exponential Pulse
      - Gaussian Pulse
      - Lorentz Pulse
      - Secant Pulse
+     - Dipole Pulse
    * - ``np.exp(theta) * np.heaviside(-1.0 * t, 1)``
-     - ``1 / np.sqrt(np.pi) * np.exp(-(t**2))``
+     - ``1 / np.sqrt(2*np.pi) * np.exp(-(t**2)/2)``
      - ``1 / (np.pi * (1 + t**2))``
      - ``2 / np.pi / (np.exp(t) + np.exp(-t))``
+     - ``-2 * theta / np.sqrt(np.pi) * np.exp(-(theta**2))``
 
 .. image:: pulse_shapes.png
    :scale: 80%

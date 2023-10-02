@@ -7,7 +7,7 @@ def test_gauss_pulse_shape():
     ps = BlobShapeImpl()
     x = np.arange(-10, 10, 0.1)
     values = ps.get_blob_shape_perp(x)
-    expected_values = 1 / np.sqrt(np.pi) * np.exp(-(x**2))
+    expected_values = 1 / np.sqrt(2 * np.pi) * np.exp(-(x**2) / 2)
     assert np.max(np.abs(values - expected_values)) < 1e-5, "Wrong gaussian shape"
 
 
@@ -66,5 +66,5 @@ def test__get_lorentz_shape():
 
 def test__get_dipole_shape():
     theta = np.array([1, 2, 3])
-    expected_result = np.array([-0.4151074974, -0.0413339707, -0.0004177592])
+    expected_result = np.array([-0.48394145, -0.21596387, -0.02659109])
     assert np.allclose(BlobShapeImpl._get_dipole_shape(theta), expected_result)

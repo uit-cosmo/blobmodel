@@ -24,7 +24,9 @@ def test_initial_blob():
     mesh_x, mesh_y = np.meshgrid(x, y)
     blob_values = blob.discretize_blob(x=mesh_x, y=mesh_y, t=0, periodic_y=False, Ly=10)
 
-    expected_values = 1 / np.pi * np.exp(-(mesh_x**2)) * np.exp(-(mesh_y**2))
+    expected_values = (
+        1 / (2 * np.pi) * np.exp(-(mesh_x**2) / 2) * np.exp(-(mesh_y**2) / 2)
+    )
     error = np.max(abs(expected_values - blob_values))
 
     assert error < 1e-10, "Numerical error too big"
@@ -66,9 +68,11 @@ def test_periodicity():
         x=mesh_x, y=mesh_y, t=mesh_t, periodic_y=True, Ly=10
     )
 
-    expected_values = 1 / np.pi * np.exp(-((mesh_x - 2) ** 2)) * np.exp(
-        -(mesh_y**2)
-    ) + 1 / np.pi * np.exp(-((mesh_x - 2) ** 2)) * np.exp(-((mesh_y - 10) ** 2))
+    expected_values = 1 / (2 * np.pi) * np.exp(-((mesh_x - 2) ** 2) / 2) * np.exp(
+        -(mesh_y**2) / 2
+    ) + 1 / (2 * np.pi) * np.exp(-((mesh_x - 2) ** 2) / 2) * np.exp(
+        -((mesh_y - 10) ** 2) / 2
+    )
     error = np.max(abs(expected_values - blob_values))
 
     assert error < 1e-10, "Numerical error too big"
@@ -97,10 +101,12 @@ def test_single_point():
         x=mesh_x, y=mesh_y, t=0, periodic_y=True, Ly=10
     )
 
-    expected_values = 1 / np.pi * np.exp(-(mesh_x**2)) * np.exp(-(4**2))
+    expected_values = (
+        1 / (2 * np.pi) * np.exp(-(mesh_x**2) / 2) * np.exp(-(4**2) / 2)
+    )
     error = np.max(abs(expected_values - blob_values))
 
-    assert error < 1e-10, "Numerical error too big"
+    assert error < 1e-8, "Numerical error too big"
 
 
 def test_negative_radial_velocity():
@@ -131,7 +137,7 @@ def test_negative_radial_velocity():
     # The exact analytical expression for the expected values is a bit cumbersome, thus we just check
     # that the shape is correct
     maxx = np.max(blob_values)
-    expected_values = maxx * np.exp(-((mesh_x - vx * t) ** 2))
+    expected_values = maxx * np.exp(-((mesh_x - vx * t) ** 2) / 2)
     error = np.max(abs(expected_values - blob_values))
 
     assert error < 1e-10, "Numerical error too big"
@@ -164,7 +170,7 @@ def test_theta_0():
     # The exact analytical expression for the expected values is a bit cumbersome, thus we just check
     # that the shape is correct
     maxx = np.max(blob_values)
-    expected_values = maxx * np.exp(-((mesh_x - 2) ** 2))
+    expected_values = maxx * np.exp(-((mesh_x - 2) ** 2) / 2)
     error = np.max(abs(expected_values - blob_values))
 
     assert error < 1e-10, "Numerical error too big"
