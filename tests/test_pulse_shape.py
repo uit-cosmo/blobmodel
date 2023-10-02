@@ -7,7 +7,7 @@ def test_gauss_pulse_shape():
     ps = BlobShapeImpl()
     x = np.arange(-10, 10, 0.1)
     values = ps.get_blob_shape_perp(x)
-    expected_values = 1 / np.sqrt(2*np.pi) * np.exp(-(x**2)/2)
+    expected_values = 1 / np.sqrt(2 * np.pi) * np.exp(-(x**2) / 2)
     assert np.max(np.abs(values - expected_values)) < 1e-5, "Wrong gaussian shape"
 
 
