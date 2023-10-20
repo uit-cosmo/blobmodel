@@ -5,7 +5,7 @@ import numpy as np
 
 bf = DefaultBlobFactory(
     A_dist="deg",
-    vy_dist="zeros",
+    vy_dist="deg",
     wx_dist="deg",
     spx_dist="deg",
     spy_dist="deg",
