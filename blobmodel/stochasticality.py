@@ -47,6 +47,7 @@ class DefaultBlobFactory(BlobFactory):
         vy_dist: str = "normal",
         spx_dist: str = "deg",
         spy_dist: str = "deg",
+        theta_dist: str = "none",
         A_parameter: float = 1.0,
         wx_parameter: float = 1.0,
         wy_parameter: float = 1.0,
@@ -54,6 +55,7 @@ class DefaultBlobFactory(BlobFactory):
         vy_parameter: float = 1.0,
         shape_param_x_parameter: float = 0.5,
         shape_param_y_parameter: float = 0.5,
+        theta_parameter: float = 1.0,
         blob_alignment: bool = True,
     ) -> None:
         """
@@ -123,6 +125,7 @@ class DefaultBlobFactory(BlobFactory):
         self.shape_param_x_parameter = shape_param_x_parameter
         self.shape_param_y_parameter = shape_param_y_parameter
         self.blob_alignment = blob_alignment
+        self.theta_setter = None
 
     def _draw_random_variables(
         self,
@@ -169,6 +172,8 @@ class DefaultBlobFactory(BlobFactory):
             return free_parameter * np.ones(num_blobs).astype(np.float64)
         elif dist_type == "zeros":
             return np.zeros(num_blobs).astype(np.float64)
+        elif dist_type == "none":
+            return None
         else:
             raise NotImplementedError(
                 self.__class__.__name__ + ".distribution function not implemented"
@@ -249,12 +254,16 @@ class DefaultBlobFactory(BlobFactory):
                 prop_shape_parameters=spxs_dict[i],
                 perp_shape_parameters=spys_dict[i],
                 blob_alignment=self.blob_alignment,
+                theta=self.theta_setter() if self.theta_setter is not None else None,
             )
             for i in range(num_blobs)
         ]
 
         # sort blobs by amplitude
         return sorted(blobs, key=lambda x: x.amplitude)
+
+    def set_theta_setter(self, theta_setter):
+        self.theta_setter = theta_setter
 
     def is_one_dimensional(self) -> bool:
         """
