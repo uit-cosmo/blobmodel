@@ -14,7 +14,7 @@ bf = DefaultBlobFactory(
     blob_alignment=False,
 )
 
-bf.set_theta_setter(lambda: np.random.uniform(-np.pi/2, np.pi/2))
+bf.set_theta_setter(lambda: np.random.uniform(-np.pi / 2, np.pi / 2))
 # bf.set_theta_setter(lambda: np.pi/4)
 
 bm = Model(
