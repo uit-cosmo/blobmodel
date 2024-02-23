@@ -1,5 +1,5 @@
 import pytest
-from blobmodel import BlobShapeImpl, AbstractBlobShape, BlobShapeImpl
+from blobmodel import AbstractBlobShape, BlobShapeImpl
 import numpy as np
 
 
