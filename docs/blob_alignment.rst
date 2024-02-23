@@ -34,6 +34,7 @@ Instantiating a single blob as follows results in a unaligned blob:
       pos_y=5,
       t_init=0,
       t_drain=1e10,
+      blob_alignment=True,
   )
 
 .. image:: alignment_false.gif
