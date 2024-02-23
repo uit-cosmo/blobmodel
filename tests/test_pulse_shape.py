@@ -47,9 +47,9 @@ def test__get_double_exponential_shape():
     theta = np.array([-1, 0, 1])
     lam = 0.5
     expected_result = np.array([0.13533528, 1.0, 0.13533528])
-    assert np.allclose(
-        BlobShapeImpl._get_double_exponential_shape(theta, lam=lam), expected_result
-    )
+    ps = BlobShapeImpl("2-exp", "2-exp")
+    values = ps.get_blob_shape_perp(theta, lam=lam)
+    assert np.max(np.abs(values - expected_result)) < 1e-5, "Wrong shape"
 
 
 def test__get_secant_shape():
