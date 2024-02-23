@@ -77,7 +77,7 @@ class BlobShapeImpl(AbstractBlobShape):
         """
         raise NotImplementedError
 
-    def _get_exponential_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
+    def _get_exponential_shape(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the exponential pulse shape.
 
         Parameters
@@ -94,7 +94,7 @@ class BlobShapeImpl(AbstractBlobShape):
         """
         return np.exp(theta) * np.heaviside(-1.0 * theta, 1)
 
-    def _get_lorentz_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
+    def _get_lorentz_shape(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the Lorentzian pulse shape.
 
         Parameters
@@ -111,7 +111,7 @@ class BlobShapeImpl(AbstractBlobShape):
         """
         return 1 / (np.pi * (1 + theta**2))
 
-    def _get_double_exponential_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
+    def _get_double_exponential_shape(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the double-exponential pulse shape.
 
         Parameters
@@ -135,7 +135,7 @@ class BlobShapeImpl(AbstractBlobShape):
         kern[theta >= 0] = np.exp(-theta[theta >= 0] / (1 - lam))
         return kern
 
-    def _get_gaussian_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
+    def _get_gaussian_shape(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the Gaussian pulse shape.
 
         Parameters
@@ -152,7 +152,7 @@ class BlobShapeImpl(AbstractBlobShape):
         """
         return 1 / np.sqrt(2 * np.pi) * np.exp(-(theta**2) / 2)
 
-    def _get_secant_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
+    def _get_secant_shape(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the secant pulse shape.
 
         Parameters
@@ -169,7 +169,7 @@ class BlobShapeImpl(AbstractBlobShape):
         """
         return 2 / np.pi / (np.exp(theta) + np.exp(-theta))
 
-    def _get_dipole_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
+    def _get_dipole_shape(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the diople pulse shape as a derivative of a gaussian pulse shape.
 
         Parameters
