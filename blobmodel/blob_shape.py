@@ -77,7 +77,6 @@ class BlobShapeImpl(AbstractBlobShape):
         """
         raise NotImplementedError
 
-    @staticmethod
     def _get_exponential_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the exponential pulse shape.
 
@@ -95,7 +94,6 @@ class BlobShapeImpl(AbstractBlobShape):
         """
         return np.exp(theta) * np.heaviside(-1.0 * theta, 1)
 
-    @staticmethod
     def _get_lorentz_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the Lorentzian pulse shape.
 
@@ -113,7 +111,6 @@ class BlobShapeImpl(AbstractBlobShape):
         """
         return 1 / (np.pi * (1 + theta**2))
 
-    @staticmethod
     def _get_double_exponential_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the double-exponential pulse shape.
 
@@ -138,7 +135,6 @@ class BlobShapeImpl(AbstractBlobShape):
         kern[theta >= 0] = np.exp(-theta[theta >= 0] / (1 - lam))
         return kern
 
-    @staticmethod
     def _get_gaussian_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the Gaussian pulse shape.
 
@@ -156,7 +152,6 @@ class BlobShapeImpl(AbstractBlobShape):
         """
         return 1 / np.sqrt(2 * np.pi) * np.exp(-(theta**2) / 2)
 
-    @staticmethod
     def _get_secant_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the secant pulse shape.
 
@@ -174,7 +169,6 @@ class BlobShapeImpl(AbstractBlobShape):
         """
         return 2 / np.pi / (np.exp(theta) + np.exp(-theta))
 
-    @staticmethod
     def _get_dipole_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
         """Compute the diople pulse shape as a derivative of a gaussian pulse shape.
 
