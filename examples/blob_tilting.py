@@ -2,8 +2,8 @@ from blobmodel import Model, show_model, BlobShapeImpl, DefaultBlobFactory
 import numpy as np
 
 # velocities
-vx = 0
-vy = 1
+vx = 1
+vy = 0
 
 # sizes
 wx = 3
