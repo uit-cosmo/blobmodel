@@ -186,6 +186,23 @@ class BlobShapeImpl(AbstractBlobShape):
         """
         return -2 * theta / np.sqrt(2 * np.pi) * np.exp(-(theta**2) / 2)
 
+    def _get_rectangle_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
+        """Compute the hard ellipse pulse shape.
+
+        Parameters
+        ----------
+        theta : np.ndarray
+            Array of theta values.
+        kwargs
+            Additional keyword arguments.
+
+        Returns
+        -------
+        np.ndarray
+            Array representing the rectangle pulse shape.
+        """
+        return np.abs(theta) < 0.5
+
     __GENERATORS = {
         "exp": _get_exponential_shape,
         "gauss": _get_gaussian_shape,
@@ -193,4 +210,5 @@ class BlobShapeImpl(AbstractBlobShape):
         "lorentz": _get_lorentz_shape,
         "secant": _get_secant_shape,
         "dipole": _get_dipole_shape,
+        "rectangle": _get_rectangle_shape,
     }

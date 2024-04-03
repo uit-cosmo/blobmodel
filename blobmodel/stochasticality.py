@@ -47,7 +47,6 @@ class DefaultBlobFactory(BlobFactory):
         vy_dist: str = "normal",
         spx_dist: str = "deg",
         spy_dist: str = "deg",
-        theta_dist: str = "none",
         A_parameter: float = 1.0,
         wx_parameter: float = 1.0,
         wy_parameter: float = 1.0,
@@ -55,7 +54,6 @@ class DefaultBlobFactory(BlobFactory):
         vy_parameter: float = 1.0,
         shape_param_x_parameter: float = 0.5,
         shape_param_y_parameter: float = 0.5,
-        theta_parameter: float = 1.0,
         blob_alignment: bool = True,
     ) -> None:
         """
