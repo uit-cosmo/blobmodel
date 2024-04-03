@@ -101,9 +101,7 @@ def test_single_point():
         x=mesh_x, y=mesh_y, t=0, periodic_y=True, Ly=10
     )
 
-    expected_values = (
-        1 / (2 * np.pi) * np.exp(-(mesh_x**2) / 2) * np.exp(-(4**2) / 2)
-    )
+    expected_values = 1 / (2 * np.pi) * np.exp(-(mesh_x**2) / 2) * np.exp(-(4**2) / 2)
     error = np.max(abs(expected_values - blob_values))
 
     assert error < 1e-8, "Numerical error too big"
