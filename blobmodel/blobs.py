@@ -65,7 +65,8 @@ class Blob:
             If blob_alignment == False, the blob shapes are independent of the propagation direction
         theta : float
             Blob rotation. If set to None, it is computed according to blob_alignment. If set to a no None value,
-        the blob alignment flag is ignored.
+        the blob alignment flag is ignored. Important: the blob angle is measured with respect to the x axis, not with
+         respect to the velocity vector.
 
         """
         self.int = int
