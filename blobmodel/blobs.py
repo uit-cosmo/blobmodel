@@ -87,7 +87,7 @@ class Blob:
         self.perp_shape_parameters = (
             {} if perp_shape_parameters is None else perp_shape_parameters
         )
-        self.blob_alignment = blob_alignment
+        self.blob_alignment = blob_alignment if theta is None else False
         self._theta = (
             theta
             if theta is not None
