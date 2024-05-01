@@ -27,7 +27,7 @@ class Blob:
         prop_shape_parameters: Union[dict, None] = None,
         perp_shape_parameters: Union[dict, None] = None,
         blob_alignment: bool = True,
-        theta: float = None,
+        theta: Union[float, None] = None,
     ) -> None:
         """
         Initialize a single blob.
