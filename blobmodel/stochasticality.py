@@ -123,7 +123,7 @@ class DefaultBlobFactory(BlobFactory):
         self.shape_param_x_parameter = shape_param_x_parameter
         self.shape_param_y_parameter = shape_param_y_parameter
         self.blob_alignment = blob_alignment
-        self.theta_setter = None
+        self.theta_setter = lambda: None
 
     def _draw_random_variables(
         self,
@@ -170,8 +170,6 @@ class DefaultBlobFactory(BlobFactory):
             return free_parameter * np.ones(num_blobs).astype(np.float64)
         elif dist_type == "zeros":
             return np.zeros(num_blobs).astype(np.float64)
-        elif dist_type == "none":
-            return None
         else:
             raise NotImplementedError(
                 self.__class__.__name__ + ".distribution function not implemented"
@@ -252,7 +250,7 @@ class DefaultBlobFactory(BlobFactory):
                 prop_shape_parameters=spxs_dict[i],
                 perp_shape_parameters=spys_dict[i],
                 blob_alignment=self.blob_alignment,
-                theta=self.theta_setter() if self.theta_setter is not None else None,
+                theta=self.theta_setter(),
             )
             for i in range(num_blobs)
         ]
