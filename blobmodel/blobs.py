@@ -355,10 +355,11 @@ class Blob:
             Position of the blob in the propagation direction.
 
         """
+        t_array = np.asarray(t)
         return (
-            self.pos_x + (self.v_x**2 + self.v_y**2) ** 0.5 * (t - self.t_init)
+            self.pos_x + (self.v_x**2 + self.v_y**2) ** 0.5 * (t_array - self.t_init)
             if self.blob_alignment
-            else self.pos_x + self.v_x * (t - self.t_init)
+            else self.pos_x + self.v_x * (t_array - self.t_init)
         )
 
     def _perp_dir_blob_position(self, t: Union[int, NDArray]) -> Any:
