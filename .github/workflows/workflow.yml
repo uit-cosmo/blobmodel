@@ -40,8 +40,8 @@ jobs:
 
     - name: Type checking with mypy
       run: |
+        pip install -U mypy 
         mypy  --ignore-missing-imports blobmodel
-
   python-3-10:
 
     runs-on: ubuntu-latest
