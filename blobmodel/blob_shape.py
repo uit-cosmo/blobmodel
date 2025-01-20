@@ -35,7 +35,9 @@ def _get_exponential_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
     np.ndarray
         Array representing the exponential pulse shape.
     """
-    return np.exp(theta) * np.heaviside(-1.0 * theta, 1)
+    kern = np.zeros(shape=np.shape(theta))
+    kern[theta < 0] = np.exp(theta[theta < 0])
+    return kern
 
 
 def _get_lorentz_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
