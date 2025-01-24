@@ -197,7 +197,9 @@ class Model:
             t_drain=self.t_drain,
         )
 
-        iterable = tqdm(self._blobs, desc="Summing up Blobs") if self._verbose else self._blobs
+        iterable = (
+            tqdm(self._blobs, desc="Summing up Blobs") if self._verbose else self._blobs
+        )
         for blob in iterable:
             self._sum_up_blobs(blob, speed_up, error)
 

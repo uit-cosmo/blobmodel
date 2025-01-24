@@ -98,7 +98,7 @@ def _get_gaussian_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
     np.ndarray
         Array representing the Gaussian pulse shape.
     """
-    return 1 / np.sqrt(np.pi) * np.exp(-theta**2)
+    return 1 / np.sqrt(np.pi) * np.exp(-(theta**2))
 
 
 def _get_rectangle_shape(theta: np.ndarray, **kwargs) -> np.ndarray:

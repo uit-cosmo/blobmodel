@@ -64,7 +64,10 @@ class Blob:
             If blob_alignment == True, the blob shapes are rotated in the propagation direction of the blob
             If blob_alignment == False, the blob shapes are independent of the propagation direction
         theta : float
-            Blob rotation. If set to None, it is computed according to blob_alignment. If set to a no None value,
+            Blob rotation. If set to None, blobs are rotated so to be aligned with their propagation. Otherwise, theta
+            sets the blob angle with respect to the x axis.
+
+            it is computed according to blob_alignment. If set to a no None value,
         the blob alignment flag is ignored. Important: the blob angle is measured with respect to the x axis, not with
          respect to the velocity vector.
 
@@ -93,6 +96,11 @@ class Blob:
             if theta is not None
             else (cmath.phase(self.v_x + self.v_y * 1j) if blob_alignment else 0.0)
         )
+        self._theta = theta
+        if theta is None:
+            self._theta = (
+                cmath.phase(self.v_x + self.v_y * 1j) if blob_alignment else 0.0
+            )
 
     def discretize_blob(
         self,
@@ -136,7 +144,7 @@ class Blob:
         x_perp, y_perp = self._rotate(
             origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self._theta
         )
-        if not self.blob_alignment:
+        if True:
             v_x_new = self.v_x * np.cos(self._theta) + self.v_y * np.sin(self._theta)
             v_y_new = -self.v_x * np.sin(self._theta) + self.v_y * np.cos(self._theta)
             self.v_x, self.v_y = v_x_new, v_y_new
@@ -368,11 +376,7 @@ class Blob:
             Position of the blob in the propagation direction.
 
         """
-        return (
-            self.pos_x + (self.v_x**2 + self.v_y**2) ** 0.5 * (t - self.t_init)
-            if self.blob_alignment
-            else self.pos_x + self.v_x * (t - self.t_init)
-        )
+        return self.pos_x + self.v_x * (t - self.t_init)
 
     def _perp_dir_blob_position(self, t: Union[int, NDArray]) -> Any:
         """
@@ -389,11 +393,7 @@ class Blob:
             Position of the blob in the perpendicular direction.
 
         """
-        return (
-            self.pos_y
-            if self.blob_alignment
-            else self.pos_y + self.v_y * (t - self.t_init)
-        )
+        return self.pos_y + self.v_y * (t - self.t_init)
 
     def _rotate(
         self, origin: Tuple[float, float], x: NDArray, y: NDArray, angle: float
