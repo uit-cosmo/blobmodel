@@ -13,10 +13,10 @@ DefaultBlobFactory
 We can use ``DefaultBlobFactory`` class in order to change the distribution functions of the following blob parameters:
 
 * Amplitudes
-* widths in x
-* widths in y
-* velocities in x
-* velocities in y
+* widths in x and y
+* velocities in x and y
+* pulse shape in x and y
+* blob alignment and tilt
 
 The distributions for these parameters are set with the ``*_dist`` arguments. The following distribution functions are implemented:
 

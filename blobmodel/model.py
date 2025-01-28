@@ -321,6 +321,7 @@ class Model:
                     np.abs(blob.t_init * blob.v_x)
                     + blob.width_prop * np.log(error * np.sqrt(np.pi))
                     + blob.pos_x
+                    - self._geometry.t[0]
                 )
                 / np.abs(self._geometry.dt * blob.v_x)
             ),

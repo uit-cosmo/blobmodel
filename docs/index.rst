@@ -66,7 +66,7 @@ Alternatively, you can take a look at the examples gallery at :py:mod:`blobmodel
    parameter_distributions
    blob_labels
    drainage_time
-   blob_alignment
+   blob_tilt
    contributor_guide
 
 

@@ -34,7 +34,7 @@ bm = Model(
     num_blobs=100,
     t_drain=1e10,
     blob_factory=bf,
-    t_init=10
+    t_init=10,
 )
 ds = bm.make_realization(speed_up=True, error=1e-2)
 # show animation and save as gif
@@ -56,9 +56,7 @@ bf = DefaultBlobFactory(
 # blob tilting
 theta = np.pi / 2
 # Setting the angle with a lambda allows us to set a distribution of tilt angles. In this case we use a degenerate distribution:
-bf.set_theta_setter(
-    lambda: theta
-)
+bf.set_theta_setter(lambda: theta)
 
 # create data, same as before
 bm = Model(
@@ -73,7 +71,7 @@ bm = Model(
     num_blobs=100,
     t_drain=1e10,
     blob_factory=bf,
-    t_init=10
+    t_init=10,
 )
 ds = bm.make_realization(speed_up=True, error=1e-2)
 # show animation and save as gif
