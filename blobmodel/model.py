@@ -28,6 +28,7 @@ class Model:
         num_blobs: int = 1000,
         t_drain: Union[float, NDArray, int] = 10,
         blob_factory: BlobFactory = DefaultBlobFactory(),
+        t_init: float = 0,
         labels: str = "off",
         label_border: float = 0.75,
         one_dimensional: bool = False,
@@ -63,6 +64,8 @@ class Model:
             of length Nx.
         blob_factory : BlobFactory, optional
             BlobFactory instance for setting blob parameter distributions.
+        t_init : float, optional
+            Initial time for simulation, default 0.
         labels : str, optional
             Blob label setting. Possible values: "off", "same", "individual".
             "off": no blob labels returned
@@ -108,6 +111,7 @@ class Model:
             Ly=Ly,
             dt=dt,
             T=T,
+            t_init=t_init,
             periodic_y=periodic_y,
         )
         self.blob_shape = (
