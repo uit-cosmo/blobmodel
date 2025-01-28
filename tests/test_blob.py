@@ -14,6 +14,7 @@ blob = Blob(
     pos_y=0,
     t_init=0,
     t_drain=10**10,
+    blob_alignment=False,
     theta=0,
 )
 
