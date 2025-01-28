@@ -57,7 +57,7 @@ class Geometry:
             self.y: NDArray[Literal[64], Any] = np.array([0])
         else:
             self.y = np.arange(0, self.Ly, self.Ly / self.Ny)
-        self.t: NDArray[Literal[64], Any] = np.arange(t_init, self.T + t_init, self.dt)
+        self.t: NDArray[Literal[64], Any] = np.arange(t_init, self.T, self.dt)
         self.x_matrix, self.y_matrix, self.t_matrix = np.meshgrid(
             self.x, self.y, self.t
         )
