@@ -3,10 +3,10 @@ from blobmodel.geometry import Geometry
 
 
 def test_geometry_str():
-    geo = Geometry(1, 1, 1, 1, 1, 1, False)
+    geo = Geometry(1, 1, 1, 1, 1, 1, 1, False)
     assert (
         str(geo)
-        == "Geometry parameters:  Nx:1,  Ny:1, Lx:1, Ly:1, dt:1, T:1, y-periodicity:False"
+        == "Geometry parameters:  Nx:1,  Ny:1, Lx:1, Ly:1, dt:1, T:1, t_init:1, y-periodicity:False"
     )
 
 

@@ -14,7 +14,7 @@ def show_model(
     interval: int = 100,
     gif_name: Union[str, None] = None,
     fps: int = 10,
-    initial_time: float = 0
+    initial_time: float = 0,
 ) -> None:
     """
     Creates an animation that shows the evolution of a specific variable over time.
