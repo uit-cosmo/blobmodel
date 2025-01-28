@@ -123,7 +123,7 @@ class DefaultBlobFactory(BlobFactory):
         self.shape_param_x_parameter = shape_param_x_parameter
         self.shape_param_y_parameter = shape_param_y_parameter
         self.blob_alignment = blob_alignment
-        self.theta_setter = lambda: None
+        self.theta_setter = lambda: 0
 
     def _draw_random_variables(
         self,

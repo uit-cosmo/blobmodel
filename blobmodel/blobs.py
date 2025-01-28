@@ -27,7 +27,7 @@ class Blob:
         prop_shape_parameters: Union[dict, None] = None,
         perp_shape_parameters: Union[dict, None] = None,
         blob_alignment: bool = True,
-        theta: Union[float, None] = None,
+        theta: float = 0,
     ) -> None:
         """
         Initialize a single blob.
@@ -90,17 +90,10 @@ class Blob:
         self.perp_shape_parameters = (
             {} if perp_shape_parameters is None else perp_shape_parameters
         )
-        self.blob_alignment = blob_alignment if theta is None else False
-        self._theta = (
-            theta
-            if theta is not None
-            else (cmath.phase(self.v_x + self.v_y * 1j) if blob_alignment else 0.0)
-        )
+        self.blob_alignment = blob_alignment
         self._theta = theta
-        if theta is None:
-            self._theta = (
-                cmath.phase(self.v_x + self.v_y * 1j) if blob_alignment else 0.0
-            )
+        if blob_alignment:
+            self._theta = cmath.phase(self.v_x + self.v_y * 1j)
 
     def discretize_blob(
         self,
@@ -361,7 +354,7 @@ class Blob:
             theta_y, **self.perp_shape_parameters
         )
 
-    def _prop_dir_blob_position(self, t: Union[int, NDArray]) -> NDArray:
+    def _prop_dir_blob_position(self, t: Union[int, NDArray]) -> Any:
         """
         Calculate the position of the blob in the propagation direction.
 
