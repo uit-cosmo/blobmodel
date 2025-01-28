@@ -14,7 +14,6 @@ def show_model(
     interval: int = 100,
     gif_name: Union[str, None] = None,
     fps: int = 10,
-    initial_time: float = 0,
 ) -> None:
     """
     Creates an animation that shows the evolution of a specific variable over time.
@@ -31,8 +30,6 @@ def show_model(
         If not None, save the animation as a GIF and name it acoridingly.
     fps : int, optional
         Set the frames per second for the saved GIF (default: 10).
-    initial_time : float, optional
-        Initial time at which the GIF starts
 
     Returns
     -------
