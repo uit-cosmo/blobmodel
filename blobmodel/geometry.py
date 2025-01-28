@@ -17,6 +17,7 @@ class Geometry:
         Ly: float,
         dt: float,
         T: float,
+        t_init: float,
         periodic_y: bool,
     ) -> None:
         """
@@ -36,6 +37,8 @@ class Geometry:
             Time step.
         T : float
             Time length.
+        t_init : float
+            Initial time
         periodic_y : bool
             Flag indicating whether periodicity is allowed in the y-direction.
         """
@@ -45,6 +48,7 @@ class Geometry:
         self.Ly = Ly
         self.dt = dt
         self.T = T
+        self.t_init = t_init
         self.periodic_y = periodic_y
 
         # calculate x, y and t coordinates
@@ -53,7 +57,7 @@ class Geometry:
             self.y: NDArray[Literal[64], Any] = np.array([0])
         else:
             self.y = np.arange(0, self.Ly, self.Ly / self.Ny)
-        self.t: NDArray[Literal[64], Any] = np.arange(0, self.T, self.dt)
+        self.t: NDArray[Literal[64], Any] = np.arange(t_init, self.T + t_init, self.dt)
         self.x_matrix, self.y_matrix, self.t_matrix = np.meshgrid(
             self.x, self.y, self.t
         )
@@ -69,5 +73,5 @@ class Geometry:
         """
         return (
             f"Geometry parameters:  Nx:{self.Nx},  Ny:{self.Ny}, Lx:{self.Lx}, Ly:{self.Ly}, "
-            + f"dt:{self.dt}, T:{self.T}, y-periodicity:{self.periodic_y}"
+            + f"dt:{self.dt}, T:{self.T}, t_init:{self.t_init}, y-periodicity:{self.periodic_y}"
         )
