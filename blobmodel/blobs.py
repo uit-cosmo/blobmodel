@@ -27,6 +27,7 @@ class Blob:
         prop_shape_parameters: Union[dict, None] = None,
         perp_shape_parameters: Union[dict, None] = None,
         blob_alignment: bool = True,
+        theta: float = 0,
     ) -> None:
         """
         Initialize a single blob.
@@ -60,8 +61,15 @@ class Blob:
         perp_shape_parameters : dict
             Additional shape parameters for the perpendicular direction.
         blob_alignment : bool, optional
-            If blob_aligment == True, the blob shapes are rotated in the propagation direction of the blob
-            If blob_aligment == False, the blob shapes are independent of the propagation direction
+            If blob_alignment == True, the blob shapes are rotated in the propagation direction of the blob
+            If blob_alignment == False, the blob shapes are independent of the propagation direction
+        theta : float
+            Blob rotation. If set to None, blobs are rotated so to be aligned with their propagation. Otherwise, theta
+            sets the blob angle with respect to the x axis.
+
+            it is computed according to blob_alignment. If set to a no None value,
+        the blob alignment flag is ignored. Important: the blob angle is measured with respect to the x axis, not with
+         respect to the velocity vector.
 
         """
         self.int = int
@@ -83,7 +91,9 @@ class Blob:
             {} if perp_shape_parameters is None else perp_shape_parameters
         )
         self.blob_alignment = blob_alignment
-        self._theta = cmath.phase(self.v_x + self.v_y * 1j) if blob_alignment else 0.0
+        self._theta = theta
+        if blob_alignment:
+            self._theta = cmath.phase(self.v_x + self.v_y * 1j)
 
     def discretize_blob(
         self,
@@ -127,6 +137,10 @@ class Blob:
         x_perp, y_perp = self._rotate(
             origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self._theta
         )
+        if True:
+            v_x_new = self.v_x * np.cos(self._theta) + self.v_y * np.sin(self._theta)
+            v_y_new = -self.v_x * np.sin(self._theta) + self.v_y * np.cos(self._theta)
+            self.v_x, self.v_y = v_x_new, v_y_new
         if not periodic_y or one_dimensional:
             return self._single_blob(
                 x_perp, y_perp, t, Ly, periodic_y, one_dimensional=one_dimensional
@@ -340,7 +354,7 @@ class Blob:
             theta_y, **self.perp_shape_parameters
         )
 
-    def _prop_dir_blob_position(self, t: Union[int, NDArray]) -> NDArray:
+    def _prop_dir_blob_position(self, t: Union[int, NDArray]) -> Any:
         """
         Calculate the position of the blob in the propagation direction.
 
@@ -355,12 +369,7 @@ class Blob:
             Position of the blob in the propagation direction.
 
         """
-        t_array = np.asarray(t)
-        return (
-            self.pos_x + (self.v_x**2 + self.v_y**2) ** 0.5 * (t_array - self.t_init)
-            if self.blob_alignment
-            else self.pos_x + self.v_x * (t_array - self.t_init)
-        )
+        return self.pos_x + self.v_x * (t - self.t_init)
 
     def _perp_dir_blob_position(self, t: Union[int, NDArray]) -> Any:
         """
@@ -377,11 +386,7 @@ class Blob:
             Position of the blob in the perpendicular direction.
 
         """
-        return (
-            self.pos_y
-            if self.blob_alignment
-            else self.pos_y + self.v_y * (t - self.t_init)
-        )
+        return self.pos_y + self.v_y * (t - self.t_init)
 
     def _rotate(
         self, origin: Tuple[float, float], x: NDArray, y: NDArray, angle: float

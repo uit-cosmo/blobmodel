@@ -31,6 +31,7 @@ class Model:
         labels: str = "off",
         label_border: float = 0.75,
         one_dimensional: bool = False,
+        verbose: bool = True,
     ) -> None:
         """
         Initialize the 2D Model of propagating blobs.
@@ -74,6 +75,8 @@ class Model:
         one_dimensional : bool, optional
             If True, the perpendicular shape of the blobs will be discarded.
             Parameters for the y-component (Ny and Ly) will be overwritten to Ny=1, Ly=0.
+        verbose : bool, optional
+            If True, print a loading bar.
 
         Raises
         ------
@@ -122,6 +125,7 @@ class Model:
         self._labels = labels
         self._label_border = label_border
         self._reset_fields()
+        self._verbose = verbose
 
     def __str__(self) -> str:
         """
@@ -193,7 +197,10 @@ class Model:
             t_drain=self.t_drain,
         )
 
-        for blob in tqdm(self._blobs, desc="Summing up Blobs"):
+        iterable = (
+            tqdm(self._blobs, desc="Summing up Blobs") if self._verbose else self._blobs
+        )
+        for blob in iterable:
             self._sum_up_blobs(blob, speed_up, error)
 
         dataset = self._create_xr_dataset()

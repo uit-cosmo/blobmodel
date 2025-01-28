@@ -98,7 +98,23 @@ def _get_gaussian_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
     np.ndarray
         Array representing the Gaussian pulse shape.
     """
-    return 1 / np.sqrt(2 * np.pi) * np.exp(-(theta**2) / 2)
+    return 1 / np.sqrt(np.pi) * np.exp(-(theta**2))
+
+
+def _get_rectangle_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
+    """Compute the hard ellipse pulse shape.
+    Parameters
+    ----------
+    theta : np.ndarray
+        Array of theta values.
+    kwargs
+        Additional keyword arguments.
+    Returns
+    -------
+    np.ndarray
+        Array representing the rectangle pulse shape.
+    """
+    return np.abs(theta) < 0.5
 
 
 def _get_secant_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
@@ -201,4 +217,5 @@ class BlobShapeImpl(AbstractBlobShape):
         "lorentz": _get_lorentz_shape,
         "secant": _get_secant_shape,
         "dipole": _get_dipole_shape,
+        "rectangle": _get_rectangle_shape,
     }

@@ -123,6 +123,7 @@ class DefaultBlobFactory(BlobFactory):
         self.shape_param_x_parameter = shape_param_x_parameter
         self.shape_param_y_parameter = shape_param_y_parameter
         self.blob_alignment = blob_alignment
+        self.theta_setter = lambda: 0
 
     def _draw_random_variables(
         self,
@@ -249,12 +250,20 @@ class DefaultBlobFactory(BlobFactory):
                 prop_shape_parameters=spxs_dict[i],
                 perp_shape_parameters=spys_dict[i],
                 blob_alignment=self.blob_alignment,
+                theta=self.theta_setter(),
             )
             for i in range(num_blobs)
         ]
 
         # sort blobs by amplitude
         return sorted(blobs, key=lambda x: x.amplitude)
+
+    def set_theta_setter(self, theta_setter):
+        """
+        Set a lambda function to set the value of theta (blob tilting) for each blob.
+        Important: the blob angle is measured with respect to the x axis, not with respect to the velocity vector.
+        """
+        self.theta_setter = theta_setter
 
     def is_one_dimensional(self) -> bool:
         """
