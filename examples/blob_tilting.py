@@ -3,7 +3,7 @@ import numpy as np
 
 # velocities
 vx = 1
-vy = 0
+vy = 1
 
 # sizes
 wx = 3
@@ -18,14 +18,16 @@ bf = DefaultBlobFactory(
     vx_parameter=vx,
     wx_parameter=wx,
     wy_parameter=wy,
-    blob_alignment=False,
+    blob_alignment=True  # Blobs are aligned
 )
 
 # blob tilting
 theta = np.pi / 4
+# Using a lambda function to set the tilt angle theta, allows us to set a distribution for tilt angles if desired.
+# In this case we use a degenerate distribution.
 bf.set_theta_setter(
     lambda: theta
-)  # If you want to stochasticity in the angle theta, you can do this thanks to the lambda
+)
 
 # create data
 bm = Model(
@@ -43,4 +45,4 @@ bm = Model(
 )
 ds = bm.make_realization(speed_up=True, error=1e-2)
 # show animation and save as gif
-show_model(dataset=ds, interval=100, gif_name="2d_animation.gif", fps=10)
+show_model(dataset=ds, interval=100, gif_name="blob_alignment_true.gif", fps=10, initial_time=10)
