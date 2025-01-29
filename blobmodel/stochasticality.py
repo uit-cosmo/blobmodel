@@ -44,7 +44,7 @@ class DefaultBlobFactory(BlobFactory):
         wx_dist: str = "deg",
         wy_dist: str = "deg",
         vx_dist: str = "deg",
-        vy_dist: str = "normal",
+        vy_dist: str = "deg",
         spx_dist: str = "deg",
         spy_dist: str = "deg",
         A_parameter: float = 1.0,
@@ -73,7 +73,7 @@ class DefaultBlobFactory(BlobFactory):
         vx_dist : str, optional
             Distribution type for velocity in the x-direction, by default "deg"
         vy_dist : str, optional
-            Distribution type for velocity in the y-direction, by default "normal"
+            Distribution type for velocity in the y-direction, by default "deg"
         spx_dist : str, optional
             Distribution type for shape parameter in the x-direction, by default "deg"
         spy_dist : str, optional

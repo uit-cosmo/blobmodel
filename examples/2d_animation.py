@@ -13,6 +13,7 @@ bm = Model(
     blob_shape="gauss",
     num_blobs=100,
     t_drain=1e10,
+    t_init=10,
 )
 
 # create data

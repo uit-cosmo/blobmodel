@@ -18,6 +18,7 @@ tmp = Model(
     periodic_y=False,
     num_blobs=10000,
     blob_factory=bf,
+    t_init=10,
 )
 
 tmp.make_realization(file_name="test_analytical.nc", speed_up=True, error=1e-2)
@@ -25,7 +26,7 @@ tmp.make_realization(file_name="test_analytical.nc", speed_up=True, error=1e-2)
 
 def test_convergence_to_analytical_solution():
     ds = xr.open_dataset("test_analytical.nc")
-    model_profile = ds.n.isel(y=0).mean(dim=("t"))
+    model_profile = ds.n.isel(y=0).mean(dim="t")
 
     x = np.linspace(0, 10, 100)
     t_p = 1

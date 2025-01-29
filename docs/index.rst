@@ -63,10 +63,11 @@ Alternatively, you can take a look at the examples gallery at :py:mod:`blobmodel
    visualize_model
    model_geometry
    blob_shapes
-   parameter_distributions
+   one_dim
+   blob_factory
    blob_labels
    drainage_time
-   blob_alignment
+   blob_tilt
    contributor_guide
 
 

@@ -7,7 +7,7 @@ Getting Started
 Creating a model
 ++++++++++++++++
 
-We create a grid on which the blobs are discretized with using the ``Model`` class. Here, we specify the geometry of the model by the number of grid points, the lengths of the domain, the time step and the time length of our realization.
+We create a grid on which the blobs are discretized with using the ``Model`` class. Here, we specify the geometry of the model by the number of grid points, the lengths of the domain, the time step, the time length and the initial time of our realization.
 
 In addition, we can specify the blob shape, drainage time and the number of blobs when creating a ``Model`` object. For more details about the geometry, take a look at the :ref:`blobmodel-geometry` section.
 
@@ -15,17 +15,20 @@ In addition, we can specify the blob shape, drainage time and the number of blob
 
   from blobmodel import Model
 
-  bm = Model(
-      Nx=200,
-      Ny=100,
-      Lx=10,
-      Ly=10,
-      dt=0.1,
-      T=20,
-      blob_shape="gauss",
-      t_drain=100,
-      num_blobs=100,
-  )
+    bm = Model(
+        Nx=100,
+        Ny=100,
+        Lx=10,
+        Ly=10,
+        dt=0.1,
+        T=20,
+        periodic_y=True,
+        blob_shape="gauss",
+        num_blobs=100,
+        t_drain=1e10,
+        t_init=10,
+    )
+
 
 
 +++++++++++++++++
@@ -42,6 +45,15 @@ If we provide a ``file_name`` to the ``make_realization`` method, it will store 
 The ``make_realization`` mehtod can take two more arguments, ``speed_up`` and ``error``, which can be helpful for integrating very large datasets. 
 By setting ``spee_up`` to ``True``, the code will truncate the blobs when the blob values fall under the given ``error`` value. 
 The code assumes an exponential shape for the blobs when calculating the truncation position (see :ref:`blob-shapes` for further details).
+The resulting realization will look something like this:
+
+
+.. image:: 2d_animation.gif
+   :alt: StreamPlayer
+   :align: center
+   :scale: 80%
+
+Which may be a bit boring, as all the blobs move with the same speed and have the same shape and size. We will learn how to set distribution functions for the blobs parameters in :ref:`parameter-distributions`
 
 
 The ``make_realization`` method returns the realization in the form of an `xarray dataset <https://docs.xarray.dev/en/stable/index.html>`_. 
