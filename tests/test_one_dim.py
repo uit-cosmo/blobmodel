@@ -1,10 +1,10 @@
 import pytest
-from blobmodel import Model, DefaultBlobFactory
+from blobmodel import Model, DefaultBlobFactory, Distribution
 import numpy as np
 
 
 # use DefaultBlobFactory to define distribution functions fo random variables
-bf = DefaultBlobFactory(A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="zeros")
+bf = DefaultBlobFactory(A_dist=Distribution.deg, vy_dist=Distribution.zeros)
 
 one_dim_model = Model(
     Nx=100,

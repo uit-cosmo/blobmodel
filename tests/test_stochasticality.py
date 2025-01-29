@@ -1,15 +1,21 @@
 import pytest
-from blobmodel import DefaultBlobFactory, BlobShapeImpl, BlobFactory
+from blobmodel import DefaultBlobFactory, BlobShapeImpl, BlobFactory, Distribution
 
 
 def test_mean_of_distribution():
     bf = DefaultBlobFactory()
-    distributions_mean_1 = ["exp", "gamma", "uniform", "ray", "deg"]
-    distributions_mean_0 = ["normal", "zeros"]
+    distributions_mean_1 = [
+        Distribution.exp,
+        Distribution.gamma,
+        Distribution.uniform,
+        Distribution.rayleigh,
+        Distribution.deg,
+    ]
+    distributions_mean_0 = [Distribution.normal, Distribution.zeros]
 
     for dist in distributions_mean_1:
         tmp = bf._draw_random_variables(
-            dist_type=dist,
+            dist=dist,
             free_parameter=1,
             num_blobs=10000,
         )
@@ -17,7 +23,7 @@ def test_mean_of_distribution():
 
     for dist in distributions_mean_0:
         tmp = bf._draw_random_variables(
-            dist_type=dist,
+            dist=dist,
             free_parameter=1,
             num_blobs=10000,
         )
@@ -25,7 +31,7 @@ def test_mean_of_distribution():
 
 
 def test_not_implemented_distribution():
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(KeyError):
         bf = DefaultBlobFactory(A_dist="something_different")
         bf.sample_blobs(1, 1, 1, BlobShapeImpl("gauss"), 1)
 

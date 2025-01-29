@@ -6,6 +6,7 @@ from nptyping import NDArray, Float
 from typing import Any, List, Union, Dict
 from .blobs import Blob
 from .blob_shape import AbstractBlobShape
+from .distributions import *
 
 
 class BlobFactory(ABC):
@@ -40,13 +41,13 @@ class DefaultBlobFactory(BlobFactory):
 
     def __init__(
         self,
-        A_dist: str = "exp",
-        wx_dist: str = "deg",
-        wy_dist: str = "deg",
-        vx_dist: str = "deg",
-        vy_dist: str = "deg",
-        spx_dist: str = "deg",
-        spy_dist: str = "deg",
+        A_dist: Distribution = Distribution.exp,
+        wx_dist: Distribution = Distribution.deg,
+        wy_dist: Distribution = Distribution.deg,
+        vx_dist: Distribution = Distribution.deg,
+        vy_dist: Distribution = Distribution.deg,
+        spx_dist: Distribution = Distribution.deg,
+        spy_dist: Distribution = Distribution.deg,
         A_parameter: float = 1.0,
         wx_parameter: float = 1.0,
         wy_parameter: float = 1.0,
@@ -64,20 +65,20 @@ class DefaultBlobFactory(BlobFactory):
 
         Parameters
         ----------
-        A_dist : str, optional
-            Distribution type for amplitude, by default "exp"
-        wx_dist : str, optional
-            Distribution type for width in the x-direction, by default "deg"
-        wy_dist : str, optional
-            Distribution type for width in the y-direction, by default "deg"
-        vx_dist : str, optional
-            Distribution type for velocity in the x-direction, by default "deg"
-        vy_dist : str, optional
-            Distribution type for velocity in the y-direction, by default "deg"
-        spx_dist : str, optional
-            Distribution type for shape parameter in the x-direction, by default "deg"
-        spy_dist : str, optional
-            Distribution type for shape parameter in the y-direction, by default "deg"
+        A_dist : Distribution, optional
+            Distribution type for amplitude, by default "Distribution.exp"
+        wx_dist : Distribution, optional
+            Distribution type for width in the x-direction, by default "Distribution.deg"
+        wy_dist : Distribution, optional
+            Distribution type for width in the y-direction, by default "Distribution.deg"
+        vx_dist : Distribution, optional
+            Distribution type for velocity in the x-direction, by default "Distribution.deg"
+        vy_dist : Distribution, optional
+            Distribution type for velocity in the y-direction, by default "Distribution.deg"
+        spx_dist : Distribution, optional
+            Distribution type for shape parameter in the x-direction, by default "Distribution.deg"
+        spy_dist : Distribution, optional
+            Distribution type for shape parameter in the y-direction, by default "Distribution.deg"
         A_parameter : float, optional
             Free parameter for the amplitude distribution, by default 1.0
         wx_parameter : float, optional
@@ -126,54 +127,10 @@ class DefaultBlobFactory(BlobFactory):
         self.theta_setter = lambda: 0
 
     def _draw_random_variables(
-        self,
-        dist_type: str,
-        free_parameter: float,
-        num_blobs: int,
+        self, dist: Distribution, free_parameter: float, num_blobs: int
     ) -> np.ndarray:
-        """
-        Draws random variables from a specified distribution.
-
-        Parameters
-        ----------
-        dist_type : str
-            Type of distribution.
-        free_parameter : float
-            Free parameter for the distribution.
-        num_blobs : int
-            Number of random variables to draw.
-
-        Returns
-        -------
-        NDArray[Any, Float[64]]
-            Array of random variables drawn from the specified distribution.
-        """
-        if dist_type == "exp":
-            return np.random.exponential(scale=1, size=num_blobs).astype(np.float64)
-        elif dist_type == "gamma":
-            return np.random.gamma(
-                shape=free_parameter, scale=1 / free_parameter, size=num_blobs
-            ).astype(np.float64)
-        elif dist_type == "normal":
-            return np.random.normal(loc=0, scale=free_parameter, size=num_blobs).astype(
-                np.float64
-            )
-        elif dist_type == "uniform":
-            return np.random.uniform(
-                low=1 - free_parameter / 2, high=1 + free_parameter / 2, size=num_blobs
-            ).astype(np.float64)
-        elif dist_type == "ray":
-            return np.random.rayleigh(
-                scale=np.sqrt(2.0 / np.pi), size=num_blobs
-            ).astype(np.float64)
-        elif dist_type == "deg":
-            return free_parameter * np.ones(num_blobs).astype(np.float64)
-        elif dist_type == "zeros":
-            return np.zeros(num_blobs).astype(np.float64)
-        else:
-            raise NotImplementedError(
-                self.__class__.__name__ + ".distribution function not implemented"
-            )
+        """Draws random variables from a specified distribution."""
+        return DISTRIBUTIONS[dist](num_blobs, free_param=free_parameter)
 
     def sample_blobs(
         self,
@@ -205,9 +162,9 @@ class DefaultBlobFactory(BlobFactory):
             List of Blob objects generated for the Model.
         """
         amps = self._draw_random_variables(
-            dist_type=self.amplitude_dist,
-            free_parameter=self.amplitude_parameter,
-            num_blobs=num_blobs,
+            self.amplitude_dist,
+            self.amplitude_parameter,
+            num_blobs,
         )
         wxs = self._draw_random_variables(
             self.width_x_dist, self.width_x_parameter, num_blobs

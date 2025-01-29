@@ -1,4 +1,4 @@
-from blobmodel import Model, DefaultBlobFactory, Blob, BlobShapeImpl
+from blobmodel import Model, DefaultBlobFactory, Blob, BlobShapeImpl, Distribution
 import numpy as np
 from unittest.mock import MagicMock
 
@@ -204,7 +204,7 @@ def test_kwargs():
 
 
 def test_get_blobs():
-    bf = DefaultBlobFactory(A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="deg")
+    bf = DefaultBlobFactory(A_dist=Distribution.deg)
     one_blob = Model(
         Nx=100,
         Ny=100,
@@ -218,6 +218,6 @@ def test_get_blobs():
         num_blobs=3,
         blob_factory=bf,
     )
-    ds = one_blob.make_realization()
+    one_blob.make_realization()
     blob_list = one_blob.get_blobs()
     assert len(blob_list) == 3
