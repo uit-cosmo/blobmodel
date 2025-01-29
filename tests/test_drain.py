@@ -5,10 +5,10 @@ import numpy as np
 def test_high_t_drain():
     blob_sp = Blob(
         blob_id=0,
-        blob_shape=BlobShapeImpl("gauss"),
         amplitude=1,
         width_prop=1,
         width_perp=1,
+        blob_shape=BlobShapeImpl(),
         v_x=1,
         v_y=1,
         pos_x=0,

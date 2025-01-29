@@ -1,7 +1,18 @@
 """This module defines classes for blob pulse shapes used in two-dimensional simulations."""
 
+from enum import Enum
 from abc import ABC, abstractmethod
 import numpy as np
+
+
+class BlobShapeEnum(Enum):
+    exp = 1
+    lorentz = 2
+    double_exp = 3
+    gaussian = 4
+    rect = 5
+    secant = 6
+    dipole = 7
 
 
 class AbstractBlobShape(ABC):
@@ -156,7 +167,11 @@ def _get_dipole_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
 class BlobShapeImpl(AbstractBlobShape):
     """Implementation of the AbstractPulseShape class."""
 
-    def __init__(self, pulse_shape_prop="gauss", pulse_shape_perp="gauss"):
+    def __init__(
+        self,
+        pulse_shape_prop=BlobShapeEnum.gaussian,
+        pulse_shape_perp=BlobShapeEnum.gaussian,
+    ):
         """Initialize the BlobShapeImpl object.
 
         Attributes
@@ -211,11 +226,11 @@ class BlobShapeImpl(AbstractBlobShape):
         raise NotImplementedError
 
     __GENERATORS = {
-        "exp": _get_exponential_shape,
-        "gauss": _get_gaussian_shape,
-        "2-exp": _get_double_exponential_shape,
-        "lorentz": _get_lorentz_shape,
-        "secant": _get_secant_shape,
-        "dipole": _get_dipole_shape,
-        "rectangle": _get_rectangle_shape,
+        BlobShapeEnum.exp: _get_exponential_shape,
+        BlobShapeEnum.lorentz: _get_lorentz_shape,
+        BlobShapeEnum.double_exp: _get_double_exponential_shape,
+        BlobShapeEnum.gaussian: _get_gaussian_shape,
+        BlobShapeEnum.secant: _get_secant_shape,
+        BlobShapeEnum.dipole: _get_dipole_shape,
+        BlobShapeEnum.rect: _get_rectangle_shape,
     }

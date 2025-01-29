@@ -1,10 +1,16 @@
 import pytest
-from blobmodel import Model, DefaultBlobFactory, Distribution
+from blobmodel import (
+    Model,
+    DefaultBlobFactory,
+    DistributionEnum,
+    BlobShapeImpl,
+    BlobShapeEnum,
+)
 import numpy as np
 
 
 # use DefaultBlobFactory to define distribution functions fo random variables
-bf = DefaultBlobFactory(A_dist=Distribution.deg, vy_dist=Distribution.zeros)
+bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros)
 
 one_dim_model = Model(
     Nx=100,
@@ -13,7 +19,7 @@ one_dim_model = Model(
     Ly=0,
     dt=1,
     T=1000,
-    blob_shape="exp",
+    blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
     t_drain=2,
     periodic_y=False,
     num_blobs=10000,
@@ -54,7 +60,7 @@ def test_1d_warning():
                 Ly=10,
                 dt=1,
                 T=1000,
-                blob_shape="exp",
+                blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
                 t_drain=2,
                 periodic_y=False,
                 num_blobs=1,

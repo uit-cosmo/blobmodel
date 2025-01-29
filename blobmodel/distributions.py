@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 
-class Distribution(Enum):
+class DistributionEnum(Enum):
     """Enum class used to identify distribution functions."""
 
     deg = 1
@@ -67,11 +67,11 @@ def _sample_rayleigh(num_blobs, **kwargs):
 
 
 DISTRIBUTIONS = {
-    Distribution.deg: _sample_deg,
-    Distribution.zeros: _sample_zeros,
-    Distribution.exp: _sample_exp,
-    Distribution.gamma: _sample_gamma,
-    Distribution.normal: _sample_normal,
-    Distribution.uniform: _sample_uniform,
-    Distribution.rayleigh: _sample_rayleigh,
+    DistributionEnum.deg: _sample_deg,
+    DistributionEnum.zeros: _sample_zeros,
+    DistributionEnum.exp: _sample_exp,
+    DistributionEnum.gamma: _sample_gamma,
+    DistributionEnum.normal: _sample_normal,
+    DistributionEnum.uniform: _sample_uniform,
+    DistributionEnum.rayleigh: _sample_rayleigh,
 }

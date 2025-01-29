@@ -24,7 +24,7 @@ class Model:
         dt: float = 0.1,
         T: float = 10,
         periodic_y: bool = False,
-        blob_shape: Union[AbstractBlobShape, str] = BlobShapeImpl("gauss"),
+        blob_shape: AbstractBlobShape = BlobShapeImpl(),
         num_blobs: int = 1000,
         t_drain: Union[float, NDArray, int] = 10,
         blob_factory: BlobFactory = DefaultBlobFactory(),
@@ -54,9 +54,8 @@ class Model:
         periodic_y : bool, optional
             Allow periodicity in the y-direction.
             Important: only good approximation for Ly >> blob width
-        blob_shape : AbstractBlobShape or str, optional
-            Shape of the blobs. Can be an instance of AbstractBlobShape or a string
-            specifying the shape.
+        blob_shape : AbstractBlobShape, optional
+            Shape of the blobs. Can be an instance of AbstractBlobShape. Defaults to gaussian.
         num_blobs : int, optional
             Number of blobs.
         t_drain : float or array-like, optional
@@ -117,9 +116,7 @@ class Model:
             t_init=t_init,
             periodic_y=periodic_y,
         )
-        self.blob_shape = (
-            BlobShapeImpl(blob_shape) if isinstance(blob_shape, str) else blob_shape
-        )
+        self.blob_shape = blob_shape
         self.num_blobs: int = num_blobs
         self.t_drain: Union[float, NDArray] = t_drain
 

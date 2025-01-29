@@ -1,9 +1,7 @@
 """This module defines a class for generating blob parameters."""
 
-from abc import ABC, abstractmethod
-import numpy as np
-from nptyping import NDArray, Float
-from typing import Any, List, Union, Dict
+from nptyping import NDArray
+from typing import List, Union
 from .blobs import Blob
 from .blob_shape import AbstractBlobShape
 from .distributions import *
@@ -41,13 +39,13 @@ class DefaultBlobFactory(BlobFactory):
 
     def __init__(
         self,
-        A_dist: Distribution = Distribution.exp,
-        wx_dist: Distribution = Distribution.deg,
-        wy_dist: Distribution = Distribution.deg,
-        vx_dist: Distribution = Distribution.deg,
-        vy_dist: Distribution = Distribution.deg,
-        spx_dist: Distribution = Distribution.deg,
-        spy_dist: Distribution = Distribution.deg,
+        A_dist: DistributionEnum = DistributionEnum.exp,
+        wx_dist: DistributionEnum = DistributionEnum.deg,
+        wy_dist: DistributionEnum = DistributionEnum.deg,
+        vx_dist: DistributionEnum = DistributionEnum.deg,
+        vy_dist: DistributionEnum = DistributionEnum.deg,
+        spx_dist: DistributionEnum = DistributionEnum.deg,
+        spy_dist: DistributionEnum = DistributionEnum.deg,
         A_parameter: float = 1.0,
         wx_parameter: float = 1.0,
         wy_parameter: float = 1.0,
@@ -127,7 +125,7 @@ class DefaultBlobFactory(BlobFactory):
         self.theta_setter = lambda: 0
 
     def _draw_random_variables(
-        self, dist: Distribution, free_parameter: float, num_blobs: int
+        self, dist: DistributionEnum, free_parameter: float, num_blobs: int
     ) -> np.ndarray:
         """Draws random variables from a specified distribution."""
         return DISTRIBUTIONS[dist](num_blobs, free_param=free_parameter)

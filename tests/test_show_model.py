@@ -11,7 +11,6 @@ bm_2d = Model(
     dt=0.1,
     T=1,
     periodic_y=False,
-    blob_shape="exp",
     num_blobs=1,
 )
 
@@ -34,7 +33,6 @@ bm_1d = Model(
     dt=0.1,
     T=1,
     periodic_y=False,
-    blob_shape="exp",
     num_blobs=1,
 )
 
