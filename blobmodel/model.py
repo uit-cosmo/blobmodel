@@ -95,10 +95,13 @@ class Model:
             If the model is one-dimensional and the blob factory is not one-dimensional.
         """
         self._one_dimensional = one_dimensional
-        if self._one_dimensional and (Ny != 1 or Ly != 0):
-            warnings.warn("Overwritting Ny=1 and Ly=0 to allow one dimensional model")
-            Ny = 1
-            Ly = 0
+        if self._one_dimensional:
+            if Ny != 1 or Ly != 0:
+                warnings.warn(
+                    "Overwritting Ny=1 and Ly=0 to allow one dimensional model"
+                )
+                Ny = 1
+                Ly = 0
             if not blob_factory.is_one_dimensional():
                 warnings.warn(
                     "Using a one dimensional model with a blob factory that is not one-dimensional. Are you sure you know what you are doing?"

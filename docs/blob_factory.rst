@@ -1,10 +1,11 @@
-.. _parameter-distributions:
+.. blob-factory:
 
 Parameter Distributions
 =======================
 
-While instantiating a ``Model`` object, we define the distribution functions used to sample blob parameters from. 
-So far we have only used the default distributions but in this section we cover how change these.
+By default a realization obtained by an instance of ``Model`` will have degenerate distributions of all blob parameters. For any interesting application this is not enough.
+In order to provide the highest possible flexibility for setting blob parameters this is done by a separate class, which
+should implement ``BlobFactory``. An implementation is provided by ``DefaultBlobFactory`` which allows to easily set independent distributions of any blob parameters to a wide range of distribution families.
 
 ++++++++++++++++++
 DefaultBlobFactory
