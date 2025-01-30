@@ -1,10 +1,10 @@
-from blobmodel import Model, DefaultBlobFactory, Blob, BlobShapeImpl
+from blobmodel import Model, DefaultBlobFactory, Blob, BlobShapeImpl, DistributionEnum
 import numpy as np
 from unittest.mock import MagicMock
 
 blob = Blob(
     blob_id=0,
-    blob_shape=BlobShapeImpl("gauss"),
+    blob_shape=BlobShapeImpl(),
     amplitude=1,
     width_prop=1,
     width_perp=1,
@@ -36,7 +36,7 @@ def test_blob_non_alignment():
     # Dead pixels have already been preprocessed and have an array of nans at their site
     blob = Blob(
         blob_id=0,
-        blob_shape=BlobShapeImpl("exp", "exp"),
+        blob_shape=BlobShapeImpl(),
         amplitude=1,
         width_prop=1,
         width_perp=1,
@@ -80,10 +80,10 @@ def test_periodicity():
 def test_single_point():
     blob_sp = Blob(
         blob_id=0,
-        blob_shape=BlobShapeImpl("gauss"),
         amplitude=1,
         width_prop=1,
         width_perp=1,
+        blob_shape=BlobShapeImpl(),
         v_x=1,
         v_y=1,
         pos_x=0,
@@ -110,10 +110,10 @@ def test_negative_radial_velocity():
     vx = -1
     blob_sp = Blob(
         blob_id=0,
-        blob_shape=BlobShapeImpl("gauss"),
         amplitude=1,
         width_prop=1,
         width_perp=1,
+        blob_shape=BlobShapeImpl(),
         v_x=vx,
         v_y=1,
         pos_x=0,
@@ -143,10 +143,10 @@ def test_negative_radial_velocity():
 def test_theta_0():
     blob_sp = Blob(
         blob_id=0,
-        blob_shape=BlobShapeImpl("gauss"),
         amplitude=1,
         width_prop=1,
         width_perp=1,
+        blob_shape=BlobShapeImpl(),
         v_x=1,
         v_y=0,
         pos_x=0,
@@ -176,7 +176,7 @@ def test_theta_0():
 def test_kwargs():
     from unittest.mock import MagicMock
 
-    mock_ps = BlobShapeImpl("2-exp", "2-exp")
+    mock_ps = BlobShapeImpl()
     mock_ps.get_blob_shape_prop = MagicMock()
 
     blob_sp = Blob(
@@ -204,7 +204,7 @@ def test_kwargs():
 
 
 def test_get_blobs():
-    bf = DefaultBlobFactory(A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="deg")
+    bf = DefaultBlobFactory(A_dist=DistributionEnum.deg)
     one_blob = Model(
         Nx=100,
         Ny=100,
@@ -212,12 +212,11 @@ def test_get_blobs():
         Ly=10,
         dt=1,
         T=1,
-        blob_shape="exp",
         t_drain=1e10,
         periodic_y=False,
         num_blobs=3,
         blob_factory=bf,
     )
-    ds = one_blob.make_realization()
+    one_blob.make_realization()
     blob_list = one_blob.get_blobs()
     assert len(blob_list) == 3

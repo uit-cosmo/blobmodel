@@ -1,15 +1,21 @@
 import pytest
-from blobmodel import DefaultBlobFactory, BlobShapeImpl, BlobFactory
+from blobmodel import DefaultBlobFactory, BlobShapeImpl, BlobFactory, DistributionEnum
 
 
 def test_mean_of_distribution():
     bf = DefaultBlobFactory()
-    distributions_mean_1 = ["exp", "gamma", "uniform", "ray", "deg"]
-    distributions_mean_0 = ["normal", "zeros"]
+    distributions_mean_1 = [
+        DistributionEnum.exp,
+        DistributionEnum.gamma,
+        DistributionEnum.uniform,
+        DistributionEnum.rayleigh,
+        DistributionEnum.deg,
+    ]
+    distributions_mean_0 = [DistributionEnum.normal, DistributionEnum.zeros]
 
     for dist in distributions_mean_1:
         tmp = bf._draw_random_variables(
-            dist_type=dist,
+            dist=dist,
             free_parameter=1,
             num_blobs=10000,
         )
@@ -17,7 +23,7 @@ def test_mean_of_distribution():
 
     for dist in distributions_mean_0:
         tmp = bf._draw_random_variables(
-            dist_type=dist,
+            dist=dist,
             free_parameter=1,
             num_blobs=10000,
         )
@@ -25,9 +31,9 @@ def test_mean_of_distribution():
 
 
 def test_not_implemented_distribution():
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(KeyError):
         bf = DefaultBlobFactory(A_dist="something_different")
-        bf.sample_blobs(1, 1, 1, BlobShapeImpl("gauss"), 1)
+        bf.sample_blobs(1, 1, 1, BlobShapeImpl(), 1)
 
 
 def test_abstract_mehtods():
@@ -39,7 +45,7 @@ def test_abstract_mehtods():
     my_obj = MyBlobFactory()
 
     with pytest.raises(NotImplementedError):
-        my_obj.sample_blobs(1, 1, 1, "exp", 1)
+        my_obj.sample_blobs(1, 1, 1, BlobShapeImpl(), 1)
 
     with pytest.raises(NotImplementedError):
         my_obj.is_one_dimensional()
