@@ -77,6 +77,7 @@ class Model:
         one_dimensional : bool, optional
             If True, the perpendicular shape of the blobs will be discarded.
             Parameters for the y-component (Ny and Ly) will be overwritten to Ny=1, Ly=0.
+            The perpendicular blob shape will be set to 1.
         verbose : bool, optional
             If True, print a loading bar.
 

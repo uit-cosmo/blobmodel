@@ -19,14 +19,17 @@ tmp = Model(
     Ny=1,
     Lx=10,
     Ly=0,
-    dt=1,
+    dt=0.1,
     T=1000,
     t_drain=t_loss,
-    blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
+    blob_shape=BlobShapeImpl(
+        BlobShapeEnum.exp, BlobShapeEnum.gaussian
+    ),  # Analytical form only applies to exp shape
     periodic_y=False,
     num_blobs=10000,
     blob_factory=bf,
     t_init=10,
+    one_dimensional=True,
 )
 
 tmp.make_realization(file_name="test_analytical.nc", speed_up=True, error=1e-2)
@@ -43,9 +46,7 @@ def test_convergence_to_analytical_solution():
     v_p = 1.0
     t_d = t_loss * t_p / (t_loss + t_p)
 
-    analytical_profile = (
-        1 / np.sqrt(np.pi) * t_d / t_w * amp * np.exp(-x / (v_p * t_loss))
-    )
+    analytical_profile = t_d / t_w * amp * np.exp(-x / (v_p * t_loss))
 
     error = np.mean(abs(model_profile.values - analytical_profile))
 

@@ -160,7 +160,13 @@ class Blob:
             ) // adjusted_Ly
         return (
             self._single_blob(
-                x_perp, y_perp, t, Ly, periodic_y, number_of_y_propagations
+                x_perp,
+                y_perp,
+                t,
+                Ly,
+                periodic_y,
+                number_of_y_propagations,
+                one_dimensional=one_dimensional,
             )
             + self._single_blob(
                 x_perp,
