@@ -1,5 +1,5 @@
 ---
-title: 'Blobmodel: A Python package for generating superpositions of pulses in two dimensions'
+title: 'Blobmodel: A Python package for generating superpositions of pulses in one and two dimensions'
 tags:
   - Python
   - pulses
@@ -14,12 +14,12 @@ authors:
   - name: Gregor Decristoforo
     orcid: 0000-0002-7616-0946
     equal-contrib: true # (This is how you can denote equal contributions between multiple authors)
-    affiliation: 2
+    affiliation: 1
 affiliations:
  - name: UiT, The Arctic University of Norway
    index: 1
    ror: 00hx57361
-date: 10 February 2025
+date: 11 February 2025
 bibliography: paper.bib
 
 ---
@@ -31,7 +31,7 @@ of moving pulses in a turbulent environment. It creates controlled datasets wher
 true motion of each pulse is known, allowing researchers to test and improve tracking 
 algorithms for analyzing turbulent flows. While originally developed for studying
 turbulence in fusion experiments, `blobmodel` can be applied to any field where
-turbulence leads to the generation of structures propagating in two dimensions.
+turbulence leads to the generation of structures propagating in one or two dimensions.
 The software is open source, easy to use, and designed to support reproducible research.
 
 # Statement of need
@@ -46,9 +46,9 @@ accuracy.
 
 `blobmodel` addresses this need by providing a framework for generating synthetic 
 datasets resulting from a superposition of uncorrelated pulses:
-$$\begin{equation}
+\begin{equation}
     \Phi(x,y,t) = \sum_{k=1}^{K} a_k \varphi\left( \frac{x-v_k(t-t_k)}{\ell_{x, k}}, \frac{(y-y_k)-w_k(t-t_k)}{\ell_{y, k}}\right) ,
-\end{equation}$$
+\end{equation}
 where the pulse amplitudes $a_k$, velocity components $v_k$ and $w_k$, arrival times $t_k$, 
 arrival positions $y_k$ and sizes $\ell_{x, k}$ and $\ell_{y, k}$ are random variables. 
 Additionally, each pulse may be tilted an angle given by an additional random variable
@@ -61,11 +61,13 @@ The framework allows an explicit definition of all relevant process parameters, 
 * Degree of pulse overlap.
 * Signal length.
 
+For more details visit [blobmodel's documentation](https://blobmodel.readthedocs.io/en/latest/)
+
 This allows researchers to systematically test and benchmark
 tracking algorithms and velocity estimation techniques in a controlled setting. 
 Originally developed for studying turbulence-driven transport in fusion plasma
 experiments, blobmodel is applicable to any system where turbulence leads to the
-formation of moving structures in two-dimensional space. By offering an open-source
+formation of moving structures in one or two-dimensional space. By offering an open-source
 and easily accessible tool, blobmodel supports the development and validation of 
 analysis methods used in experimental and computational research.
 
@@ -75,5 +77,6 @@ velocity estimation techniques on coarse-grained imaging data `@losada:2024`.
 # Acknowledgements
 
 This work was supported by the UiT Aurora Centre Program, UiT The Arctic University of Norway (2020).
+@Juan, ask Odd Erik whether we have to include Equinor since my position was funded by them.
 
 # References
