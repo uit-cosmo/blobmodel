@@ -46,9 +46,9 @@ accuracy.
 
 `blobmodel` addresses this need by providing a framework for generating synthetic 
 datasets resulting from a superposition of uncorrelated pulses:
-$$\begin{equation}
+$$
     \Phi(x,y,t) = \sum_{k=1}^{K} a_k \varphi\left( \frac{x-v_k(t-t_k)}{\ell_{x, k}}, \frac{(y-y_k)-w_k(t-t_k)}{\ell_{y, k}}\right) ,
-\end{equation}$$
+$$
 where the pulse amplitudes $a_k$, velocity components $v_k$ and $w_k$, arrival times $t_k$, 
 arrival positions $y_k$ and sizes $\ell_{x, k}$ and $\ell_{y, k}$ are random variables. 
 Additionally, each pulse may be tilted an angle given by an additional random variable
