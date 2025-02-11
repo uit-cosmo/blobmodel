@@ -37,10 +37,10 @@ The software is open source, easy to use, and designed to support reproducible r
 # Statement of need
 
 Understanding and analyzing the motion of structures in turbulent systems is crucial
-in many areas of research, including plasma physics `[@dippolito:2011]`, fluid dynamics `[@fiedler:1988]`, and atmospheric 
-science `[@nosov:2009]`. In experimental studies, imaging diagnostics are often used to capture the 
-evolution of these structures `[@zweben:2017]`, but extracting reliable velocity information from such 
-data remains challenging `[@offeddu:2023]`. Many existing analysis methods rely on assumptions about 
+in many areas of research, including plasma physics [@dippolito_convective_2011], fluid dynamics [@fiedler_coherent_1988], and atmospheric 
+science [@nosov_coherent_2009]. In experimental studies, imaging diagnostics are often used to capture the 
+evolution of these structures [@zweben_invited_2017], but extracting reliable velocity information from such 
+data remains challenging [@offeddu_analysis_2023]. Many existing analysis methods rely on assumptions about 
 the underlying dynamics and must be tested against known reference data to ensure
 accuracy.
 
@@ -70,7 +70,7 @@ and easily accessible tool, blobmodel supports the development and validation of
 analysis methods used in experimental and computational research.
 
 The package has been used to generate synthetic data to study and compare the robustness of
-velocity estimation techniques on coarse-grained imaging data `@losada:2024`.
+velocity estimation techniques on coarse-grained imaging data [@losada_three-point_2024].
 
 # Acknowledgements
 
