@@ -57,6 +57,7 @@ $\theta_k$ with respect to its centre.
 The framework allows an explicit definition of all relevant process parameters, including:
 * All pulse parameters if defined as degenerate random variables.
 * All distribution functions of the pulse parameters otherwise.
+* Optionally, a drainage term $\tau_\shortparallel$ that models an exponential decay in the pulse amplitude.
 * Spatial and temporal resolution.
 * Degree of pulse overlap.
 * Signal length.
