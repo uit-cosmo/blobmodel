@@ -45,7 +45,7 @@ the underlying dynamics and must be tested against known reference data to ensur
 accuracy.
 
 `blobmodel` addresses this need by providing a framework for generating synthetic 
-datasets resulting from a superposition of uncorrelated pulses [@militello_two-dimensional_2018, @losada_tde_2025]:
+datasets resulting from a superposition of uncorrelated pulses [@militello_two-dimensional_2018; @losada_tde_2025]:
 $$
     \Phi(x,y,t) = \sum_{k=1}^{K} a_k \varphi\left( \frac{x-v_k(t-t_k)}{\ell_{x, k}}, \frac{(y-y_k)-w_k(t-t_k)}{\ell_{y, k}}\right) ,
 $$
@@ -55,14 +55,13 @@ Additionally, each pulse may be tilted an angle given by an additional random va
 $\theta_k$ with respect to its centre.
 
 The framework allows an explicit definition of all relevant process parameters, including:
-* All pulse parameters if defined as degenerate random variables.
-* All distribution functions of the pulse parameters otherwise.
-* Optionally, a drainage term $\tau_\shortparallel$ that models an exponential decay in the pulse amplitude.
-* Spatial and temporal resolution.
-* Degree of pulse overlap.
-* Signal length.
 
-For more details visit [blobmodel's documentation](https://blobmodel.readthedocs.io/en/latest/)
+- All pulse parameters if defined as degenerate random variables.
+- All distribution functions of the pulse parameters otherwise.
+- Optionally, a drainage term $\tau_\shortparallel$ that models an exponential decay in the pulse amplitude.
+- Spatial and temporal resolution.
+- Degree of pulse overlap.
+- Signal length.
 
 This allows researchers to systematically test and benchmark
 tracking algorithms and velocity estimation techniques in a controlled setting. 
@@ -71,6 +70,8 @@ experiments, blobmodel is applicable to any system where turbulence leads to the
 formation of moving structures in one or two-dimensional space. By offering an open-source
 and easily accessible tool, blobmodel supports the development and validation of 
 analysis methods used in experimental and computational research.
+
+For more details visit [blobmodel's documentation](https://blobmodel.readthedocs.io/en/latest/).
 
 The package has been used to generate synthetic data to study and compare the robustness of
 velocity estimation techniques on coarse-grained imaging data [@losada_three-point_2024].
