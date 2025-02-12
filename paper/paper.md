@@ -45,7 +45,7 @@ the underlying dynamics and must be tested against known reference data to ensur
 accuracy.
 
 `blobmodel` addresses this need by providing a framework for generating synthetic 
-datasets resulting from a superposition of uncorrelated pulses:
+datasets resulting from a superposition of uncorrelated pulses [@militello_two-dimensional_2018, @losada_tde_2025]:
 $$
     \Phi(x,y,t) = \sum_{k=1}^{K} a_k \varphi\left( \frac{x-v_k(t-t_k)}{\ell_{x, k}}, \frac{(y-y_k)-w_k(t-t_k)}{\ell_{y, k}}\right) ,
 $$
@@ -74,9 +74,12 @@ analysis methods used in experimental and computational research.
 The package has been used to generate synthetic data to study and compare the robustness of
 velocity estimation techniques on coarse-grained imaging data [@losada_three-point_2024].
 
+Additionally, theoretically predicted radial profiles from stochastic modelling
+[@garcia_stochastic_2016, @militello_relation_2016] agree with those obtained with `blobmodel`. 
+
 # Acknowledgements
 
 This work was supported by the UiT Aurora Centre Program, UiT The Arctic University of Norway (2020).
-@Juan, ask Odd Erik whether we have to include Equinor since my position was funded by them.
+TODO: @Juan, ask Odd Erik whether we have to include Equinor since my position was funded by them.
 
 # References
