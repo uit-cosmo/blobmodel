@@ -18,7 +18,6 @@ authors:
 affiliations:
  - name: UiT, The Arctic University of Norway
    index: 1
-   ror: 00hx57361
 date: 11 February 2025
 bibliography: paper.bib
 
