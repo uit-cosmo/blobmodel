@@ -76,7 +76,7 @@ The package has been used to generate synthetic data to study and compare the ro
 velocity estimation techniques on coarse-grained imaging data [@losada_three-point_2024].
 
 Additionally, theoretically predicted radial profiles from stochastic modelling
-[@garcia_stochastic_2016, @militello_relation_2016] agree with those obtained with `blobmodel`. 
+[@garcia_stochastic_2016; @militello_relation_2016] agree with those obtained with `blobmodel`. 
 
 # Acknowledgements
 
