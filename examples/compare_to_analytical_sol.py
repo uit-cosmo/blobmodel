@@ -1,11 +1,15 @@
-from blobmodel import Model, DefaultBlobFactory
-import xarray as xr
+from blobmodel import (
+    Model,
+    DefaultBlobFactory,
+    BlobShapeEnum,
+    DistributionEnum,
+    BlobShapeImpl,
+)
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 
 # use DefaultBlobFactory to define distribution functions fo random variables
-bf = DefaultBlobFactory(A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="zeros")
+bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros)
 
 tmp = Model(
     Nx=100,
@@ -14,7 +18,7 @@ tmp = Model(
     Ly=0,
     dt=1,
     T=1000,
-    blob_shape="exp",
+    blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
     t_drain=2,
     periodic_y=False,
     num_blobs=10000,

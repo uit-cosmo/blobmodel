@@ -1,5 +1,4 @@
-from blobmodel import Model, show_model
-import numpy as np
+from blobmodel import Model
 
 # here you can define your custom parameter distributions
 
@@ -11,7 +10,6 @@ bm = Model(
     dt=0.1,
     T=20,
     periodic_y=True,
-    blob_shape="gauss",
     num_blobs=10,
     t_drain=1e10,
     labels="individual",

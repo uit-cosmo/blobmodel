@@ -10,7 +10,6 @@ bm = Model(
     dt=0.1,
     T=20,
     periodic_y=True,
-    blob_shape="gauss",
     num_blobs=100,
     t_drain=1e10,
     t_init=10,
