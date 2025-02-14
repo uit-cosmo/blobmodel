@@ -110,7 +110,7 @@ at vertical positions $y_b\pm L_y$, where $y_b$ is the pulse's original position
 size of the simulation domain. This ensures that blobs crossing the upper or lower boundaries are correctly 
 wrapped around, maintaining continuity in the periodic direction.
 
-This package is fully compatible with `xarray`, with all outputs provided as `xarray` datasets
+This package is fully compatible with `xarray` [@hoyer_xarray_2017], with all outputs provided as `xarray` datasets
 for easy handling and analysis.
 
 # Acknowledgements
