@@ -27,8 +27,9 @@ bibliography: paper.bib
 
 `blobmodel` is a Python library for generating synthetic data that mimics the behavior
 of moving pulses in a turbulent environment. It creates controlled datasets where the
-true motion of each pulse is known, allowing researchers to test and improve tracking 
-algorithms for analyzing turbulent flows. While originally developed for studying
+true motion of each pulse is known, allowing researchers gain further understanding on
+the statistical outputs of such systems as well as to test and improve analysis 
+and tracking algorithms. While originally developed for studying
 turbulence in fusion experiments, `blobmodel` can be applied to any field where
 turbulence leads to the generation of structures propagating in one or two dimensions.
 The software is open source, easy to use, and designed to support reproducible research.
@@ -36,12 +37,28 @@ The software is open source, easy to use, and designed to support reproducible r
 # Statement of need
 
 Understanding and analyzing the motion of structures in turbulent systems is crucial
-in many areas of research, including plasma physics [@dippolito_convective_2011], fluid dynamics [@fiedler_coherent_1988], and atmospheric 
-science [@nosov_coherent_2009]. In experimental studies, imaging diagnostics are often used to capture the 
+in many areas of research, including plasma physics [@dippolito_convective_2011],
+fluid dynamics [@fiedler_coherent_1988], and atmospheric science [@nosov_coherent_2009]. 
+
+More widely, the study of the statistical characteristics resulting from the superposition
+of uncorrelated propagating pulses is of importance in fields such as astrophysical plasmas [@veltri_mhd_1999], 
+detection rates of interplanetary dust [@kociscak_modeling_2023], 
+$1/f$ noise in self-organized critical systems [@bak_self_1988], 
+shot noise in electronics [@lower_power_1990]
+
+In experimental studies, imaging diagnostics are often used to capture the 
 evolution of these structures [@zweben_invited_2017], but extracting reliable velocity information from such 
 data remains challenging [@offeddu_analysis_2023]. Many existing analysis methods rely on assumptions about 
 the underlying dynamics and must be tested against known reference data to ensure
 accuracy.
+
+Several stochastic models have been developed describing a superposition of uncorrelated structures arriving in time
+in zero spatial dimensions [@garcia_stochastic_2016]; or propagating in one [@losada_stochastic_2023]
+or two [@militello_two-dimensional_2018] spatial dimensions. In the simplest cases, it is possible
+to derive analytical expressions for different statistical quantities such as probability density functions, 
+autocorrelation functions, power spectral densities and spatial dependence of the mean or other higher-order
+moments [@garcia_stochastic_2016; @militello_relation_2016; @losada_stochastic_2023]. More general scenarios 
+require numerical tools [@losada_stochastic_2024], and synthetic realizations of the model.
 
 `blobmodel` addresses this need by providing a framework for generating synthetic 
 datasets resulting from a superposition of uncorrelated pulses [@militello_two-dimensional_2018; @losada_tde_2025]:
@@ -78,9 +95,26 @@ velocity estimation techniques on coarse-grained imaging data [@losada_three-poi
 Additionally, theoretically predicted radial profiles from stochastic modelling
 [@garcia_stochastic_2016; @militello_relation_2016] agree with those obtained with `blobmodel`. 
 
+# Implementation details
+
+Since the simulation domain has finite spatial extent, pulses may originate or extend beyond its boundaries.
+If a pulse has a non-bound shape, such as a Gaussian, its tails can still contribute to the
+superposition inside the domain. However, in long simulations, most pulses will exist outside the 
+domain for the majority of the time, making it computationally inefficient to account for all of them.
+To improve efficiency, a `speed_up` flag has been added to `Model.make_realization`. When enabled, the model
+ignores pulses whose contribution within the domain falls below a user-defined `error` threshold. 
+This allows for significant computational savings while maintaining accuracy in the simulation.
+
+Periodicity in the vertical direction is an optional feature. It is implemented by replicating each pulse 
+at vertical positions $y_b\pm L_y$, where $y_b$ is the pulse's original position and $L_y$ is the vertical
+size of the simulation domain. This ensures that blobs crossing the upper or lower boundaries are correctly 
+wrapped around, maintaining continuity in the periodic direction.
+
+This package is fully compatible with `xarray`, with all outputs provided as `xarray` datasets
+for easy handling and analysis.
+
 # Acknowledgements
 
 This work was supported by the UiT Aurora Centre Program, UiT The Arctic University of Norway (2020).
-TODO: @Juan, ask Odd Erik whether we have to include Equinor since my position was funded by them.
 
 # References
