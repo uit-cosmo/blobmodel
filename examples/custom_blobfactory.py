@@ -58,16 +58,15 @@ class CustomBlobFactory(BlobFactory):
 
 bf = CustomBlobFactory()
 tmp = Model(
-    Nx=100,
-    Ny=100,
-    Lx=2,
-    Ly=2,
+    Nx=32,
+    Ny=32,
+    Lx=10,
+    Ly=10,
     dt=0.1,
     T=10,
-    blob_shape="gauss",
     t_drain=2,
     periodic_y=True,
-    num_blobs=1000,
+    num_blobs=100,
     blob_factory=bf,
 )
 

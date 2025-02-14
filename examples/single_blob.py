@@ -1,4 +1,12 @@
-from blobmodel import Model, show_model, BlobFactory, Blob, AbstractBlobShape
+from blobmodel import (
+    Model,
+    show_model,
+    BlobFactory,
+    Blob,
+    AbstractBlobShape,
+    BlobShapeImpl,
+    BlobShapeEnum,
+)
 import numpy as np
 
 
@@ -19,7 +27,7 @@ class CustomBlobFactory(BlobFactory):
         amp = np.ones(num_blobs)
         width = np.ones(num_blobs)
         vx = np.ones(num_blobs)
-        vy = np.ones(num_blobs)
+        vy = np.ones(num_blobs) * 5
 
         posx = np.zeros(num_blobs)
         posy = np.ones(num_blobs) * Ly / 2
@@ -30,7 +38,7 @@ class CustomBlobFactory(BlobFactory):
                 blob_id=i,
                 blob_shape=blob_shape,
                 amplitude=amp[i],
-                width_prop=width[i],
+                width_prop=width[i] * 3,
                 width_perp=width[i],
                 v_x=vx[i],
                 v_y=vy[i],
@@ -38,6 +46,8 @@ class CustomBlobFactory(BlobFactory):
                 pos_y=posy[i],
                 t_init=t_init[i],
                 t_drain=t_drain,
+                blob_alignment=False,
+                theta=np.pi / 3,
             )
             for i in range(num_blobs)
         ]
@@ -56,7 +66,7 @@ bm = Model(
     dt=0.1,
     T=10,
     periodic_y=True,
-    blob_shape="exp",
+    blob_shape=BlobShapeImpl(BlobShapeEnum.rect, BlobShapeEnum.rect),
     num_blobs=1,
     blob_factory=bf,
     t_drain=1e10,
