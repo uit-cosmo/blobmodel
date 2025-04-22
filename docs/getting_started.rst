@@ -11,6 +11,9 @@ We create a grid on which the blobs are discretized with using the ``Model`` cla
 
 In addition, we can specify the blob shape, drainage time and the number of blobs when creating a ``Model`` object. For more details about the geometry, take a look at the :ref:`blobmodel-geometry` section.
 
+.. literalinclude:: ../tests/test_docs.py
+  :language: python
+
 .. code-block:: python
 
   from blobmodel import Model
