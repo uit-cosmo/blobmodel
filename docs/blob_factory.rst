@@ -57,7 +57,7 @@ We chose the defualt distributions for all other blob parameters. We would set u
 
   from blobmodel import Model, DefaultBlobFactory
 
-  my_blob_factory = DefaultBlobFactory(A_dist="normal", A_parameter=5)
+  my_blob_factory = DefaultBlobFactory(A_dist=DistributionEnum.normal, A_parameter=5)
 
   bm = Model(
       Nx=200,
@@ -66,7 +66,7 @@ We chose the defualt distributions for all other blob parameters. We would set u
       Ly=10,
       dt=0.1,
       T=20,
-      blob_shape="gauss",
+      blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
       blob_factory=my_blob_factory,
       t_drain=100,
       num_blobs=100,
@@ -148,7 +148,7 @@ In this case you can use the ``CustomBlobFactory`` class to define all blob para
         Ly=2,
         dt=0.1,
         T=10,
-        blob_shape="gauss",
+        blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
         t_drain=2,
         periodic_y=True,
         num_blobs=1000,
