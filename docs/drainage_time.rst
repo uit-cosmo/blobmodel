@@ -13,8 +13,6 @@ Let's take a look at a quick example. Let's assume we want ``t_drain`` to decrea
   from blobmodel import Model, DefaultBlobFactory
   import numpy as np
 
-  bf = DefaultBlobFactory(A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="zeros")
-
   t_drain = np.linspace(2, 1, 100)
 
   tmp = Model(
@@ -24,11 +22,10 @@ Let's take a look at a quick example. Let's assume we want ``t_drain`` to decrea
       Ly=0,
       dt=1,
       T=1000,
-      blob_shape="exp",
+      blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
       t_drain=t_drain,
       periodic_y=False,
-      num_blobs=10000,
-      blob_factory=bf,
+      num_blobs=100,
   )
 
   ds_changing_t_drain = tmp.make_realization()

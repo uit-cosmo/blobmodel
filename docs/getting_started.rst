@@ -23,7 +23,7 @@ In addition, we can specify the blob shape, drainage time and the number of blob
         dt=0.1,
         T=20,
         periodic_y=True,
-        blob_shape="gauss",
+        blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
         num_blobs=100,
         t_drain=1e10,
         t_init=10,
