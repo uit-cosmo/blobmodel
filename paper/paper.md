@@ -85,7 +85,13 @@ Originally developed for studying turbulence-driven transport in fusion plasma
 experiments, blobmodel is applicable to any system where turbulence leads to the
 formation of moving structures in one or two-dimensional space. By offering an open-source
 and easily accessible tool, blobmodel supports the development and validation of 
-analysis methods used in experimental and computational research.
+analysis methods used in experimental and computational research. 
+
+To the authors' knowledge, no other packages exist which provide a comprehensive, 
+open-source framework for generating synthetic datasets of uncorrelated, propagating
+pulses in one or two spatial dimensions, with fully customizable statistical distributions
+for pulse parameters and explicit control over spatial and temporal resolution, pulse overlap,
+and drainage effects, as implemented in `blobmodel`.
 
 For more details visit [blobmodel's documentation](https://blobmodel.readthedocs.io/en/latest/).
 
