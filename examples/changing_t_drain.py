@@ -1,8 +1,19 @@
-from blobmodel import Model, DefaultBlobFactory
+from blobmodel import (
+    Model,
+    DefaultBlobFactory,
+    DistributionEnum,
+    BlobShapeImpl,
+    BlobShapeEnum,
+)
 import matplotlib.pyplot as plt
 import numpy as np
 
-bf = DefaultBlobFactory(A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="zeros")
+bf = DefaultBlobFactory(
+    A_dist=DistributionEnum.deg,
+    wx_dist=DistributionEnum.deg,
+    vx_dist=DistributionEnum.deg,
+    vy_dist=DistributionEnum.zeros,
+)
 
 t_drain = np.linspace(2, 1, 100)
 
@@ -13,7 +24,7 @@ tmp = Model(
     Ly=0,
     dt=1,
     T=1000,
-    blob_shape="exp",
+    blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
     t_drain=t_drain,
     periodic_y=False,
     num_blobs=10000,

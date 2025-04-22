@@ -1,6 +1,13 @@
-from blobmodel import Model, show_model, BlobFactory, Blob, AbstractBlobShape
+from blobmodel import (
+    Model,
+    show_model,
+    BlobFactory,
+    Blob,
+    AbstractBlobShape,
+    BlobShapeImpl,
+    BlobShapeEnum,
+)
 import numpy as np
-
 
 # here you can define your custom parameter distributions
 class CustomBlobFactory(BlobFactory):
@@ -56,7 +63,7 @@ bm = Model(
     dt=0.1,
     T=10,
     periodic_y=True,
-    blob_shape="exp",
+    blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
     num_blobs=1,
     blob_factory=bf,
     t_drain=1e10,

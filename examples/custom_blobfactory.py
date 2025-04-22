@@ -4,6 +4,8 @@ from blobmodel import (
     Blob,
     show_model,
     AbstractBlobShape,
+    BlobShapeImpl,
+    BlobShapeEnum,
 )
 import numpy as np
 
@@ -64,7 +66,7 @@ tmp = Model(
     Ly=2,
     dt=0.1,
     T=10,
-    blob_shape="gauss",
+    blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
     t_drain=2,
     periodic_y=True,
     num_blobs=1000,

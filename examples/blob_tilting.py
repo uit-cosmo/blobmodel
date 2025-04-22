@@ -1,4 +1,11 @@
-from blobmodel import Model, show_model, BlobShapeImpl, DefaultBlobFactory
+from blobmodel import (
+    Model,
+    show_model,
+    BlobShapeImpl,
+    DefaultBlobFactory,
+    DistributionEnum,
+    BlobShapeEnum,
+)
 import numpy as np
 
 # To have something to compare we will first make a simulation with aligned blobs moving with velocities
@@ -12,7 +19,7 @@ wx = 3
 wy = 1
 
 bf = DefaultBlobFactory(
-    A_dist="deg",
+    A_dist=DistributionEnum.deg,
     vy_parameter=vy,
     vx_parameter=vx,
     wx_parameter=wx,
@@ -30,7 +37,7 @@ bm = Model(
     dt=0.1,
     T=20,
     periodic_y=True,
-    blob_shape=BlobShapeImpl("rectangle", "rectangle"),
+    blob_shape=BlobShapeImpl(BlobShapeEnum.rect, BlobShapeEnum.rect),
     num_blobs=100,
     t_drain=1e10,
     blob_factory=bf,
@@ -44,7 +51,7 @@ show_model(dataset=ds, interval=100, gif_name="alignment_true.gif", fps=10)
 
 
 bf = DefaultBlobFactory(
-    A_dist="deg",
+    A_dist=DistributionEnum.deg,
     vy_parameter=vy,
     vx_parameter=vx,
     wx_parameter=wx,
@@ -67,7 +74,7 @@ bm = Model(
     dt=0.1,
     T=20,
     periodic_y=True,
-    blob_shape=BlobShapeImpl("rectangle", "rectangle"),
+    blob_shape=BlobShapeImpl(BlobShapeEnum.rect, BlobShapeEnum.rect),
     num_blobs=100,
     t_drain=1e10,
     blob_factory=bf,

@@ -1,6 +1,18 @@
-from blobmodel import Model, show_model, DefaultBlobFactory
+from blobmodel import (
+    Model,
+    show_model,
+    DefaultBlobFactory,
+    DistributionEnum,
+    BlobShapeImpl,
+    BlobShapeEnum,
+)
 
-bf = DefaultBlobFactory(A_dist="deg", wx_dist="deg", vx_dist="deg", vy_dist="zeros")
+bf = DefaultBlobFactory(
+    A_dist=DistributionEnum.exp,
+    wx_dist=DistributionEnum.deg,
+    vx_dist=DistributionEnum.deg,
+    vy_dist=DistributionEnum.zeros,
+)
 
 bm = Model(
     Nx=100,
@@ -10,7 +22,7 @@ bm = Model(
     dt=0.1,
     T=10,
     periodic_y=False,
-    blob_shape="exp",
+    blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
     num_blobs=20,
     t_drain=10,
     blob_factory=bf,

@@ -1,4 +1,4 @@
-from blobmodel import Model, show_model
+from blobmodel import Model, show_model, BlobShapeImpl, BlobShapeEnum
 
 # here you can define your custom parameter distributions
 
@@ -10,7 +10,7 @@ bm = Model(
     dt=0.1,
     T=20,
     periodic_y=True,
-    blob_shape="gauss",
+    blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
     num_blobs=100,
     t_drain=1e10,
     t_init=10,

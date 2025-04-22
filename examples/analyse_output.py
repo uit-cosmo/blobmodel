@@ -1,11 +1,19 @@
-from blobmodel import Model
+from blobmodel import Model, BlobShapeImpl, BlobShapeEnum
 import xarray as xr
 import matplotlib.pyplot as plt
 import os
 
+
 if not os.path.isfile("./example.nc"):
     bm = Model(
-        Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=10, blob_shape="exp", num_blobs=1000
+        Nx=100,
+        Ny=100,
+        Lx=10,
+        Ly=10,
+        dt=0.1,
+        T=10,
+        blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
+        num_blobs=1000,
     )
     bm.make_realization(file_name="example.nc", speed_up=True, error=1e-2)
 
