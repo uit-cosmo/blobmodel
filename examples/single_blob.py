@@ -9,6 +9,7 @@ from blobmodel import (
 )
 import numpy as np
 
+
 # here you can define your custom parameter distributions
 class CustomBlobFactory(BlobFactory):
     def __init__(self) -> None:
