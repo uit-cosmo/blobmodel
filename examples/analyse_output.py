@@ -3,6 +3,7 @@ import xarray as xr
 import matplotlib.pyplot as plt
 import os
 
+
 if not os.path.isfile("./example.nc"):
     bm = Model(
         Nx=100,
