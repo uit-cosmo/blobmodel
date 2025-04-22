@@ -61,7 +61,7 @@ An example would look like this:
       dt=0.1,
       T=10,
       num_blobs=10,
-      blob_shape=BlobShapeImpl("exp", "lorentz"),
+      blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.lorentz),
       periodic_y=True,
       t_drain=1e10,
   )
@@ -87,13 +87,13 @@ We specify the asymmetry parameter when defining the ``blob_factory``. An exampl
 .. code-block:: python
 
   bf = DefaultBlobFactory(
-      A_dist="deg",
-      wx_dist="deg",
-      spx_dist="deg",
-      spy_dist="deg",
+      A_dist=DistributionEnum.deg,
+      wx_dist=DistributionEnum.deg,
+      spx_dist=DistributionEnum.deg,
+      spy_dist=DistributionEnum.deg,
       shape_param_x_parameter=0.5,
       shape_param_y_parameter=0.5,
-  )
+   )
 
   bm = Model(
       Nx=100,
@@ -103,7 +103,7 @@ We specify the asymmetry parameter when defining the ``blob_factory``. An exampl
       dt=0.1,
       T=10,
       num_blobs=10,
-      blob_shape=BlobShapeImpl("2-exp", "2-exp"),
+      blob_shape=BlobShapeImpl(BlobShapeEnum.double_exp, BlobShapeEnum.double_exp),
       t_drain=1e10,
       blob_factory=bf,
   )

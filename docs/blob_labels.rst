@@ -26,7 +26,7 @@ Let's take a look at an example: Let's say we want to calculate the individual b
       dt=0.1,
       T=20,
       periodic_y=True,
-      blob_shape="gauss",
+      blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
       num_blobs=10,
       t_drain=1e10,
       labels="individual",

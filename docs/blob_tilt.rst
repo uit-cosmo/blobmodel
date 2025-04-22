@@ -20,8 +20,10 @@ Alternatively, we can force force any tilt angle by setting blob_alignment = Fal
 
 .. code-block:: python
 
+    vx, vy = 1, 0
+    wx, wy = 1, 1
     bf = DefaultBlobFactory(
-        A_dist="deg",
+        A_dist=DistributionEnum.deg,
         vy_parameter=vy,
         vx_parameter=vx,
         wx_parameter=wx,

@@ -10,7 +10,12 @@ This is achieved by setting the flag ``one_dimensional`` to True. Additionally, 
 
     from blobmodel import Model, show_model, DefaultBlobFactory
 
-    bf = DefaultBlobFactory(A_dist="exp", wx_dist="deg", vx_dist="deg", vy_dist="zeros")
+    bf = DefaultBlobFactory(
+        A_dist=DistributionEnum.exp,
+        wx_dist=DistributionEnum.deg,
+        vx_dist=DistributionEnum.deg,
+        vy_dist=DistributionEnum.zeros,
+    )
 
     bm = Model(
         Nx=100,
@@ -20,7 +25,7 @@ This is achieved by setting the flag ``one_dimensional`` to True. Additionally, 
         dt=0.1,
         T=10,
         periodic_y=False,
-        blob_shape="exp",
+        blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
         num_blobs=20,
         t_drain=10,
         blob_factory=bf,
