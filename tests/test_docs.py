@@ -1,19 +1,10 @@
-from blobmodel import (
-    Model,
-    DefaultBlobFactory,
-    Blob,
-    BlobShapeImpl,
-    DistributionEnum,
-    BlobShapeEnum,
-)
-import numpy as np
-from unittest.mock import MagicMock
-import matplotlib.pyplot as plt
-
 # The following tests check that the docs examples run, if they fail make sure to change the docs too!
 
 
 def test_getting_started():
+    # PLACEHOLDER getting_started_0
+    from blobmodel import Model
+
     bm = Model(
         Nx=10,
         Ny=10,
@@ -22,13 +13,15 @@ def test_getting_started():
         dt=0.1,
         T=20,
         periodic_y=True,
-        blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
         num_blobs=100,
         t_drain=1e10,
         t_init=10,
     )
+    # PLACEHOLDER getting_started_1
     ds = bm.make_realization(file_name="example.nc")
+    # PLACEHOLDER getting_started_2
     ds["n"].isel(y=0).mean(dim=("t")).plot()
+    # PLACEHOLDER getting_started_3
 
 
 def test_drainage_time():

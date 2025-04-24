@@ -12,26 +12,9 @@ We create a grid on which the blobs are discretized with using the ``Model`` cla
 In addition, we can specify the blob shape, drainage time and the number of blobs when creating a ``Model`` object. For more details about the geometry, take a look at the :ref:`blobmodel-geometry` section.
 
 .. literalinclude:: ../tests/test_docs.py
-  :language: python
-
-.. code-block:: python
-
-  from blobmodel import Model
-
-    bm = Model(
-        Nx=100,
-        Ny=100,
-        Lx=10,
-        Ly=10,
-        dt=0.1,
-        T=20,
-        periodic_y=True,
-        blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
-        num_blobs=100,
-        t_drain=1e10,
-        t_init=10,
-    )
-
+   :language: python
+   :start-after: # PLACEHOLDER getting_started_0
+   :end-before: # PLACEHOLDER getting_started_1
 
 
 +++++++++++++++++
@@ -41,9 +24,10 @@ Superposing blobs
 We can now call the ``make_realization()`` method to sum up the individual blobs. The blob parameters are sampled from the according distribution functions (see :ref:`parameter-distributions` for further details).
 If we provide a ``file_name`` to the ``make_realization`` method, it will store the realization under this name on your machine. 
 
-.. code-block:: python 
-
-   ds = bm.make_realization(file_name="example.nc")
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER getting_started_1
+   :end-before: # PLACEHOLDER getting_started_2
 
 The ``make_realization`` method can take two more arguments, ``speed_up`` and ``error``, which can be helpful for integrating very large datasets.
 By setting ``spee_up`` to ``True``, the code will truncate the blobs when the blob values fall under the given ``error`` value. 
@@ -65,12 +49,10 @@ The superposed pulses are stored in the ``n`` variable of the dataset. The dimen
 
 We can now analyse the data using the convenient xarray syntax, for example:
 
-.. code-block:: python
-
-  import matplotlib.pyplot as plt
-
-  ds["n"].isel(y=0).mean(dim=("t")).plot()
-  plt.show()
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER getting_started_2
+   :end-before: # PLACEHOLDER getting_started_3
 
 .. image:: xarray_example.png
    :scale: 80%
