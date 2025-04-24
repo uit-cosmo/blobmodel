@@ -51,23 +51,10 @@ direction, respectively. These arguments are ``BlobShapeEnum`` typed, and can ta
 The following example creates a `Model` with a pulse shape given by an exponential in the propagation direction, and
 lorentzian in the perpendicular direction:
 
-.. code-block:: python
-
-  from blobmodel import Model, BlobShapeImpl
-
-  bm = Model(
-      Nx=100,
-      Ny=100,
-      Lx=10,
-      Ly=10,
-      dt=0.1,
-      T=10,
-      num_blobs=10,
-      blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.lorentz),
-      periodic_y=True,
-      t_drain=1e10,
-  )
-
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER blob_shapes_0
+   :end-before: # PLACEHOLDER blob_shapes_1
 
 ++++++++++++++++++++++++++++++++
 Two-sided exponential blob shape
@@ -86,28 +73,9 @@ The shape is implemented as follows:
 
 We specify the asymmetry parameter when defining the ``blob_factory``. An example would look like this:
 
-.. code-block:: python
-
-  bf = DefaultBlobFactory(
-      A_dist=DistributionEnum.deg,
-      wx_dist=DistributionEnum.deg,
-      spx_dist=DistributionEnum.deg,
-      spy_dist=DistributionEnum.deg,
-      shape_param_x_parameter=0.5,
-      shape_param_y_parameter=0.5,
-   )
-
-  bm = Model(
-      Nx=100,
-      Ny=100,
-      Lx=10,
-      Ly=10,
-      dt=0.1,
-      T=10,
-      num_blobs=10,
-      blob_shape=BlobShapeImpl(BlobShapeEnum.double_exp, BlobShapeEnum.double_exp),
-      t_drain=1e10,
-      blob_factory=bf,
-  )
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER blob_shapes_1
+   :end-before: # PLACEHOLDER blob_shapes_2
 
 Take a look at ``examples/2_sided_exp_pulse.py`` for a fully implemented example.

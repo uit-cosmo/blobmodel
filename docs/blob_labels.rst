@@ -11,35 +11,10 @@ The borders of the blob labels are defined with the ``label_border`` argument. T
 
 Let's take a look at an example: Let's say we want to calculate the individual blob labels of some Gaussian blobs:
 
-.. code-block:: python
-
-  from blobmodel import Model
-  import numpy as np
-  import matplotlib.pyplot as plt
-  
-
-  bm = Model(
-      Nx=100,
-      Ny=100,
-      Lx=20,
-      Ly=20,
-      dt=0.1,
-      T=20,
-      periodic_y=True,
-      blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
-      num_blobs=10,
-      t_drain=1e10,
-      labels="individual",
-      label_border=0.75
-  )
-
-  ds = bm.make_realization(speed_up=True, error=1e-2)
-
-  ds['n'].isel(t=-1).plot()
-  plt.figure()
-  ds['blob_labels'].isel(t=-1).plot()
-
-  plt.show()
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER blob_labels_0
+   :end-before: # PLACEHOLDER blob_labels_1
 
 |pic1| |pic2|
 

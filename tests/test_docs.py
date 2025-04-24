@@ -25,6 +25,10 @@ def test_getting_started():
 
 
 def test_drainage_time():
+    # PLACEHOLDER drainage_time_0
+    import numpy as np
+    from blobmodel import Model
+
     t_drain = np.linspace(2, 1, 100)
 
     tmp = Model(
@@ -34,15 +38,24 @@ def test_drainage_time():
         Ly=0,
         dt=1,
         T=1000,
-        blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
         t_drain=t_drain,
         periodic_y=False,
         num_blobs=10,
     )
     tmp.make_realization()
+    # PLACEHOLDER drainage_time_1
 
 
 def test_one_dim():
+    # PLACEHOLDER one_dim_0
+    from blobmodel import (
+        Model,
+        DefaultBlobFactory,
+        DistributionEnum,
+        BlobShapeImpl,
+        BlobShapeEnum,
+    )
+
     bf = DefaultBlobFactory(
         A_dist=DistributionEnum.exp,
         wx_dist=DistributionEnum.deg,
@@ -65,10 +78,18 @@ def test_one_dim():
         one_dimensional=True,
     )
     bm.make_realization(speed_up=True, error=1e-2)
+    # PLACEHOLDER one_dim_0
 
 
 def test_blob_shapes():
-    from blobmodel import Model, BlobShapeImpl
+    # PLACEHOLDER blob_shapes_0
+    from blobmodel import (
+        Model,
+        BlobShapeImpl,
+        BlobShapeEnum,
+        DefaultBlobFactory,
+        DistributionEnum,
+    )
 
     bm = Model(
         Nx=100,
@@ -82,7 +103,7 @@ def test_blob_shapes():
         periodic_y=True,
         t_drain=1e10,
     )
-
+    # PLACEHOLDER blob_shapes_1
     bf = DefaultBlobFactory(
         A_dist=DistributionEnum.deg,
         wx_dist=DistributionEnum.deg,
@@ -103,9 +124,14 @@ def test_blob_shapes():
         t_drain=1e10,
         blob_factory=bf,
     )
+    # PLACEHOLDER blob_shapes_2
 
 
 def test_blob_tilt():
+    # PLACEHOLDER blob_tilt_0
+    from blobmodel import DefaultBlobFactory, DistributionEnum
+    import numpy as np
+
     vx, vy = 1, 0
     wx, wy = 1, 1
 
@@ -117,12 +143,16 @@ def test_blob_tilt():
         wy_parameter=wy,
         blob_alignment=False,
     )
-
+    # PLACEHOLDER blob_tilt_1
     theta = np.pi / 2
     bf.set_theta_setter(lambda: theta)
+    # PLACEHOLDER blob_tilt_2
 
 
-def test_labels():
+def test_blob_labels():
+    # PLACEHOLDER blob_labels_0
+    from blobmodel import Model, BlobShapeImpl, BlobShapeEnum
+
     bm = Model(
         Nx=10,
         Ny=10,
@@ -141,11 +171,14 @@ def test_labels():
     ds = bm.make_realization(speed_up=True, error=1e-2)
 
     ds["n"].isel(t=-1).plot()
-    plt.figure()
     ds["blob_labels"].isel(t=-1).plot()
+    # PLACEHOLDER blob_labels_1
 
 
 def test_blob_factory():
+    # PLACEHOLDER blob_factory_0
+    from blobmodel import DefaultBlobFactory, DistributionEnum, Model
+
     my_blob_factory = DefaultBlobFactory(A_dist=DistributionEnum.normal, A_parameter=5)
 
     bm = Model(
@@ -155,17 +188,19 @@ def test_blob_factory():
         Ly=10,
         dt=0.1,
         T=20,
-        blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
         blob_factory=my_blob_factory,
         t_drain=100,
         num_blobs=100,
     )
 
     ds = bm.make_realization()
+    # PLACEHOLDER blob_factory_1
 
 
 def test_custom_blob_factory():
-    from blobmodel import BlobFactory, AbstractBlobShape
+    # PLACEHOLDER custom_blob_factory_0
+    from blobmodel import BlobFactory, AbstractBlobShape, Blob, Model
+    import numpy as np
 
     class CustomBlobFactory(BlobFactory):
         def __init__(self) -> None:
@@ -221,7 +256,6 @@ def test_custom_blob_factory():
         Ly=2,
         dt=0.1,
         T=10,
-        blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
         t_drain=2,
         periodic_y=True,
         num_blobs=10,
@@ -229,3 +263,4 @@ def test_custom_blob_factory():
     )
 
     ds = tmp.make_realization()
+    # PLACEHOLDER custom_blob_factory_1

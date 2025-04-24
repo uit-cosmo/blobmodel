@@ -18,28 +18,17 @@ An example of a realization with aligned blobs is shown below.
 
 Alternatively, we can force force any tilt angle by setting blob_alignment = False for each blob. If you use a ``DefaultBlobFactory``, this can be done by setting a False ``blob_alignment`` flag:
 
-.. code-block:: python
-
-    vx, vy = 1, 0
-    wx, wy = 1, 1
-    bf = DefaultBlobFactory(
-        A_dist=DistributionEnum.deg,
-        vy_parameter=vy,
-        vx_parameter=vx,
-        wx_parameter=wx,
-        wy_parameter=wy,
-        blob_alignment=False,
-    )
-
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER blob_tilt_0
+   :end-before: # PLACEHOLDER blob_tilt_1
 
 Then the tilt will be given by the argument theta. Which, if using a ``DefaultBlobFactory``, can be set by
 
-.. code-block:: python
-
-    theta = np.pi / 2
-    bf.set_theta_setter(
-        lambda: theta
-    )
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER blob_tilt_1
+   :end-before: # PLACEHOLDER blob_tilt_2
 
 Setting the angle with a lambda allows us to set a distribution of tilt angles. In this case we use a degenerate distribution:
 The blob propagation direction won't be affected. The resulting realization is shown below:
