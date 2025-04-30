@@ -1,4 +1,4 @@
-from blobmodel import Model, show_model
+from blobmodel import Model, show_model, BlobShapeImpl, BlobShapeEnum
 
 # here you can define your custom parameter distributions
 

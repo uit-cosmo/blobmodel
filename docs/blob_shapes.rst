@@ -9,63 +9,52 @@ We can choose between four different blob shapes that are specified with the ``b
 The blob shape consists of two parts, the blob shape in the propagation direction and the blob shape in the perpendicular direction thereof.
 The propagation direction is calculated from vx and vy of each individual blob (see :ref:`blob-alignment` for further details).
 
-You can choose one of the following blob shapes for the propagation and perpendicular direction:
+The ``blob_shape`` argument should implement the ``AbstractBlobShape`` class. For most cases it suffices to use the standard implementation
+``BlobShapeImpl``, instantiated as
+
+.. code-block:: python
+    BlobShapeImpl(pulse_shape_prop, pulse_shape_perp)
+Where ``pulse_shape_prop`` and ``pulse_shape_perp`` indicate the pulse shape in the propagation and perpendicular
+direction, respectively. These arguments are ``BlobShapeEnum`` typed, and can take the following values, where
+:math:`\theta` represents a coordinate in either the propagation or perpendicular direction.
 
 .. list-table:: 
-   :widths: 10 10 10 10 10
+   :widths: 10 10 10 10 10 10 10
    :header-rows: 1
 
-   * - "exp"
-     - "gauss"
-     - "lorentz"
-     - "secant"
-     - "dipole"
-   * - Exponential Pulse
-     - Gaussian Pulse
-     - Lorentz Pulse
-     - Secant Pulse
-     - Dipole Pulse
-   * - ``np.exp(theta) * np.heaviside(-1.0 * t, 1)``
-     - ``1 / np.sqrt(2*np.pi) * np.exp(-(t**2)/2)``
-     - ``1 / (np.pi * (1 + t**2))``
-     - ``2 / np.pi / (np.exp(t) + np.exp(-t))``
-     - ``-2 * theta / np.sqrt(np.pi) * np.exp(-(theta**2))``
+   * - exp
+     - lorentz
+     - double_exp
+     - gaussian
+     - secant
+     - dipole
+     - rect
+   * - Exponential
+     - Lorentz
+     - Double Exponential
+     - Gaussian
+     - Secant
+     - Dipole
+     - Rectangular
+   * - :math:`e^\theta \Theta(-\theta)`
+     - :math:`\frac{1}{\pi(1+\theta^2)}`
+     - :math:`e^{\theta/\lambda} \Theta(-\theta) + e^{\theta/(1-\lambda)} \Theta(\theta)`
+     - :math:`\frac{e^{-\theta^2/2}}{\sqrt{\pi}}`
+     - :math:`\frac{2}{\pi (e^\theta + e^{-\theta})}`
+     - :math:`\frac{-2 \theta e^{-\theta^2}}{\sqrt{\pi}}`
+     - :math:`\Theta(|\theta|-1/2)`
+
 
 .. image:: pulse_shapes.png
    :scale: 80%
 
-+++++++++++++++++++++
-Propagation direction
-+++++++++++++++++++++
+The following example creates a `Model` with a pulse shape given by an exponential in the propagation direction, and
+lorentzian in the perpendicular direction:
 
-If you specify the ``blob_shape`` as a string such as ``blob_shape = "exp"``, the specified blob shape will be used in the propagation direction. 
-The perpendicular blob shape will be set to ``gauss``.
-
-+++++++++++++++++++++++
-Perpendicular direction
-+++++++++++++++++++++++
-
-In order to specify the blob shape in the perpendicular direction we need to specify the blob shapes with the ``BlobShapeImpl`` class.
-The first argument refers to the propagation direction and the second one refers to the perpendicular direction.
-An example would look like this:
-
-.. code-block:: python
-
-  from blobmodel import Model, BlobShapeImpl
-
-  bm = Model(
-      Nx=100,
-      Ny=100,
-      Lx=10,
-      Ly=10,
-      dt=0.1,
-      T=10,
-      num_blobs=10,
-      blob_shape=BlobShapeImpl("exp", "lorentz"),
-      periodic_y=True,
-      t_drain=1e10,
-  )
-
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER blob_shapes_0
+   :end-before: # PLACEHOLDER blob_shapes_1
 
 ++++++++++++++++++++++++++++++++
 Two-sided exponential blob shape
@@ -84,28 +73,9 @@ The shape is implemented as follows:
 
 We specify the asymmetry parameter when defining the ``blob_factory``. An example would look like this:
 
-.. code-block:: python
-
-  bf = DefaultBlobFactory(
-      A_dist="deg",
-      wx_dist="deg",
-      spx_dist="deg",
-      spy_dist="deg",
-      shape_param_x_parameter=0.5,
-      shape_param_y_parameter=0.5,
-  )
-
-  bm = Model(
-      Nx=100,
-      Ny=100,
-      Lx=10,
-      Ly=10,
-      dt=0.1,
-      T=10,
-      num_blobs=10,
-      blob_shape=BlobShapeImpl("2-exp", "2-exp"),
-      t_drain=1e10,
-      blob_factory=bf,
-  )
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER blob_shapes_1
+   :end-before: # PLACEHOLDER blob_shapes_2
 
 Take a look at ``examples/2_sided_exp_pulse.py`` for a fully implemented example.

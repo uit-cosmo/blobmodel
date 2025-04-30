@@ -184,7 +184,14 @@ class Model:
         Returns
         -------
         xr.Dataset
-            xarray dataset with the resulting data.
+            xarray dataset with the data resulting from a realization of the process described by the model
+            and evaluated in a three-dimensional grid with dimensions:
+            - x: Horizontal coordinate
+            - y: Vertical coordinate
+            - t: Time coordinate
+            The resulting blob density, evaluated in the grid, is given by the `DataArray`, `n`. In case that
+            the model is one-dimensional, the vertical coordinate `y` will be of length 1.
+
 
         Notes
         -----
