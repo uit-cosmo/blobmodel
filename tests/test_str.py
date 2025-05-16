@@ -3,6 +3,9 @@ from blobmodel.geometry import Geometry
 
 
 def test_geometry_str():
+    """
+    Tests geometry string function.
+    """
     geo = Geometry(1, 1, 1, 1, 1, 1, 1, False)
     assert (
         str(geo)
@@ -11,6 +14,9 @@ def test_geometry_str():
 
 
 def test_model_str():
+    """
+    Tests model string function.
+    """
     bm = Model(
         Nx=2,
         Ny=2,

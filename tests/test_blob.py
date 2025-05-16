@@ -19,7 +19,10 @@ blob = Blob(
 )
 
 
-def test_initial_blob():
+def test_gaussian_blob():
+    """
+    Tests Gaussian blob discretization on a meshgrid.
+    """
     x = np.arange(0, 10, 0.1)
     y = np.array([0, 1])
 

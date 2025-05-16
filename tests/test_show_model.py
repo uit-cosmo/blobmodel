@@ -18,9 +18,12 @@ bm_2d = Model(
 ds_2d = bm_2d.make_realization()
 
 
-# warnings are supressed since plt complains about animation blocked
+# warnings are suppressed since plt complains about animation blocked
 @patch("matplotlib.pyplot.show")
 def test_plot_2d(mock_show):
+    """
+    Checks that show model runs on a two-dimensional model.
+    """
     warnings.filterwarnings("ignore")
     show_model(dataset=ds_2d, interval=100, gif_name=None, fps=10)
 
@@ -43,5 +46,8 @@ ds_1d = bm_1d.make_realization()
 # warnings are supressed since plt complains about animation blocked
 @patch("matplotlib.pyplot.show")
 def test_plot_1d(mock_show):
+    """
+    Checks that show model runs on a one-dimensional model.
+    """
     warnings.filterwarnings("ignore")
     show_model(dataset=ds_1d, interval=100, gif_name=None, fps=10)

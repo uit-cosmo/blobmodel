@@ -28,7 +28,11 @@ one_dim_model = Model(
 )
 
 
-def test_one_dim():
+def test_one_dim_converges_to_analytical():
+    """
+    Checks that one-dimensional realizations of the process agree with analytical results (see
+    O. E. Garcia et al. Phys. Plasmas 1 May 2016; 23 (5): 052308. https://doi.org/10.1063/1.4951016)
+    """
     ds = one_dim_model.make_realization(speed_up=True, error=1e-2)
     model_profile = ds.n.isel(y=0).mean(dim=("t"))
 
@@ -48,6 +52,9 @@ def test_one_dim():
 
 
 def test_1d_warning():
+    """
+    Checks model warning when instantiating a one-dimensional model with Ny!=0.
+    """
     with pytest.warns(UserWarning):
         for vy_dist in ["deg", "zeros"]:
             bf = DefaultBlobFactory(
