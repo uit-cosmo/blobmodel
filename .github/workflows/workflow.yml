@@ -41,6 +41,7 @@ jobs:
 
     - name: Type checking with mypy
       run: |
+        mypy --version
         mypy  --ignore-missing-imports blobmodel
 
   python-3-10:
