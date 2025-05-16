@@ -137,10 +137,9 @@ class Blob:
         x_perp, y_perp = self._rotate(
             origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self._theta
         )
-        if True:
-            v_x_new = self.v_x * np.cos(self._theta) + self.v_y * np.sin(self._theta)
-            v_y_new = -self.v_x * np.sin(self._theta) + self.v_y * np.cos(self._theta)
-            self.v_x, self.v_y = v_x_new, v_y_new
+        v_x_new = self.v_x * np.cos(self._theta) + self.v_y * np.sin(self._theta)
+        v_y_new = -self.v_x * np.sin(self._theta) + self.v_y * np.cos(self._theta)
+        self.v_x, self.v_y = v_x_new, v_y_new
         if not periodic_y or one_dimensional:
             return self._single_blob(
                 x_perp, y_perp, t, Ly, periodic_y, one_dimensional=one_dimensional
