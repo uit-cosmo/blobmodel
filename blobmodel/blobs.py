@@ -399,7 +399,7 @@ class Blob:
         x: Union[float, NDArray],
         y: Union[float, NDArray],
         angle: float,
-    ) -> Tuple[NDArray, NDArray]:
+    ) -> Tuple[Union[float, NDArray], Union[float, NDArray]]:
         """
         Rotate the coordinates around a given origin point.
 
