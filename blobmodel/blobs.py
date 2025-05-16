@@ -394,11 +394,7 @@ class Blob:
         return self.pos_y + self.v_y * (t - self.t_init)
 
     def _rotate(
-        self,
-        origin: Tuple[float, float],
-        x: Union[float, NDArray],
-        y: Union[float, NDArray],
-        angle: float,
+        self, origin: Tuple[float, float], x: NDArray, y: NDArray, angle: float
     ) -> Tuple[NDArray, NDArray]:
         """
         Rotate the coordinates around a given origin point.
