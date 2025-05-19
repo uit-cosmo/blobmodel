@@ -2,27 +2,26 @@ from blobmodel import Model, DefaultBlobFactory, Blob, BlobShapeImpl, Distributi
 import numpy as np
 from unittest.mock import MagicMock
 
-blob = Blob(
-    blob_id=0,
-    blob_shape=BlobShapeImpl(),
-    amplitude=1,
-    width_prop=1,
-    width_perp=1,
-    v_x=1,
-    v_y=5,
-    pos_x=0,
-    pos_y=0,
-    t_init=0,
-    t_drain=10**10,
-    blob_alignment=False,
-    theta=0,
-)
-
 
 def test_gaussian_blob():
     """
     Tests Gaussian blob discretization on a meshgrid.
     """
+    blob = Blob(
+        blob_id=0,
+        blob_shape=BlobShapeImpl(),
+        amplitude=1,
+        width_prop=1,
+        width_perp=1,
+        v_x=1,
+        v_y=5,
+        pos_x=0,
+        pos_y=0,
+        t_init=0,
+        t_drain=10**10,
+        blob_alignment=False,
+        theta=0,
+    )
     x = np.arange(0, 10, 0.1)
     y = np.array([0, 1])
 
@@ -39,6 +38,21 @@ def test_blob_non_alignment():
     """
     Tests that blob.discretize_blob call the right blob_shape mesh grid.
     """
+    blob = Blob(
+        blob_id=0,
+        blob_shape=BlobShapeImpl(),
+        amplitude=1,
+        width_prop=1,
+        width_perp=1,
+        v_x=1,
+        v_y=5,
+        pos_x=0,
+        pos_y=0,
+        t_init=0,
+        t_drain=10**10,
+        blob_alignment=False,
+        theta=0,
+    )
     x = np.arange(0, 10, 0.1)
     y = np.array([0, 1])
 
@@ -55,6 +69,21 @@ def test_periodicity():
     Tests that periodic blobs are summed in with periodic_y=True when a blob has moved vertically through all
     the discretization domain.
     """
+    blob = Blob(
+        blob_id=0,
+        blob_shape=BlobShapeImpl(),
+        amplitude=1,
+        width_prop=1,
+        width_perp=1,
+        v_x=1,
+        v_y=5,
+        pos_x=0,
+        pos_y=0,
+        t_init=0,
+        t_drain=10**10,
+        blob_alignment=False,
+        theta=0,
+    )
     x = np.arange(0, 10, 0.1)
     y = np.arange(0, 10, 1)
     t = np.array(2)
