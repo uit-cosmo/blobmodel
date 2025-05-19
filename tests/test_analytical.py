@@ -36,6 +36,10 @@ tmp.make_realization(file_name="test_analytical.nc", speed_up=True, error=1e-2)
 
 
 def test_convergence_to_analytical_solution():
+    """
+    Checks that the mean value of a one-dimensional realization with constant velocities agrees with the
+    analytical derived results. See O. E. Garcia, et al.; Phys. Plasmas 1 May 2016; 23 (5): 052308. https://doi.org/10.1063/1.4951016
+    """
     ds = xr.open_dataset("test_analytical.nc")
     model_profile = ds.n.isel(y=0).mean(dim="t")
 
