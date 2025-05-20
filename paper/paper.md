@@ -44,7 +44,7 @@ More widely, the study of the statistical characteristics resulting from the sup
 of uncorrelated propagating pulses is of importance in fields such as astrophysical plasmas [@veltri_mhd_1999], 
 detection rates of interplanetary dust [@kociscak_modeling_2023], 
 $1/f$ noise in self-organized critical systems [@bak_self_1988], 
-shot noise in electronics [@lowen_power_1990]
+and shot noise in electronics [@lowen_power_1990].
 
 In experimental studies, imaging diagnostics are often used to capture the 
 evolution of these structures [@zweben_invited_2017], but extracting reliable velocity information from such 
