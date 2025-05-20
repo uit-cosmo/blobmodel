@@ -1,6 +1,7 @@
 from blobmodel import Model
 
-# here you can define your custom parameter distributions
+# Example of use of labels, which returns a new field with the blob labels in the same discretization grid
+# as the blob density n.
 
 bm = Model(
     Nx=100,

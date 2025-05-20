@@ -6,7 +6,8 @@ from blobmodel import (
     BlobShapeEnum,
 )
 import matplotlib.pyplot as plt
-import numpy as np
+
+# Example of use of extra blob shape parameters with a double exponential blob shape.
 
 bf = DefaultBlobFactory(
     shape_param_x_parameter=0.5,

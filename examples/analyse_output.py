@@ -3,6 +3,8 @@ import xarray as xr
 import matplotlib.pyplot as plt
 import os
 
+# Example reading data from a file stored in "example.nc" and plotting the time mean using xarray functions.
+
 
 if not os.path.isfile("./example.nc"):
     bm = Model(

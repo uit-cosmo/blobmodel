@@ -245,4 +245,4 @@ class DefaultBlobFactory(BlobFactory):
         - Perpendicular width parameters are irrelevant since perp shape should be ignored by the Bolb class.
 
         """
-        return self.velocity_y_dist == "zeros"
+        return self.velocity_y_dist == DistributionEnum.zeros
