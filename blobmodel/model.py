@@ -13,7 +13,13 @@ from .blob_shape import AbstractBlobShape, BlobShapeImpl
 
 
 class Model:
-    """2D Model of propagating blobs."""
+    """
+    Class storing all parameters relevant for the realization of a random process of a superposition of
+    uncorrelated pulses propagating in two dimensions. The realization is performed by calling `make_realization` which:
+        - uses a `BlobFactory` to make a list of blobs following the specified blob parameter distribution functions,
+        - each 'Blob' is discretized by calling its `discretize_blob` function and
+        - the discretization is performed on a grid given by the `Geometry`.
+    """
 
     def __init__(
         self,

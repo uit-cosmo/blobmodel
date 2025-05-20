@@ -6,6 +6,10 @@ import numpy as np
 
 
 class BlobShapeEnum(Enum):
+    """
+    Enum class representing blob shapes.
+    """
+
     exp = 1
     lorentz = 2
     double_exp = 3
