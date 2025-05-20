@@ -6,6 +6,8 @@ from blobmodel import (
     BlobShapeEnum,
 )
 
+# Example of a one-dimensional realization and animation.
+
 bf = DefaultBlobFactory()
 
 bm = Model(

@@ -4,10 +4,10 @@ from blobmodel import (
     Blob,
     show_model,
     AbstractBlobShape,
-    BlobShapeImpl,
-    BlobShapeEnum,
 )
 import numpy as np
+
+# Example of implementing a BlobFactory, which allows to set blob parameters in any desirable way.
 
 
 # create custom class that inherits from BlobFactory

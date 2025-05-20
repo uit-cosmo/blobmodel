@@ -8,6 +8,9 @@ from blobmodel import (
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Example of use of a spatially varying t_drain parameter. The results are compared with the case of constant
+# t_drain.
+
 bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros)
 
 t_drain = np.linspace(2, 1, 100)
@@ -29,7 +32,7 @@ tmp = Model(
 ds = tmp.make_realization(file_name="profile_comparison.nc", speed_up=True, error=1e-2)
 
 
-def plot_cahnging_t_drain(ds):
+def plot_changing_t_drain(ds):
     x = np.linspace(0, 10, 100)
     t_p = 1
     t_w = 1 / 10
@@ -49,4 +52,4 @@ def plot_cahnging_t_drain(ds):
     plt.show()
 
 
-plot_cahnging_t_drain(ds)
+plot_changing_t_drain(ds)
