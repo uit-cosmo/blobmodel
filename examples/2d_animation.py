@@ -1,4 +1,4 @@
-from blobmodel import Model, show_model, BlobShapeImpl, BlobShapeEnum
+from blobmodel import Model, show_model
 
 # Example of a simple two-dimensional realization and animation.
 

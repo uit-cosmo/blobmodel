@@ -4,8 +4,6 @@ from blobmodel import (
     Blob,
     show_model,
     AbstractBlobShape,
-    BlobShapeImpl,
-    BlobShapeEnum,
 )
 import numpy as np
 
