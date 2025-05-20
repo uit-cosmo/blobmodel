@@ -107,6 +107,14 @@ class DefaultBlobFactory(BlobFactory):
             - zeros: array of zeros
 
         """
+        assert isinstance(A_dist, DistributionEnum)
+        assert isinstance(wx_dist, DistributionEnum)
+        assert isinstance(wy_dist, DistributionEnum)
+        assert isinstance(vx_dist, DistributionEnum)
+        assert isinstance(vy_dist, DistributionEnum)
+        assert isinstance(spx_dist, DistributionEnum)
+        assert isinstance(spy_dist, DistributionEnum)
+
         self.amplitude_dist = A_dist
         self.width_x_dist = wx_dist
         self.width_y_dist = wy_dist
@@ -159,6 +167,8 @@ class DefaultBlobFactory(BlobFactory):
         List[Blob]
             List of Blob objects generated for the Model.
         """
+        assert isinstance(blob_shape, AbstractBlobShape)
+
         amps = self._draw_random_variables(
             self.amplitude_dist,
             self.amplitude_parameter,

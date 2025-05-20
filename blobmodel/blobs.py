@@ -72,6 +72,8 @@ class Blob:
          respect to the velocity vector.
 
         """
+        assert isinstance(blob_shape, AbstractBlobShape)
+
         self.int = int
         self.blob_id = blob_id
         self.blob_shape = blob_shape

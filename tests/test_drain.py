@@ -3,6 +3,9 @@ import numpy as np
 
 
 def test_high_t_drain():
+    """
+    Checks that high t drain runs without errors.
+    """
     blob_sp = Blob(
         blob_id=0,
         amplitude=1,
@@ -22,6 +25,4 @@ def test_high_t_drain():
     times = np.arange(1, 5, 0.01)
 
     mesh_x, mesh_y, mesh_t = np.meshgrid(x, y, times)
-    blob_values = blob_sp.discretize_blob(
-        x=mesh_x, y=mesh_y, t=mesh_t, periodic_y=False, Ly=10
-    )
+    blob_sp.discretize_blob(x=mesh_x, y=mesh_y, t=mesh_t, periodic_y=False, Ly=10)
