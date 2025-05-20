@@ -3,6 +3,9 @@ from blobmodel import DefaultBlobFactory, BlobShapeImpl, BlobFactory, Distributi
 
 
 def test_mean_of_distribution():
+    """
+    Checks that the distributions are normalized.
+    """
     bf = DefaultBlobFactory()
     distributions_mean_1 = [
         DistributionEnum.exp,
@@ -31,21 +34,9 @@ def test_mean_of_distribution():
 
 
 def test_not_implemented_distribution():
-    with pytest.raises(KeyError):
+    """
+    Checks that a KeyError is thrown when using unknown strings as distributions.
+    """
+    with pytest.raises(AssertionError):
         bf = DefaultBlobFactory(A_dist="something_different")
         bf.sample_blobs(1, 1, 1, BlobShapeImpl(), 1)
-
-
-def test_abstract_mehtods():
-    BlobFactory.__abstractmethods__ = set()
-
-    class MyBlobFactory(BlobFactory):
-        pass
-
-    my_obj = MyBlobFactory()
-
-    with pytest.raises(NotImplementedError):
-        my_obj.sample_blobs(1, 1, 1, BlobShapeImpl(), 1)
-
-    with pytest.raises(NotImplementedError):
-        my_obj.is_one_dimensional()

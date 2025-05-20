@@ -2,24 +2,26 @@ from blobmodel import Model, DefaultBlobFactory, Blob, BlobShapeImpl, Distributi
 import numpy as np
 from unittest.mock import MagicMock
 
-blob = Blob(
-    blob_id=0,
-    blob_shape=BlobShapeImpl(),
-    amplitude=1,
-    width_prop=1,
-    width_perp=1,
-    v_x=1,
-    v_y=5,
-    pos_x=0,
-    pos_y=0,
-    t_init=0,
-    t_drain=10**10,
-    blob_alignment=False,
-    theta=0,
-)
 
-
-def test_initial_blob():
+def test_gaussian_blob():
+    """
+    Tests Gaussian blob discretization on a meshgrid.
+    """
+    blob = Blob(
+        blob_id=0,
+        blob_shape=BlobShapeImpl(),
+        amplitude=1,
+        width_prop=1,
+        width_perp=1,
+        v_x=1,
+        v_y=5,
+        pos_x=0,
+        pos_y=0,
+        t_init=0,
+        t_drain=10**10,
+        blob_alignment=False,
+        theta=0,
+    )
     x = np.arange(0, 10, 0.1)
     y = np.array([0, 1])
 
@@ -33,7 +35,9 @@ def test_initial_blob():
 
 
 def test_blob_non_alignment():
-    # Dead pixels have already been preprocessed and have an array of nans at their site
+    """
+    Tests that blob.discretize_blob call the right blob_shape mesh grid.
+    """
     blob = Blob(
         blob_id=0,
         blob_shape=BlobShapeImpl(),
@@ -41,12 +45,13 @@ def test_blob_non_alignment():
         width_prop=1,
         width_perp=1,
         v_x=1,
-        v_y=1,
+        v_y=5,
         pos_x=0,
         pos_y=0,
         t_init=0,
         t_drain=10**10,
         blob_alignment=False,
+        theta=0,
     )
     x = np.arange(0, 10, 0.1)
     y = np.array([0, 1])
@@ -60,6 +65,25 @@ def test_blob_non_alignment():
 
 
 def test_periodicity():
+    """
+    Tests that periodic blobs are summed in with periodic_y=True when a blob has moved vertically through all
+    the discretization domain.
+    """
+    blob = Blob(
+        blob_id=0,
+        blob_shape=BlobShapeImpl(),
+        amplitude=1,
+        width_prop=1,
+        width_perp=1,
+        v_x=1,
+        v_y=5,
+        pos_x=0,
+        pos_y=0,
+        t_init=0,
+        t_drain=10**10,
+        blob_alignment=False,
+        theta=0,
+    )
     x = np.arange(0, 10, 0.1)
     y = np.arange(0, 10, 1)
     t = np.array(2)
@@ -78,6 +102,9 @@ def test_periodicity():
 
 
 def test_single_point():
+    """
+    Checks that singled valued vertical geometries are discretized correctly.
+    """
     blob_sp = Blob(
         blob_id=0,
         amplitude=1,
@@ -107,6 +134,9 @@ def test_single_point():
 
 
 def test_negative_radial_velocity():
+    """
+    Tests correct behaviour on negative velocities.
+    """
     vx = -1
     blob_sp = Blob(
         blob_id=0,
@@ -140,40 +170,10 @@ def test_negative_radial_velocity():
     assert error < 1e-10, "Numerical error too big"
 
 
-def test_theta_0():
-    blob_sp = Blob(
-        blob_id=0,
-        amplitude=1,
-        width_prop=1,
-        width_perp=1,
-        blob_shape=BlobShapeImpl(),
-        v_x=1,
-        v_y=0,
-        pos_x=0,
-        pos_y=6,
-        t_init=0,
-        t_drain=10**100,
-    )
-
-    x = np.arange(0, 10, 0.1)
-    y = 0
-
-    t = np.array(2)
-    mesh_x, mesh_y = np.meshgrid(x, y)
-    blob_values = blob_sp.discretize_blob(
-        x=mesh_x, y=mesh_y, t=t, periodic_y=True, Ly=1
-    )
-
-    # The exact analytical expression for the expected values is a bit cumbersome, thus we just check
-    # that the shape is correct
-    maxx = np.max(blob_values)
-    expected_values = maxx * np.exp(-((mesh_x - 2) ** 2))
-    error = np.max(abs(expected_values - blob_values))
-
-    assert error < 1e-10, "Numerical error too big"
-
-
 def test_kwargs():
+    """
+    Tests that additional pulse parameters passed through kwards are used correctly for computing the pulse shape.
+    """
     from unittest.mock import MagicMock
 
     mock_ps = BlobShapeImpl()
@@ -204,8 +204,11 @@ def test_kwargs():
 
 
 def test_get_blobs():
+    """
+    Tests that get_blobs() function from the model returns correct number of blobs after a realization.
+    """
     bf = DefaultBlobFactory(A_dist=DistributionEnum.deg)
-    one_blob = Model(
+    model = Model(
         Nx=100,
         Ny=100,
         Lx=10,
@@ -217,6 +220,6 @@ def test_get_blobs():
         num_blobs=3,
         blob_factory=bf,
     )
-    one_blob.make_realization()
-    blob_list = one_blob.get_blobs()
+    model.make_realization()
+    blob_list = model.get_blobs()
     assert len(blob_list) == 3

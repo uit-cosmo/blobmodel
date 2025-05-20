@@ -9,6 +9,8 @@ from blobmodel import (
 )
 import numpy as np
 
+# Example of implementing a BlobFactory, which allows to set blob parameters in any desirable way.
+
 
 # create custom class that inherits from BlobFactory
 # here you can define your custom parameter distributions
@@ -60,16 +62,15 @@ class CustomBlobFactory(BlobFactory):
 
 bf = CustomBlobFactory()
 tmp = Model(
-    Nx=100,
-    Ny=100,
-    Lx=2,
-    Ly=2,
+    Nx=32,
+    Ny=32,
+    Lx=10,
+    Ly=10,
     dt=0.1,
     T=10,
-    blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
     t_drain=2,
     periodic_y=True,
-    num_blobs=1000,
+    num_blobs=100,
     blob_factory=bf,
 )
 

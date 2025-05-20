@@ -5,7 +5,6 @@ from blobmodel import (
     BlobShapeImpl,
     BlobShapeEnum,
 )
-import xarray as xr
 import numpy as np
 
 
@@ -29,11 +28,11 @@ tmp = Model(
 )
 
 
-tmp.make_realization(file_name="test_t_drain.nc", speed_up=True, error=1e-2)
-
-
 def test_decreasing_t_drain():
-    ds = xr.open_dataset("test_t_drain.nc")
+    """
+    Checks that models with variable t_drain run and lead to a results lower than the constant case.
+    """
+    ds = tmp.make_realization(speed_up=True, error=1e-2)
     model_profile = ds.n.isel(y=0).mean(dim=("t"))
 
     x = np.linspace(0, 10, 10)

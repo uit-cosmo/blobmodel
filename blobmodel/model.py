@@ -13,7 +13,13 @@ from .blob_shape import AbstractBlobShape, BlobShapeImpl
 
 
 class Model:
-    """2D Model of propagating blobs."""
+    """
+    Class storing all parameters relevant for the realization of a random process of a superposition of
+    uncorrelated pulses propagating in two dimensions. The realization is performed by calling `make_realization` which:
+        - uses a `BlobFactory` to make a list of blobs following the specified blob parameter distribution functions,
+        - each 'Blob' is discretized by calling its `discretize_blob` function and
+        - the discretization is performed on a grid given by the `Geometry`.
+    """
 
     def __init__(
         self,
@@ -94,6 +100,8 @@ class Model:
         UserWarning
             If the model is one-dimensional and the blob factory is not one-dimensional.
         """
+        assert isinstance(blob_shape, AbstractBlobShape)
+        assert isinstance(blob_factory, BlobFactory)
         self._one_dimensional = one_dimensional
         if self._one_dimensional:
             if Ny != 1 or Ly != 0:
@@ -184,7 +192,14 @@ class Model:
         Returns
         -------
         xr.Dataset
-            xarray dataset with the resulting data.
+            xarray dataset with the data resulting from a realization of the process described by the model
+            and evaluated in a three-dimensional grid with dimensions:
+            - x: Horizontal coordinate
+            - y: Vertical coordinate
+            - t: Time coordinate
+            The resulting blob density, evaluated in the grid, is given by the `DataArray`, `n`. In case that
+            the model is one-dimensional, the vertical coordinate `y` will be of length 1.
+
 
         Notes
         -----
@@ -330,9 +345,9 @@ class Model:
         # ignores t_drain when calculating stop time
         stop = np.minimum(
             self._geometry.t.size,
-            start
-            + int(
-                (
+            int(
+                blob.t_init
+                + (
                     -blob.width_prop * np.log(error * np.sqrt(np.pi))
                     + self._geometry.Lx
                     - blob.pos_x

@@ -9,7 +9,25 @@ import cmath
 
 
 class Blob:
-    """Define a single blob."""
+    """
+    Class representing a single blob. It stores all blob parameters and discretizes the blob on a grid through
+    the function `discretize_blob`. The contribution of a single blob to a grid defined by `x`, `y` and `t` is given by:
+
+    .. math::
+        a e^{-(t-t_k)/\tau_\shortparallel}\varphi\left( \frac{x-v(t-t_k)}{\ell_x}, \frac{(y-y_k)-w(t-t_k)}{\ell_y} \right)
+
+    Where:
+        - :math:`a` is the blob amplitude, `amplitude`.
+        - :math:`\ell_x` is the blob width in the propagation direction, `width_prop`.
+        - :math:`\ell_y` is the blob width in the perpendicular direction, `width_perp`.
+        - :math:`v` is the horizontal blob velocity.
+        - :math:`w` is the vertical blob velocity.
+        - :math:`t_k` is the blob arriving time at the position x=0, `t_init`.
+        - :math:`\tau_\shortparallel` is the drainage time, `t_drain`.
+        - :math:`\varphi` is the blob pulse shape, `blob_shape`.
+
+    Additionally, a tilt angle can be provided through `theta`.
+    """
 
     def __init__(
         self,
@@ -72,6 +90,8 @@ class Blob:
          respect to the velocity vector.
 
         """
+        assert isinstance(blob_shape, AbstractBlobShape)
+
         self.int = int
         self.blob_id = blob_id
         self.blob_shape = blob_shape
@@ -122,6 +142,11 @@ class Blob:
         one_dimensional : bool, optional
             Flag indicating a one-dimensional blob (default: False).
 
+        Notes
+        -----
+        The periodicity in the y direction is implemented by first substracting the number of full domain Ly
+        propagations made by the blob and by summing mirror blobs at vertical positions +-Ly.
+
         Returns
         -------
         discretized_blob : NDArray
@@ -131,16 +156,17 @@ class Blob:
         # If one_dimensional, then Ly should be 0.
         assert (one_dimensional and Ly == 0) or not one_dimensional
 
-        if (self.width_perp > 0.1 * Ly or self.width_prop > 0.1 * Ly) and periodic_y:
-            warnings.warn("blob width big compared to Ly")
+        if (self.width_perp > Ly / 3 or self.width_prop > Ly / 3) and periodic_y:
+            warnings.warn(
+                "blob width big compared to Ly, mirrored blobs might become apparent."
+            )
 
         x_perp, y_perp = self._rotate(
             origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self._theta
         )
-        if True:
-            v_x_new = self.v_x * np.cos(self._theta) + self.v_y * np.sin(self._theta)
-            v_y_new = -self.v_x * np.sin(self._theta) + self.v_y * np.cos(self._theta)
-            self.v_x, self.v_y = v_x_new, v_y_new
+        v_x_new = self.v_x * np.cos(self._theta) + self.v_y * np.sin(self._theta)
+        v_y_new = -self.v_x * np.sin(self._theta) + self.v_y * np.cos(self._theta)
+        self.v_x, self.v_y = v_x_new, v_y_new
         if not periodic_y or one_dimensional:
             return self._single_blob(
                 x_perp, y_perp, t, Ly, periodic_y, one_dimensional=one_dimensional

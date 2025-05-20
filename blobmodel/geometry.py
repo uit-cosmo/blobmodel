@@ -7,7 +7,10 @@ import numpy as np
 
 
 class Geometry:
-    """Define grid for Model."""
+    """
+    Represents the space and time grid used by the Model class to discretize the blob evolution.
+    It builds a meshgrid based on the desired resolution and length in each coordinate.
+    """
 
     def __init__(
         self,

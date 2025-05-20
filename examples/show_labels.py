@@ -1,5 +1,8 @@
 from blobmodel import Model
 
+# Example of use of labels, which returns a new field with the blob labels in the same discretization grid
+# as the blob density n.
+
 bm = Model(
     Nx=100,
     Ny=100,

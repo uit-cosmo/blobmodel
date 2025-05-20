@@ -2,17 +2,14 @@ from blobmodel import (
     Model,
     show_model,
     DefaultBlobFactory,
-    DistributionEnum,
     BlobShapeImpl,
     BlobShapeEnum,
+    DistributionEnum,
 )
 
-bf = DefaultBlobFactory(
-    A_dist=DistributionEnum.exp,
-    wx_dist=DistributionEnum.deg,
-    vx_dist=DistributionEnum.deg,
-    vy_dist=DistributionEnum.zeros,
-)
+# Example of a one-dimensional realization and animation.
+
+bf = DefaultBlobFactory(vy_dist=DistributionEnum.zeros)
 
 bm = Model(
     Nx=100,
@@ -22,7 +19,7 @@ bm = Model(
     dt=0.1,
     T=10,
     periodic_y=False,
-    blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
+    blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.exp),
     num_blobs=20,
     t_drain=10,
     blob_factory=bf,

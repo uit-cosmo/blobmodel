@@ -8,8 +8,10 @@ from .distributions import *
 
 
 class BlobFactory(ABC):
-    """Abstract class used by 2d propagating blob model to specify blob
-    parameters."""
+    """
+    Abstract class used by 2d propagating blob model to specify blob
+    parameters.
+    """
 
     @abstractmethod
     def sample_blobs(
@@ -20,7 +22,9 @@ class BlobFactory(ABC):
         blob_shape: AbstractBlobShape,
         t_drain: Union[float, NDArray],
     ) -> List[Blob]:
-        """creates list of Blobs used in Model."""
+        """
+        Creates a list of Blobs used in Model.
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -107,6 +111,14 @@ class DefaultBlobFactory(BlobFactory):
             - zeros: array of zeros
 
         """
+        assert isinstance(A_dist, DistributionEnum)
+        assert isinstance(wx_dist, DistributionEnum)
+        assert isinstance(wy_dist, DistributionEnum)
+        assert isinstance(vx_dist, DistributionEnum)
+        assert isinstance(vy_dist, DistributionEnum)
+        assert isinstance(spx_dist, DistributionEnum)
+        assert isinstance(spy_dist, DistributionEnum)
+
         self.amplitude_dist = A_dist
         self.width_x_dist = wx_dist
         self.width_y_dist = wy_dist
@@ -159,6 +171,8 @@ class DefaultBlobFactory(BlobFactory):
         List[Blob]
             List of Blob objects generated for the Model.
         """
+        assert isinstance(blob_shape, AbstractBlobShape)
+
         amps = self._draw_random_variables(
             self.amplitude_dist,
             self.amplitude_parameter,
@@ -235,4 +249,4 @@ class DefaultBlobFactory(BlobFactory):
         - Perpendicular width parameters are irrelevant since perp shape should be ignored by the Bolb class.
 
         """
-        return self.velocity_y_dist == "zeros"
+        return self.velocity_y_dist == DistributionEnum.zeros

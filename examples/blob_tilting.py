@@ -3,12 +3,13 @@ from blobmodel import (
     show_model,
     BlobShapeImpl,
     DefaultBlobFactory,
-    DistributionEnum,
     BlobShapeEnum,
+    DistributionEnum,
 )
 import numpy as np
 
-# To have something to compare we will first make a simulation with aligned blobs moving with velocities
+# Example with tilted blobs, to have something to compare we will first make a simulation with
+# aligned blobs moving with velocities
 
 vx = 1
 vy = 1
