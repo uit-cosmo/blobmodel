@@ -133,8 +133,10 @@ class Blob:
         # If one_dimensional, then Ly should be 0.
         assert (one_dimensional and Ly == 0) or not one_dimensional
 
-        if (self.width_perp > 0.1 * Ly or self.width_prop > 0.1 * Ly) and periodic_y:
-            warnings.warn("blob width big compared to Ly")
+        if (self.width_perp > Ly / 3 or self.width_prop > Ly / 3) and periodic_y:
+            warnings.warn(
+                "blob width big compared to Ly, mirrored blobs might become apparent."
+            )
 
         x_perp, y_perp = self._rotate(
             origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self._theta

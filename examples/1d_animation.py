@@ -4,11 +4,12 @@ from blobmodel import (
     DefaultBlobFactory,
     BlobShapeImpl,
     BlobShapeEnum,
+    DistributionEnum,
 )
 
 # Example of a one-dimensional realization and animation.
 
-bf = DefaultBlobFactory()
+bf = DefaultBlobFactory(vy_dist=DistributionEnum.zeros)
 
 bm = Model(
     Nx=100,
