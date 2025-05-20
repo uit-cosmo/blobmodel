@@ -67,7 +67,7 @@ $$
 $$
 where the pulse amplitudes $a_k$, velocity components $v_k$ and $w_k$, arrival times $t_k$, 
 arrival positions $y_k$ and sizes $\ell_{x, k}$ and $\ell_{y, k}$ are random variables. 
-Additionally, each pulse may be tilted an angle given by an additional random variable
+Additionally, each pulse may be tilted on an angle given by an additional random variable
 $\theta_k$ with respect to its centre.
 
 The framework allows an explicit definition of all relevant process parameters, including:
