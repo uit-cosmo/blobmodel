@@ -27,7 +27,7 @@ bibliography: paper.bib
 
 `blobmodel` is a Python library for generating synthetic data that mimics the behavior
 of moving pulses in a turbulent environment. It creates controlled datasets where the
-true motion of each pulse is known, allowing researchers gain further understanding on
+true motion of each pulse is known, allowing researchers to gain further understanding on
 the statistical outputs of such systems as well as to test and improve analysis 
 and tracking algorithms. While originally developed for studying
 turbulence in fusion experiments, `blobmodel` can be applied to any field where
