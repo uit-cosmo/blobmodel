@@ -94,6 +94,8 @@ class Model:
         UserWarning
             If the model is one-dimensional and the blob factory is not one-dimensional.
         """
+        assert isinstance(blob_shape, AbstractBlobShape)
+        assert isinstance(blob_factory, BlobFactory)
         self._one_dimensional = one_dimensional
         if self._one_dimensional:
             if Ny != 1 or Ly != 0:

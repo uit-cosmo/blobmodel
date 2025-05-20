@@ -37,6 +37,6 @@ def test_not_implemented_distribution():
     """
     Checks that a KeyError is thrown when using unknown strings as distributions.
     """
-    with pytest.raises(KeyError):
+    with pytest.raises(AssertionError):
         bf = DefaultBlobFactory(A_dist="something_different")
         bf.sample_blobs(1, 1, 1, BlobShapeImpl(), 1)

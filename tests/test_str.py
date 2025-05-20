@@ -1,4 +1,4 @@
-from blobmodel import Model
+from blobmodel import Model, BlobShapeImpl
 from blobmodel.geometry import Geometry
 
 
@@ -25,7 +25,7 @@ def test_model_str():
         dt=0.5,
         T=1,
         periodic_y=False,
-        blob_shape="exp",
+        blob_shape=BlobShapeImpl(),
         num_blobs=1,
     )
     assert str(bm) == "2d Blob Model with num_blobs:1 and t_drain:10"
