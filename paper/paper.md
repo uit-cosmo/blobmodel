@@ -52,8 +52,8 @@ data remains challenging [@offeddu_analysis_2023]. Many existing analysis method
 the underlying dynamics and must be tested against known reference data to ensure
 accuracy.
 
-Several stochastic models have been developed describing a superposition of uncorrelated structures arriving in time
-in zero spatial dimensions [@garcia_stochastic_2016]; or propagating in one [@losada_stochastic_2023]
+Several stochastic models have been developed describing a point process resulting from the superposition of 
+uncorrelated structures with random arrival times [@garcia_stochastic_2016]; or propagating in one [@losada_stochastic_2023]
 or two [@militello_two-dimensional_2018] spatial dimensions. In the simplest cases, it is possible
 to derive analytical expressions for different statistical quantities such as probability density functions, 
 autocorrelation functions, power spectral densities and spatial dependence of the mean or other higher-order
@@ -65,19 +65,25 @@ datasets resulting from a superposition of uncorrelated pulses [@militello_two-d
 $$
     \Phi(x,y,t) = \sum_{k=1}^{K} a_k \varphi\left( \frac{x-v_k(t-t_k)}{\ell_{x, k}}, \frac{(y-y_k)-w_k(t-t_k)}{\ell_{y, k}}\right) ,
 $$
-where the pulse amplitudes $a_k$, velocity components $v_k$ and $w_k$, arrival times $t_k$, 
-arrival positions $y_k$ and sizes $\ell_{x, k}$ and $\ell_{y, k}$ are random variables. 
-Additionally, each pulse may be tilted on an angle given by an additional random variable
-$\theta_k$ with respect to its centre.
+where:
+- $a_k$ represents the initial pulse amplitude.
+- $v_k$ and $w_k$ are the horizontal and vertical velocity components, respectively.
+- $t_k$ is the pulse arrival time at the position $x=0$, $y=y_k$.
+- $y_k$ is the pulse vertical position at time $t=t_k$.
+- $\ell_{x, k}$ and $\ell_{y, k}$ are the horizontal and vertical pulse sizes, respectively.
+- $\varphi$ is an unspecified pulse shape.
+All these parameters, except for the pulse shape $\varphi$ are assumed to be random variables. 
+Additionally, each pulse may be tilted on an angle given by an additional random variable $\theta_k$ with respect to its centre.
 
 The framework allows an explicit definition of all relevant process parameters, including:
 
 - All pulse parameters if defined as degenerate random variables.
 - All distribution functions of the pulse parameters otherwise.
-- Optionally, a drainage term $\tau_\shortparallel$ that models an exponential decay in the pulse amplitude.
+- Optionally, a drainage term $\tau_\shortparallel$ that models an exponential decay in the pulse amplitude through an
+additional factor $e^{-\frac{t-t_k}{\tau_\shortparallel}}$ in the pulse evolution.
 - Spatial and temporal resolution.
-- Degree of pulse overlap.
-- Signal length.
+- Degree of pulse overlap by setting different ratios of number of pulses to signal length and domain size.
+- Total duration of the process.
 
 This allows researchers to systematically test and benchmark
 tracking algorithms and velocity estimation techniques in a controlled setting. 
@@ -102,6 +108,12 @@ Additionally, theoretically predicted radial profiles from stochastic modelling
 [@garcia_stochastic_2016; @militello_relation_2016] agree with those obtained with `blobmodel`. 
 
 # Implementation details
+
+The evolution of the pulses is discretized by the `Blob` class in a three dimensional grid
+(two space and one time dimensions) according to the above formula. The discretization grid is provided
+by the `Geometry` and the superposition of all pulses is performed my the `Model` class, which also contains functions
+for the model initialization. The generation of pulses with pulse parameters following user-specified distribution
+functions is performed by the `BlobFactory`.
 
 Since the simulation domain has finite spatial extent, pulses may originate or extend beyond its boundaries.
 If a pulse has a non-bound shape, such as a Gaussian, its tails can still contribute to the
