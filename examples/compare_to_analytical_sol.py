@@ -30,7 +30,7 @@ tmp = Model(
 )
 
 ds = tmp.make_realization(speed_up=True, error=1e-10)
-x = np.linspace(0, 10, 100)
+x = np.linspace(0, 10, 20)
 t_p = 1
 t_w = 1 / 10
 amp = 1
