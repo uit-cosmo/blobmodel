@@ -9,7 +9,25 @@ import cmath
 
 
 class Blob:
-    """Define a single blob."""
+    """
+    Class representing a single blob. It stores all blob parameters and discretizes the blob on a grid through
+    the function `discretize_blob`. The contribution of a single blob to a grid defined by `x`, `y` and `t` is given by:
+
+    .. math::
+        a e^{-(t-t_k)/\tau_\shortparallel}\varphi\left( \frac{x-v(t-t_k)}{\ell_x}, \frac{(y-y_k)-w(t-t_k)}{\ell_y} \right)
+
+    Where:
+        - :math:`a` is the blob amplitude, `amplitude`.
+        - :math:`\ell_x` is the blob width in the propagation direction, `width_prop`.
+        - :math:`\ell_y` is the blob width in the perpendicular direction, `width_perp`.
+        - :math:`v` is the horizontal blob velocity.
+        - :math:`w` is the vertical blob velocity.
+        - :math:`t_k` is the blob arriving time at the position x=0, `t_init`.
+        - :math:`\tau_\shortparallel` is the drainage time, `t_drain`.
+        - :math:`\varphi` is the blob pulse shape, `blob_shape`.
+
+    Additionally, a tilt angle can be provided through `theta`.
+    """
 
     def __init__(
         self,
@@ -123,6 +141,11 @@ class Blob:
             Flag indicating periodicity in the y-direction (default: False).
         one_dimensional : bool, optional
             Flag indicating a one-dimensional blob (default: False).
+
+        Notes
+        -----
+        The periodicity in the y direction is implemented by first substracting the number of full domain Ly
+        propagations made by the blob and by summing mirror blobs at vertical positions +-Ly.
 
         Returns
         -------

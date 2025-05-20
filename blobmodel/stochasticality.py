@@ -8,8 +8,10 @@ from .distributions import *
 
 
 class BlobFactory(ABC):
-    """Abstract class used by 2d propagating blob model to specify blob
-    parameters."""
+    """
+    Abstract class used by 2d propagating blob model to specify blob
+    parameters.
+    """
 
     @abstractmethod
     def sample_blobs(
@@ -20,7 +22,9 @@ class BlobFactory(ABC):
         blob_shape: AbstractBlobShape,
         t_drain: Union[float, NDArray],
     ) -> List[Blob]:
-        """creates list of Blobs used in Model."""
+        """
+        Creates a list of Blobs used in Model.
+        """
         raise NotImplementedError
 
     @abstractmethod
