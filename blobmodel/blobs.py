@@ -23,8 +23,8 @@ class Blob:
         - :math:`v` is the horizontal blob velocity.
         - :math:`w` is the vertical blob velocity.
         - :math:`t_k` is the blob arriving time at the position x=0, `t_init`.
-        - :math:`\tau_\shortparallel` is the drainage time, `t_drain`.
-        - :math:`\varphi` is the blob pulse shape, `blob_shape`.
+        - :math:`\\tau_\\shortparallel` is the drainage time, `t_drain`.
+        - :math:`\\varphi` is the blob pulse shape, `blob_shape`.
 
     Additionally, a tilt angle can be provided through `theta`.
     """
