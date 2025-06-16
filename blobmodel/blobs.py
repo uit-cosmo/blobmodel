@@ -14,7 +14,7 @@ class Blob:
     the function `discretize_blob`. The contribution of a single blob to a grid defined by `x`, `y` and `t` is given by:
 
     .. math::
-        a e^{-(t-t_k)/\tau_\shortparallel}\varphi\left( \frac{x-v(t-t_k)}{\ell_x}, \frac{(y-y_k)-w(t-t_k)}{\ell_y} \right)
+        a e^{-(t-t_k)/\\tau_\\shortparallel}\\varphi\\left( \\frac{x-v(t-t_k)}{\ell_x}, \\frac{(y-y_k)-w(t-t_k)}{\ell_y} \\right)
 
     Where:
         - :math:`a` is the blob amplitude, `amplitude`.
