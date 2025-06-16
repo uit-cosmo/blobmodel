@@ -14,7 +14,7 @@ class Blob:
     the function `discretize_blob`. The contribution of a single blob to a grid defined by `x`, `y` and `t` is given by:
 
     .. math::
-        a e^{-(t-t_k)/\tau_\shortparallel}\varphi\left( \frac{x-v(t-t_k)}{\ell_x}, \frac{(y-y_k)-w(t-t_k)}{\ell_y} \right)
+        a e^{-(t-t_k)/\\tau_\\shortparallel}\\varphi\\left( \\frac{x-v(t-t_k)}{\ell_x}, \\frac{(y-y_k)-w(t-t_k)}{\ell_y} \\right)
 
     Where:
         - :math:`a` is the blob amplitude, `amplitude`.
@@ -23,8 +23,8 @@ class Blob:
         - :math:`v` is the horizontal blob velocity.
         - :math:`w` is the vertical blob velocity.
         - :math:`t_k` is the blob arriving time at the position x=0, `t_init`.
-        - :math:`\tau_\shortparallel` is the drainage time, `t_drain`.
-        - :math:`\varphi` is the blob pulse shape, `blob_shape`.
+        - :math:`\\tau_\\shortparallel` is the drainage time, `t_drain`.
+        - :math:`\\varphi` is the blob pulse shape, `blob_shape`.
 
     Additionally, a tilt angle can be provided through `theta`.
     """
