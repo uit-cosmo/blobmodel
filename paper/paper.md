@@ -111,7 +111,7 @@ Additionally, theoretically predicted radial profiles from stochastic modelling
 
 The evolution of the pulses is discretized by the `Blob` class in a three dimensional grid
 (two space and one time dimensions) according to the above formula. The discretization grid is provided
-by the `Geometry` and the superposition of all pulses is performed my the `Model` class, which also contains functions
+by the `Geometry` and the superposition of all pulses is performed by the `Model` class, which also contains functions
 for the model initialization. The generation of pulses with pulse parameters following user-specified distribution
 functions is performed by the `BlobFactory`.
 
