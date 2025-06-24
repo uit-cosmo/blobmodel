@@ -66,12 +66,14 @@ $$
     \Phi(x,y,t) = \sum_{k=1}^{K} a_k \varphi\left( \frac{x-v_k(t-t_k)}{\ell_{x, k}}, \frac{(y-y_k)-w_k(t-t_k)}{\ell_{y, k}}\right) ,
 $$
 where:
+
 - $a_k$ represents the initial pulse amplitude.
 - $v_k$ and $w_k$ are the horizontal and vertical velocity components, respectively.
 - $t_k$ is the pulse arrival time at the position $x=0$, $y=y_k$.
 - $y_k$ is the pulse vertical position at time $t=t_k$.
 - $\ell_{x, k}$ and $\ell_{y, k}$ are the horizontal and vertical pulse sizes, respectively.
 - $\varphi$ is an unspecified pulse shape.
+
 All these parameters, except for the pulse shape $\varphi$ are assumed to be random variables. 
 Additionally, each pulse may be tilted on an angle given by an additional random variable $\theta_k$ with respect to its centre.
 
