@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "blobmodel"
-version = "1.1.0"
+version = "1.1.1"
 description = "Two dimensional model of propagating blobs"
 authors = [
   { name = "gregordecristoforo", email = "gregor.decristoforo@gmail.com" }
