@@ -67,25 +67,23 @@ show_model(ds)
 You can specify the blob parameters with a BlobFactory class. The DefaultBlobFactory class has some of the most common distribution functions implemented. An example would look like this:
 
 ```Python
-from blobmodel import Model, DefaultBlobFactory
+from blobmodel import DefaultBlobFactory, DistributionEnum, Model
 
 # use DefaultBlobFactory to define distribution functions of random variables
-bf = DefaultBlobFactory(A_dist="exp", wx_dist="uniform", vx_dist="deg", vy_dist="normal")
+my_blob_factory = DefaultBlobFactory(A_dist=DistributionEnum.normal, A_parameter=5)
 
-# pass on bf when creating the Model
-tmp = Model(
-    Nx=100,
-    Ny=1,
-    Lx=10,
-    Ly=0,
-    dt=1,
-    T=1000,
-    blob_shape="exp",
-    t_drain=2,
-    periodic_y=False,
-    num_blobs=10000,
-    blob_factory=bf,
-)
+# pass on my_blob_factory when creating the Model
+bm = Model(
+        Nx=100,
+        Ny=100,
+        Lx=10,
+        Ly=10,
+        dt=0.1,
+        T=20,
+        blob_factory=my_blob_factory,
+        t_drain=100,
+        num_blobs=100,
+    )
 ```
 Alternatively, you can specify all blob parameters exactly as you want by writing your own class which inherits from BlobFactory. See `examples/custom_blobfactory.py` as an example or take a look at the [blobmodel documentation](https://blobmodel.readthedocs.io/en/latest/?badge=latest).
 
