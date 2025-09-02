@@ -15,7 +15,7 @@ bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.ze
 
 t_drain = np.linspace(2, 1, 100)
 
-tmp = Model(
+decreasing_t_drain = Model(
     Nx=100,
     Ny=1,
     Lx=10,
@@ -29,27 +29,26 @@ tmp = Model(
     blob_factory=bf,
 )
 
-ds = tmp.make_realization(file_name="profile_comparison.nc", speed_up=True, error=1e-2)
+ds_decreasing = decreasing_t_drain.make_realization(speed_up=True, error=1e-2)
+ds_decreasing.n.isel(y=0).mean(dim=("t")).plot(label="decreasing t_drain")
 
+constant_t_drain = Model(
+    Nx=100,
+    Ny=1,
+    Lx=10,
+    Ly=0,
+    dt=1,
+    T=1000,
+    blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
+    t_drain=2,
+    periodic_y=False,
+    num_blobs=10000,
+    blob_factory=bf,
+)
 
-def plot_changing_t_drain(ds):
-    x = np.linspace(0, 10, 100)
-    t_p = 1
-    t_w = 1 / 10
-    amp = 1
-    v_p = 1.0
-    t_loss = t_drain
-    t_d = t_loss * t_p / (t_loss + t_p)
+ds_constant = constant_t_drain.make_realization(speed_up=True, error=1e-2)
+ds_constant.n.isel(y=0).mean(dim=("t")).plot(label="constant t_drain")
 
-    analytical_profile = (
-        1 / np.sqrt(np.pi) * t_d / t_w * amp * np.exp(-x / (v_p * t_loss))
-    )
-
-    ds.n.isel(y=0).mean(dim=("t")).plot(label="decreasing t_drain")
-    plt.yscale("log")
-    plt.plot(x, analytical_profile, label="constant t_drain")
-    plt.legend()
-    plt.show()
-
-
-plot_changing_t_drain(ds)
+plt.yscale("log")
+plt.legend()
+plt.show()
