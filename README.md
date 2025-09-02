@@ -56,7 +56,7 @@ Create a grid on which the blobs are discretized using the `Model` class. The `m
 ```Python
 from blobmodel import Model, show_model
 
-bm = Model(Nx=200, Ny=100, Lx=10, Ly=10, dt=0.1, T=20, blob_shape='gauss',num_blobs=100)
+bm = Model(Nx=200, Ny=100, Lx=10, Ly=10, dt=0.1, T=20, num_blobs=100)
 
 ds = bm.make_realization(file_name="example.nc")
 ```
