@@ -8,6 +8,7 @@ from blobmodel import (
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 # Example of use of a spatially varying t_drain parameter. The results are compared with the case of constant
 # t_drain.
 
