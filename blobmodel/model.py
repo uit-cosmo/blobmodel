@@ -347,7 +347,7 @@ class Model:
             self._geometry.t.size,
             int(
                 (
-                    blob.t_init
+                    np.abs(blob.t_init * blob.v_x)
                     - blob.width_prop * np.log(error * np.sqrt(np.pi))
                     + self._geometry.Lx
                     - blob.pos_x

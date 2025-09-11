@@ -78,4 +78,4 @@ class TestComputeStartStop(unittest.TestCase):
             self.blob, speed_up=True, error=self.error
         )
         self.assertEqual(start, 19)
-        self.assertEqual(stop, 1)
+        self.assertEqual(stop, 21)
