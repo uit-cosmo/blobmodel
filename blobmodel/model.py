@@ -346,9 +346,9 @@ class Model:
         stop = np.minimum(
             self._geometry.t.size,
             int(
-                blob.t_init
-                + (
-                    -blob.width_prop * np.log(error * np.sqrt(np.pi))
+                (
+                    blob.t_init
+                    - blob.width_prop * np.log(error * np.sqrt(np.pi))
                     + self._geometry.Lx
                     - blob.pos_x
                 )
