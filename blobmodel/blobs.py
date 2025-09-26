@@ -341,6 +341,11 @@ class Blob:
         else:
             x_diffs = x - self._prop_dir_blob_position(t)
         theta_x = x_diffs / self.width_prop
+        if theta_x.size != 0 and np.min(np.abs(theta_x)) < 10:
+            warnings.warn(
+                "Received discretization values of less than 10 blob sizes, possibly a bug"
+            )
+
         return self.blob_shape.get_blob_shape_prop(
             theta_x, **self.prop_shape_parameters
         )
@@ -382,6 +387,10 @@ class Blob:
         else:
             y_diffs = y - self._perp_dir_blob_position(t)
         theta_y = y_diffs / self.width_perp
+        if theta_y.size != 0 and np.min(np.abs(theta_y)) > 10:
+            warnings.warn(
+                "Received discretization values of less than 10 blob sizes, possibly a bug"
+            )
         return self.blob_shape.get_blob_shape_perp(
             theta_y, **self.perp_shape_parameters
         )

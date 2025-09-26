@@ -13,7 +13,7 @@ plt.rcParams.update(matplotlib_params)
 
 
 dt = 0.1
-T = int(1e5)
+T = int(1e4)
 num_blobs = int(1e5)
 start_index = int(100 / dt)
 
