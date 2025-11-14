@@ -341,7 +341,7 @@ class Blob:
         else:
             x_diffs = x - self._prop_dir_blob_position(t)
         theta_x = x_diffs / self.width_prop
-        if theta_x.size != 0 and np.min(np.abs(theta_x)) < 10:
+        if theta_x.size != 0 and np.min(np.abs(theta_x)) > 10:
             warnings.warn(
                 "Received discretization values of less than 10 blob sizes, possibly a bug"
             )
