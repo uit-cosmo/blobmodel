@@ -101,6 +101,45 @@ def test_periodicity():
     assert error < 1e-10, "Numerical error too big"
 
 
+
+def test_periodicity_more():
+    """
+    Tests that periodic blobs are summed in with periodic_y=True when a blob has moved vertically through all
+    the discretization domain.
+    """
+    blob = Blob(
+        blob_id=0,
+        blob_shape=BlobShapeImpl(),
+        amplitude=1,
+        width_prop=1,
+        width_perp=1,
+        v_x=1,
+        v_y=5,
+        pos_x=0,
+        pos_y=5,
+        t_init=0,
+        t_drain=10**10,
+        blob_alignment=False,
+        theta=-np.pi/5,
+    )
+    x = np.arange(0, 10, 0.1)
+    y = np.arange(0, 10, 1)
+    t = np.array(8)
+    mesh_x, mesh_y, mesh_t = np.meshgrid(x, y, t)
+    blob_values = blob.discretize_blob(
+        x=mesh_x, y=mesh_y, t=mesh_t, periodic_y=True, Ly=10
+    )
+
+    x_perp, y_perp = blob._rotate(
+        origin=(blob.pos_x+blob.v_x*2, blob.pos_y), x=x, y=y, angle=-blob._theta
+    )
+
+
+    error = np.max(abs(expected_values - blob_values))
+
+    assert error < 1e-10, "Numerical error too big"
+
+
 def test_single_point():
     """
     Checks that singled valued vertical geometries are discretized correctly.

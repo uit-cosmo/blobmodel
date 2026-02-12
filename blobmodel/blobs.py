@@ -112,6 +112,7 @@ class Blob:
         )
         self.blob_alignment = blob_alignment
         self._theta = theta
+        self._alpha = cmath.phase(self.v_x + self.v_y * 1j)  # Angle with respect x-axis of velocity vector
         if blob_alignment:
             self._theta = cmath.phase(self.v_x + self.v_y * 1j)
 
@@ -171,11 +172,11 @@ class Blob:
             return self._single_blob(
                 x_perp, y_perp, t, Ly, periodic_y, one_dimensional=one_dimensional
             )
-        if self._theta == 0:
-            number_of_y_propagations = 0
+        if self._alpha == 0:
+            number_of_y_propagations = 0  # If the blob propagates in the x-direction, it will never cross the domain
         else:
-            x_border = (Ly - self.pos_y) / np.sin(self._theta)
-            adjusted_Ly = Ly / np.sin(self._theta)
+            x_border = (Ly - self.pos_y) / np.cos(self._alpha)
+            adjusted_Ly = Ly / np.sin(self._theta) # TODO: Fix this also
             prop_dir = (
                 self._prop_dir_blob_position(t)
                 if type(t) in [int, float]  # t has dimensionality = 0, used for testing
