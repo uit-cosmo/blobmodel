@@ -2,7 +2,6 @@ from unittest.mock import patch
 from blobmodel import Model, show_model
 import warnings
 
-
 bm_2d = Model(
     Nx=10,
     Ny=10,
