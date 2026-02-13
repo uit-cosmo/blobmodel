@@ -166,7 +166,7 @@ class Blob:
                 x, y, t, Ly, periodic_y, one_dimensional=one_dimensional
             )
 
-        time = t if isinstance(t, Union[int, float]) else t[0][0]
+        time = t if type(t) in [int, float] else t[0][0]
         vertical_prop = self.v_y * time + self.pos_y
         number_of_y_propagations = vertical_prop // Ly
 
