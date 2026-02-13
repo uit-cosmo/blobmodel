@@ -1,7 +1,7 @@
 """This module defines a Blob class and related functions for discretizing and manipulating blobs."""
 
 import warnings
-from typing import Tuple, Union, Any
+from typing import Union, Any
 from nptyping import NDArray
 import numpy as np
 from .blob_shape import AbstractBlobShape
@@ -18,8 +18,8 @@ class Blob:
 
     Where:
         - :math:`a` is the blob amplitude, `amplitude`.
-        - :math:`\ell_x` is the blob width in the propagation direction, `width_prop`.
-        - :math:`\ell_y` is the blob width in the perpendicular direction, `width_perp`.
+        - :math:`\ell_x` is the blob width in the principal direction, `width_p`.
+        - :math:`\ell_y` is the blob width in the secondary direction, `width_s`.
         - :math:`v` is the horizontal blob velocity.
         - :math:`w` is the vertical blob velocity.
         - :math:`t_k` is the blob arriving time at the position x=0, `t_init`.
@@ -34,17 +34,17 @@ class Blob:
         blob_id: int,
         blob_shape: AbstractBlobShape,
         amplitude: float,
-        width_prop: float,
-        width_perp: float,
+        width_p: float,
+        width_s: float,
         v_x: float,
         v_y: float,
-        pos_x: float,
-        pos_y: float,
+        pos_x0: float,
+        pos_y0: float,
         t_init: float,
         t_drain: Union[float, NDArray],
-        prop_shape_parameters: Union[dict, None] = None,
-        perp_shape_parameters: Union[dict, None] = None,
-        blob_alignment: bool = True,
+        shape_parameters_p: Union[dict, None] = None,
+        shape_parameters_s: Union[dict, None] = None,
+        blob_alignment: bool = False,
         theta: float = 0,
     ) -> None:
         """
@@ -58,32 +58,31 @@ class Blob:
             Shape of the blob.
         amplitude : float
             Amplitude of the blob.
-        width_prop : float
+        width_p : float
             Width of the blob in the propagation direction.
-        width_perp : float
+        width_s : float
             Width of the blob in the perpendicular direction.
         v_x : float
             Velocity of the blob in the x-direction.
         v_y : float
             Velocity of the blob in the y-direction.
-        pos_x : float
+        pos_x0 : float
             Initial position of the blob in the x-direction.
-        pos_y : float
+        pos_y0 : float
             Initial position of the blob in the y-direction.
         t_init : float
             Initial time of the blob.
         t_drain : Union[float, NDArray]
             Time scale for the blob to drain.
-        prop_shape_parameters : dict
+        shape_parameters_p : dict
             Additional shape parameters for the propagation direction.
-        perp_shape_parameters : dict
+        shape_parameters_s : dict
             Additional shape parameters for the perpendicular direction.
         blob_alignment : bool, optional
             If blob_alignment == True, the blob shapes are rotated in the propagation direction of the blob
             If blob_alignment == False, the blob shapes are independent of the propagation direction
         theta : float
-            Blob rotation. If set to None, blobs are rotated so to be aligned with their propagation. Otherwise, theta
-            sets the blob angle with respect to the x axis.
+            Blob rotation with respect to the x-axis.
 
             it is computed according to blob_alignment. If set to a no None value,
         the blob alignment flag is ignored. Important: the blob angle is measured with respect to the x axis, not with
@@ -96,19 +95,19 @@ class Blob:
         self.blob_id = blob_id
         self.blob_shape = blob_shape
         self.amplitude = amplitude
-        self.width_p = width_prop  # Primary width
-        self.width_s = width_perp  # Secondary width
+        self.width_p = width_p  # Primary width
+        self.width_s = width_s  # Secondary width
         self.v_x = v_x
         self.v_y = v_y
-        self.pos_x = pos_x
-        self.pos_y = pos_y
+        self.pos_x0 = pos_x0
+        self.pos_y0 = pos_y0
         self.t_init = t_init
         self.t_drain = t_drain
-        self.prop_shape_parameters = (
-            {} if prop_shape_parameters is None else prop_shape_parameters
+        self.shape_parameters_p = (
+            {} if shape_parameters_p is None else shape_parameters_p
         )
-        self.perp_shape_parameters = (
-            {} if perp_shape_parameters is None else perp_shape_parameters
+        self.shape_parameters_s = (
+            {} if shape_parameters_s is None else shape_parameters_s
         )
         self.blob_alignment = blob_alignment
         self._theta = theta
@@ -125,7 +124,7 @@ class Blob:
         one_dimensional: bool = False,
     ) -> NDArray:
         """
-        Discretize blob on grid. If one_dimensional the perpendicular pulse shape is ignored.
+        Discretize blob on grid. If one_dimensional the secondary pulse shape is ignored.
 
         Parameters
         ----------
@@ -167,7 +166,7 @@ class Blob:
             )
 
         time = t if type(t) in [int, float] else t[0][0]
-        vertical_prop = self.v_y * time + self.pos_y
+        vertical_prop = self.v_y * time + self.pos_y0
         number_of_y_propagations = vertical_prop // Ly
 
         # Sum of a centered blob is two "ghost blobs" at vertical positions +-Ly.
@@ -250,15 +249,13 @@ class Blob:
         theta_x = xb / self.width_p
         theta_y = yb / self.width_s
         primary_axis_shape = self.blob_shape.get_blob_shape_prop(
-            theta_x, **self.prop_shape_parameters
+            theta_x, **self.shape_parameters_p
         )
 
         secondary_axis_shape = (
             1
             if one_dimensional
-            else self.blob_shape.get_blob_shape_perp(
-                theta_y, **self.perp_shape_parameters
-            )
+            else self.blob_shape.get_blob_shape_perp(theta_y, **self.shape_parameters_s)
         )
 
         return (
@@ -288,10 +285,10 @@ class Blob:
         """
         Position of the blob in the x-direction at a given time t.
         """
-        return self.pos_x + self.v_x * (t - self.t_init)
+        return self.pos_x0 + self.v_x * (t - self.t_init)
 
     def _blob_trajectory_y(self, t: Union[int, NDArray]) -> Any:
         """
         Position of the blob in the y-direction at a given time t.
         """
-        return self.pos_y + self.v_y * (t - self.t_init)
+        return self.pos_y0 + self.v_y * (t - self.t_init)
