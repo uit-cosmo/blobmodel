@@ -23,8 +23,8 @@ bf = DefaultBlobFactory(
     A_dist=DistributionEnum.deg,
     vy_parameter=vy,
     vx_parameter=vx,
-    wx_parameter=wx,
-    wy_parameter=wy,
+    wp_parameter=wx,
+    ws_parameter=wy,
     blob_alignment=True,  # Blobs will be aligned with their velocities
 )
 
@@ -55,8 +55,8 @@ bf = DefaultBlobFactory(
     A_dist=DistributionEnum.deg,
     vy_parameter=vy,
     vx_parameter=vx,
-    wx_parameter=wx,
-    wy_parameter=wy,
+    wp_parameter=wx,
+    ws_parameter=wy,
     blob_alignment=False,
 )
 # Blobs will NOT be aligned with their velocities, instead they will be tilted by an angle given by theta.

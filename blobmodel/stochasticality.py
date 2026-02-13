@@ -44,19 +44,19 @@ class DefaultBlobFactory(BlobFactory):
     def __init__(
         self,
         A_dist: DistributionEnum = DistributionEnum.exp,
-        wx_dist: DistributionEnum = DistributionEnum.deg,
-        wy_dist: DistributionEnum = DistributionEnum.deg,
+        wp_dist: DistributionEnum = DistributionEnum.deg,
+        ws_dist: DistributionEnum = DistributionEnum.deg,
         vx_dist: DistributionEnum = DistributionEnum.deg,
         vy_dist: DistributionEnum = DistributionEnum.deg,
-        spx_dist: DistributionEnum = DistributionEnum.deg,
-        spy_dist: DistributionEnum = DistributionEnum.deg,
+        spp_dist: DistributionEnum = DistributionEnum.deg,
+        sps_dist: DistributionEnum = DistributionEnum.deg,
         A_parameter: float = 1.0,
-        wx_parameter: float = 1.0,
-        wy_parameter: float = 1.0,
+        wp_parameter: float = 1.0,
+        ws_parameter: float = 1.0,
         vx_parameter: float = 1.0,
         vy_parameter: float = 1.0,
-        shape_param_x_parameter: float = 0.5,
-        shape_param_y_parameter: float = 0.5,
+        shape_param_p_parameter: float = 0.5,
+        shape_param_s_parameter: float = 0.5,
         blob_alignment: bool = True,
     ) -> None:
         """
@@ -69,32 +69,32 @@ class DefaultBlobFactory(BlobFactory):
         ----------
         A_dist : Distribution, optional
             Distribution type for amplitude, by default "Distribution.exp"
-        wx_dist : Distribution, optional
-            Distribution type for width in the x-direction, by default "Distribution.deg"
-        wy_dist : Distribution, optional
-            Distribution type for width in the y-direction, by default "Distribution.deg"
+        wp_dist : Distribution, optional
+            Distribution type for width in the principal blob direction, by default "Distribution.deg"
+        ws_dist : Distribution, optional
+            Distribution type for width in the secondary blob direction, by default "Distribution.deg"
         vx_dist : Distribution, optional
             Distribution type for velocity in the x-direction, by default "Distribution.deg"
         vy_dist : Distribution, optional
             Distribution type for velocity in the y-direction, by default "Distribution.deg"
-        spx_dist : Distribution, optional
-            Distribution type for shape parameter in the x-direction, by default "Distribution.deg"
-        spy_dist : Distribution, optional
-            Distribution type for shape parameter in the y-direction, by default "Distribution.deg"
+        spp_dist : Distribution, optional
+            Distribution type for shape parameter in the principal blob direction, by default "Distribution.deg"
+        sps_dist : Distribution, optional
+            Distribution type for shape parameter in the secondary blob direction, by default "Distribution.deg"
         A_parameter : float, optional
             Free parameter for the amplitude distribution, by default 1.0
-        wx_parameter : float, optional
-            Free parameter for the width distribution in the x-direction, by default 1.0
-        wy_parameter : float, optional
-            Free parameter for the width distribution in the y-direction, by default 1.0
+        wp_parameter : float, optional
+            Free parameter for the width distribution in the principal direction, by default 1.0
+        ws_parameter : float, optional
+            Free parameter for the width distribution in the secondary direction, by default 1.0
         vx_parameter : float, optional
             Free parameter for the velocity distribution in the x-direction, by default 1.0
         vy_parameter : float, optional
             Free parameter for the velocity distribution in the y-direction, by default 1.0
-        shape_param_x_parameter : float, optional
-            Free parameter for the shape parameter distribution in the x-direction, by default 0.5
-        shape_param_y_parameter : float, optional
-            Free parameter for the shape parameter distribution in the y-direction, by default 0.5
+        shape_param_p_parameter : float, optional
+            Free parameter for the shape parameter distribution in the principal direction, by default 0.5
+        shape_param_s_parameter : float, optional
+            Free parameter for the shape parameter distribution in the secondary direction, by default 0.5
         blob_alignment : bool, optional
             If blob_aligment == True, the blob shapes are rotated in the propagation direction of the blob
             If blob_aligment == False, the blob shapes are independent of the propagation direction
@@ -112,27 +112,27 @@ class DefaultBlobFactory(BlobFactory):
 
         """
         assert isinstance(A_dist, DistributionEnum)
-        assert isinstance(wx_dist, DistributionEnum)
-        assert isinstance(wy_dist, DistributionEnum)
+        assert isinstance(wp_dist, DistributionEnum)
+        assert isinstance(ws_dist, DistributionEnum)
         assert isinstance(vx_dist, DistributionEnum)
         assert isinstance(vy_dist, DistributionEnum)
-        assert isinstance(spx_dist, DistributionEnum)
-        assert isinstance(spy_dist, DistributionEnum)
+        assert isinstance(spp_dist, DistributionEnum)
+        assert isinstance(sps_dist, DistributionEnum)
 
         self.amplitude_dist = A_dist
-        self.width_x_dist = wx_dist
-        self.width_y_dist = wy_dist
+        self.width_p_dist = wp_dist
+        self.width_s_dist = ws_dist
         self.velocity_x_dist = vx_dist
         self.velocity_y_dist = vy_dist
-        self.shape_param_x_dist = spx_dist
-        self.shape_param_y_dist = spy_dist
+        self.shape_param_p_dist = spp_dist
+        self.shape_param_s_dist = sps_dist
         self.amplitude_parameter = A_parameter
-        self.width_x_parameter = wx_parameter
-        self.width_y_parameter = wy_parameter
+        self.width_p_parameter = wp_parameter
+        self.width_s_parameter = ws_parameter
         self.velocity_x_parameter = vx_parameter
         self.velocity_y_parameter = vy_parameter
-        self.shape_param_x_parameter = shape_param_x_parameter
-        self.shape_param_y_parameter = shape_param_y_parameter
+        self.shape_param_p_parameter = shape_param_p_parameter
+        self.shape_param_s_parameter = shape_param_s_parameter
         self.blob_alignment = blob_alignment
         self.theta_setter = lambda: 0
 
@@ -179,10 +179,10 @@ class DefaultBlobFactory(BlobFactory):
             num_blobs,
         )
         wxs = self._draw_random_variables(
-            self.width_x_dist, self.width_x_parameter, num_blobs
+            self.width_p_dist, self.width_p_parameter, num_blobs
         )
         wys = self._draw_random_variables(
-            self.width_y_dist, self.width_y_parameter, num_blobs
+            self.width_s_dist, self.width_s_parameter, num_blobs
         )
         vxs = self._draw_random_variables(
             self.velocity_x_dist, self.velocity_x_parameter, num_blobs
@@ -191,10 +191,10 @@ class DefaultBlobFactory(BlobFactory):
             self.velocity_y_dist, self.velocity_y_parameter, num_blobs
         )
         spxs = self._draw_random_variables(
-            self.shape_param_x_dist, self.shape_param_x_parameter, num_blobs
+            self.shape_param_p_dist, self.shape_param_p_parameter, num_blobs
         )
         spys = self._draw_random_variables(
-            self.shape_param_y_dist, self.shape_param_y_parameter, num_blobs
+            self.shape_param_s_dist, self.shape_param_s_parameter, num_blobs
         )
         # For now, only a lambda parameter is implemented
         spxs_dict = [{"lam": s} for s in spxs]
@@ -208,16 +208,16 @@ class DefaultBlobFactory(BlobFactory):
                 blob_id=i,
                 blob_shape=blob_shape,
                 amplitude=amps[i],
-                width_prop=wxs[i],
-                width_perp=wys[i],
+                width_p=wxs[i],
+                width_s=wys[i],
                 v_x=vxs[i],
                 v_y=vys[i],
-                pos_x=posxs[i],
-                pos_y=posys[i],
+                pos_x0=posxs[i],
+                pos_y0=posys[i],
                 t_init=t_inits[i],
                 t_drain=t_drain,
-                prop_shape_parameters=spxs_dict[i],
-                perp_shape_parameters=spys_dict[i],
+                shape_parameters_p=spxs_dict[i],
+                shape_parameters_s=spys_dict[i],
                 blob_alignment=self.blob_alignment,
                 theta=self.theta_setter(),
             )

@@ -9,13 +9,13 @@ def test_high_t_drain():
     blob_sp = Blob(
         blob_id=0,
         amplitude=1,
-        width_prop=1,
-        width_perp=1,
+        width_p=1,
+        width_s=1,
         blob_shape=BlobShapeImpl(),
         v_x=1,
         v_y=1,
-        pos_x=0,
-        pos_y=6,
+        pos_x0=0,
+        pos_y0=6,
         t_init=0,
         t_drain=10**100,
     )

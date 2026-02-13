@@ -58,7 +58,7 @@ def test_one_dim():
 
     bf = DefaultBlobFactory(
         A_dist=DistributionEnum.exp,
-        wx_dist=DistributionEnum.deg,
+        wp_dist=DistributionEnum.deg,
         vx_dist=DistributionEnum.deg,
         vy_dist=DistributionEnum.zeros,
     )
@@ -106,11 +106,11 @@ def test_blob_shapes():
     # PLACEHOLDER blob_shapes_1
     bf = DefaultBlobFactory(
         A_dist=DistributionEnum.deg,
-        wx_dist=DistributionEnum.deg,
-        spx_dist=DistributionEnum.deg,
-        spy_dist=DistributionEnum.deg,
-        shape_param_x_parameter=0.5,
-        shape_param_y_parameter=0.5,
+        wp_dist=DistributionEnum.deg,
+        spp_dist=DistributionEnum.deg,
+        sps_dist=DistributionEnum.deg,
+        shape_param_p_parameter=0.5,
+        shape_param_s_parameter=0.5,
     )
     bm = Model(
         Nx=100,
@@ -139,8 +139,8 @@ def test_blob_tilt():
         A_dist=DistributionEnum.deg,
         vy_parameter=vy,
         vx_parameter=vx,
-        wx_parameter=wx,
-        wy_parameter=wy,
+        wp_parameter=wx,
+        ws_parameter=wy,
         blob_alignment=False,
     )
     # PLACEHOLDER blob_tilt_1
@@ -233,12 +233,12 @@ def test_custom_blob_factory():
                     blob_id=i,
                     blob_shape=blob_shape,
                     amplitude=amp[i],
-                    width_prop=width[i],
-                    width_perp=width[i],
+                    width_p=width[i],
+                    width_s=width[i],
                     v_x=vx[i],
                     v_y=vy[i],
-                    pos_x=posx[i],
-                    pos_y=posy[i],
+                    pos_x0=posx[i],
+                    pos_y0=posy[i],
                     t_init=t_init[i],
                     t_drain=t_drain,
                 )

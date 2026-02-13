@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 # Example of use of extra blob shape parameters with a double exponential blob shape.
 
 bf = DefaultBlobFactory(
-    shape_param_x_parameter=0.5,
-    shape_param_y_parameter=0.5,
+    shape_param_p_parameter=0.5,
+    shape_param_s_parameter=0.5,
     blob_alignment=True,
 )
 

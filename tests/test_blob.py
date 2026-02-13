@@ -11,12 +11,12 @@ def test_gaussian_blob():
         blob_id=0,
         blob_shape=BlobShapeImpl(),
         amplitude=1,
-        width_prop=1,
-        width_perp=1,
+        width_p=1,
+        width_s=1,
         v_x=1,
         v_y=5,
-        pos_x=0,
-        pos_y=0,
+        pos_x0=0,
+        pos_y0=0,
         t_init=0,
         t_drain=10**10,
         blob_alignment=False,
@@ -42,12 +42,12 @@ def test_blob_non_alignment():
         blob_id=0,
         blob_shape=BlobShapeImpl(),
         amplitude=1,
-        width_prop=1,
-        width_perp=1,
+        width_p=1,
+        width_s=1,
         v_x=1,
         v_y=5,
-        pos_x=0,
-        pos_y=0,
+        pos_x0=0,
+        pos_y0=0,
         t_init=0,
         t_drain=10**10,
         blob_alignment=False,
@@ -58,7 +58,7 @@ def test_blob_non_alignment():
 
     mesh_x, mesh_y = np.meshgrid(x, y)
     mock = MagicMock(return_value=mesh_x)
-    blob.blob_shape.get_blob_shape_prop = mock
+    blob.blob_shape.get_blob_shape_p = mock
     blob.discretize_blob(x=mesh_x, y=mesh_y, t=0, periodic_y=False, Ly=10)
 
     np.testing.assert_array_equal(mesh_x, mock.call_args[0][0])
@@ -73,12 +73,12 @@ def test_periodicity():
         blob_id=0,
         blob_shape=BlobShapeImpl(),
         amplitude=1,
-        width_prop=1,
-        width_perp=1,
+        width_p=1,
+        width_s=1,
         v_x=1,
         v_y=5,
-        pos_x=0,
-        pos_y=0,
+        pos_x0=0,
+        pos_y0=0,
         t_init=0,
         t_drain=10**10,
         blob_alignment=False,
@@ -107,12 +107,12 @@ def test_periodicity_four_passes():
         blob_id=0,
         blob_shape=BlobShapeImpl(),
         amplitude=1,
-        width_prop=1,
-        width_perp=3,
+        width_p=1,
+        width_s=3,
         v_x=1,
         v_y=5,
-        pos_x=0,
-        pos_y=5,
+        pos_x0=0,
+        pos_y0=5,
         t_init=0,
         t_drain=10**10,
         blob_alignment=False,
@@ -140,12 +140,12 @@ def test_periodicity_four_passes_with_pos_x():
         blob_id=0,
         blob_shape=BlobShapeImpl(),
         amplitude=1,
-        width_prop=1,
-        width_perp=3,
+        width_p=1,
+        width_s=3,
         v_x=1,
         v_y=10,
-        pos_x=5,
-        pos_y=5,
+        pos_x0=5,
+        pos_y0=5,
         t_init=0,
         t_drain=10**10,
         blob_alignment=False,
@@ -171,13 +171,13 @@ def test_single_point():
     blob_sp = Blob(
         blob_id=0,
         amplitude=1,
-        width_prop=1,
-        width_perp=1,
+        width_p=1,
+        width_s=1,
         blob_shape=BlobShapeImpl(),
         v_x=1,
         v_y=1,
-        pos_x=0,
-        pos_y=6,
+        pos_x0=0,
+        pos_y0=6,
         t_init=0,
         t_drain=10**100,
     )
@@ -204,13 +204,13 @@ def test_negative_radial_velocity():
     blob_sp = Blob(
         blob_id=0,
         amplitude=1,
-        width_prop=1,
-        width_perp=1,
+        width_p=1,
+        width_s=1,
         blob_shape=BlobShapeImpl(),
         v_x=vx,
         v_y=1,
-        pos_x=0,
-        pos_y=6,
+        pos_x0=0,
+        pos_y0=6,
         t_init=0,
         t_drain=10**100,
     )
@@ -240,22 +240,22 @@ def test_kwargs():
     from unittest.mock import MagicMock
 
     mock_ps = BlobShapeImpl()
-    mock_ps.get_blob_shape_prop = MagicMock()
+    mock_ps.get_blob_shape_p = MagicMock()
 
     blob_sp = Blob(
         blob_id=0,
         blob_shape=mock_ps,
         amplitude=1,
-        width_prop=1,
-        width_perp=1,
+        width_p=1,
+        width_s=1,
         v_x=1,
         v_y=0,
-        pos_x=0,
-        pos_y=0,
+        pos_x0=0,
+        pos_y0=0,
         t_init=0,
         t_drain=10**100,
-        prop_shape_parameters={"lam": 0.2},
-        perp_shape_parameters={"lam": 0.8},
+        shape_parameters_p={"lam": 0.2},
+        shape_parameters_s={"lam": 0.8},
     )
 
     x = 0
@@ -263,7 +263,7 @@ def test_kwargs():
 
     mesh_x, mesh_y = np.meshgrid(x, y)
     blob_sp.discretize_blob(x=mesh_x, y=mesh_y, t=0, periodic_y=True, Ly=10)
-    mock_ps.get_blob_shape_prop.assert_called_with([[0]], lam=0.2)
+    mock_ps.get_blob_shape_p.assert_called_with([[0]], lam=0.2)
 
 
 def test_get_blobs():

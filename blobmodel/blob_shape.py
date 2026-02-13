@@ -23,15 +23,17 @@ class AbstractBlobShape(ABC):
     """Abstract class containing the blob pulse shapes. Two-dimensional blob
     pulse shapes are written in the form:
 
-    ``phi(theta_x, theta_y) = phi_x(theta_x) * phi_y(theta_y)``
+    ``phi(theta_p, theta_s) = phi_p(theta_p) * phi_s(theta_s)``
+
+    Where the p and s subindexes stand for primary and secondary directions.
     """
 
     @abstractmethod
-    def get_blob_shape_prop(self, theta: np.ndarray, **kwargs) -> np.ndarray:
+    def get_blob_shape_p(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         raise NotImplementedError
 
     @abstractmethod
-    def get_blob_shape_perp(self, theta: np.ndarray, **kwargs) -> np.ndarray:
+    def get_blob_shape_s(self, theta: np.ndarray, **kwargs) -> np.ndarray:
         raise NotImplementedError
 
 
@@ -173,59 +175,37 @@ class BlobShapeImpl(AbstractBlobShape):
 
     def __init__(
         self,
-        pulse_shape_prop=BlobShapeEnum.gaussian,
-        pulse_shape_perp=BlobShapeEnum.gaussian,
+        pulse_shape_p=BlobShapeEnum.gaussian,
+        pulse_shape_s=BlobShapeEnum.gaussian,
     ):
         """Initialize the BlobShapeImpl object.
 
         Attributes
         ----------
-        pulse_shape_prop : str, optional
-            Type of pulse shape in the propagation direction, by default "gauss".
-        pulse_shape_perp : str, optional
-            Type of pulse shape perpendicular to the propagation direction, by default "gauss".
+        pulse_shape_p : str, optional
+            Type of pulse shape in the principal direction, by default "gauss".
+        pulse_shape_s : str, optional
+            Type of pulse shape in the secondary direction, by default "gauss".
         """
         if (
-            pulse_shape_prop not in BlobShapeImpl.__GENERATORS.keys()
-            or pulse_shape_perp not in BlobShapeImpl.__GENERATORS.keys()
+            pulse_shape_p not in BlobShapeImpl.__GENERATORS.keys()
+            or pulse_shape_s not in BlobShapeImpl.__GENERATORS.keys()
         ):
             raise NotImplementedError(
                 f"{self.__class__.__name__}.blob_shape not implemented"
             )
-        self.get_blob_shape_prop = BlobShapeImpl.__GENERATORS.get(pulse_shape_prop)
-        self.get_blob_shape_perp = BlobShapeImpl.__GENERATORS.get(pulse_shape_perp)
+        self.get_blob_shape_p = BlobShapeImpl.__GENERATORS.get(pulse_shape_p)
+        self.get_blob_shape_s = BlobShapeImpl.__GENERATORS.get(pulse_shape_s)
 
-    def get_blob_shape_prop(self, theta: np.ndarray, **kwargs) -> np.ndarray:
-        """Compute the pulse shape in the propagation direction.
-
-        Parameters
-        ----------
-        theta : np.ndarray
-            Array of theta values.
-        kwargs
-            Additional keyword arguments.
-
-        Returns
-        -------
-        np.ndarray
-            Array representing the pulse shape in the propagation direction.
+    def get_blob_shape_p(self, theta: np.ndarray, **kwargs) -> np.ndarray:
+        """
+        Compute the pulse shape in the principal direction.
         """
         raise NotImplementedError
 
-    def get_blob_shape_perp(self, theta: np.ndarray, **kwargs) -> np.ndarray:
-        """Compute the pulse shape perpendicular to the propagation direction.
-
-        Parameters
-        ----------
-        theta : np.ndarray
-            Array of theta values.
-        kwargs
-            Additional keyword arguments.
-
-        Returns
-        -------
-        np.ndarray
-            Array representing the pulse shape perpendicular to the propagation direction.
+    def get_blob_shape_s(self, theta: np.ndarray, **kwargs) -> np.ndarray:
+        """
+        Compute the pulse shape in the secondary direction.
         """
         raise NotImplementedError
 
