@@ -237,32 +237,18 @@ class Blob:
             Discretized blob.
 
         """
-        # Blob frame coordinates
-        xr, yr = self._rotate(
-            origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self._theta
-        )
-
+        # Blob position
         pos_x = self._blob_trajectory_x(t)
         pos_y = self._blob_trajectory_y(t)
-
-        pos_xr, pos_yr = self._rotate(
-            origin=(self.pos_x, self.pos_y), x=pos_x, y=pos_y, angle=-self._theta
-        )
-
         if periodic_y:
-            periodicity_correction_x = (
-                number_of_y_propagations * Ly * np.sin(self._theta)
-            )
-            periodicity_correction_y = (
-                number_of_y_propagations * Ly * np.cos(self._theta)
-            )
+            pos_y -= number_of_y_propagations * Ly
 
-        else:
-            periodicity_correction_x = 0
-            periodicity_correction_y = 0
+        # Blob frame coordinates
+        xr = np.cos(self._theta) * (x - pos_x) + np.sin(self._theta) * (y - pos_y)
+        yr = -np.sin(self._theta) * (x - pos_x) + np.cos(self._theta) * (y - pos_y)
 
-        theta_x = (xr - pos_xr + periodicity_correction_x) / self.width_p
-        theta_y = (yr - pos_yr + periodicity_correction_y) / self.width_s
+        theta_x = xr / self.width_p
+        theta_y = yr / self.width_s
         primary_axis_shape = self.blob_shape.get_blob_shape_prop(
             theta_x, **self.prop_shape_parameters
         )
@@ -309,33 +295,3 @@ class Blob:
         Position of the blob in the y-direction at a given time t.
         """
         return self.pos_y + self.v_y * (t - self.t_init)
-
-    def _rotate(
-        self, origin: Tuple[float, float], x: NDArray, y: NDArray, angle: float
-    ) -> Tuple[NDArray, NDArray]:
-        """
-        Rotate the coordinates around a given origin point.
-
-        Parameters
-        ----------
-        origin : Tuple[float, float]
-            Origin point of rotation.
-        x : NDArray
-            Coordinates in the x-direction.
-        y : NDArray
-            Coordinates in the y-direction.
-        angle : float
-            Rotation angle.
-
-        Returns
-        -------
-        rotated_coordinates : Tuple[NDArray, NDArray]
-            Rotated coordinates.
-
-        """
-        ox, oy = origin
-        px, py = x, y
-
-        qx = ox + np.cos(angle) * (px - ox) - np.sin(angle) * (py - oy)
-        qy = oy + np.sin(angle) * (px - ox) + np.cos(angle) * (py - oy)
-        return qx, qy
