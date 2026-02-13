@@ -248,14 +248,14 @@ class Blob:
 
         theta_x = xb / self.width_p
         theta_y = yb / self.width_s
-        primary_axis_shape = self.blob_shape.get_blob_shape_prop(
+        primary_axis_shape = self.blob_shape.get_blob_shape_p(
             theta_x, **self.shape_parameters_p
         )
 
         secondary_axis_shape = (
             1
             if one_dimensional
-            else self.blob_shape.get_blob_shape_perp(theta_y, **self.shape_parameters_s)
+            else self.blob_shape.get_blob_shape_s(theta_y, **self.shape_parameters_s)
         )
 
         return (
