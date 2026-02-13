@@ -337,11 +337,12 @@ class Model:
                     np.abs(blob.t_init * blob.v_x)
                     + blob.width_p * np.log(error * np.sqrt(np.pi))
                     + blob.pos_x
-                    - self._geometry.t[0]
+                    - self._geometry.t[0] * blob.v_x
                 )
                 / np.abs(self._geometry.dt * blob.v_x)
             ),
         )
+        start = np.minimum(self._geometry.t.size, start)
         # ignores t_drain when calculating stop time
         stop = np.minimum(
             self._geometry.t.size,
