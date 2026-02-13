@@ -244,11 +244,11 @@ class Blob:
             pos_y -= number_of_y_propagations * Ly
 
         # Blob frame coordinates
-        xr = np.cos(self._theta) * (x - pos_x) + np.sin(self._theta) * (y - pos_y)
-        yr = -np.sin(self._theta) * (x - pos_x) + np.cos(self._theta) * (y - pos_y)
+        xb = np.cos(self._theta) * (x - pos_x) + np.sin(self._theta) * (y - pos_y)
+        yb = -np.sin(self._theta) * (x - pos_x) + np.cos(self._theta) * (y - pos_y)
 
-        theta_x = xr / self.width_p
-        theta_y = yr / self.width_s
+        theta_x = xb / self.width_p
+        theta_y = yb / self.width_s
         primary_axis_shape = self.blob_shape.get_blob_shape_prop(
             theta_x, **self.prop_shape_parameters
         )
