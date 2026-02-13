@@ -96,8 +96,8 @@ class Blob:
         self.blob_id = blob_id
         self.blob_shape = blob_shape
         self.amplitude = amplitude
-        self.width_prop = width_prop
-        self.width_perp = width_perp
+        self.width_p = width_prop  # Primary width
+        self.width_s = width_perp  # Secondary width
         self.v_x = v_x
         self.v_y = v_y
         self.pos_x = pos_x
@@ -112,7 +112,6 @@ class Blob:
         )
         self.blob_alignment = blob_alignment
         self._theta = theta
-        self._alpha = cmath.phase(self.v_x + self.v_y * 1j)  # Angle with respect x-axis of velocity vector
         if blob_alignment:
             self._theta = cmath.phase(self.v_x + self.v_y * 1j)
 
@@ -157,38 +156,25 @@ class Blob:
         # If one_dimensional, then Ly should be 0.
         assert (one_dimensional and Ly == 0) or not one_dimensional
 
-        if (self.width_perp > Ly / 3 or self.width_prop > Ly / 3) and periodic_y:
+        if (self.width_s > Ly / 3 or self.width_p > Ly / 3) and periodic_y:
             warnings.warn(
                 "blob width big compared to Ly, mirrored blobs might become apparent."
             )
 
-        x_perp, y_perp = self._rotate(
-            origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self._theta
-        )
-        v_x_new = self.v_x * np.cos(self._theta) + self.v_y * np.sin(self._theta)
-        v_y_new = -self.v_x * np.sin(self._theta) + self.v_y * np.cos(self._theta)
-        self.v_x, self.v_y = v_x_new, v_y_new
         if not periodic_y or one_dimensional:
             return self._single_blob(
-                x_perp, y_perp, t, Ly, periodic_y, one_dimensional=one_dimensional
+                x, y, t, Ly, periodic_y, one_dimensional=one_dimensional
             )
-        if self._alpha == 0:
-            number_of_y_propagations = 0  # If the blob propagates in the x-direction, it will never cross the domain
-        else:
-            x_border = (Ly - self.pos_y) / np.cos(self._alpha)
-            adjusted_Ly = Ly / np.sin(self._theta) # TODO: Fix this also
-            prop_dir = (
-                self._prop_dir_blob_position(t)
-                if type(t) in [int, float]  # t has dimensionality = 0, used for testing
-                else self._prop_dir_blob_position(t[0, 0])
-            )
-            number_of_y_propagations = (
-                prop_dir + adjusted_Ly - x_border
-            ) // adjusted_Ly
+
+        time = t if isinstance(t, Union[int, float]) else t[0][0]
+        vertical_prop = self.v_y * time + self.pos_y
+        number_of_y_propagations = vertical_prop // Ly
+
+        # Sum of a centered blob is two "ghost blobs" at vertical positions +-Ly.
         return (
             self._single_blob(
-                x_perp,
-                y_perp,
+                x,
+                y,
                 t,
                 Ly,
                 periodic_y,
@@ -196,39 +182,33 @@ class Blob:
                 one_dimensional=one_dimensional,
             )
             + self._single_blob(
-                x_perp,
-                y_perp,
+                x,
+                y + Ly,
                 t,
                 Ly,
                 periodic_y,
                 number_of_y_propagations,
-                x_offset=Ly * np.sin(self._theta),
-                y_offset=Ly * np.cos(self._theta),
                 one_dimensional=one_dimensional,
             )
             + self._single_blob(
-                x_perp,
-                y_perp,
+                x,
+                y - Ly,
                 t,
                 Ly,
                 periodic_y,
                 number_of_y_propagations,
-                x_offset=-Ly * np.sin(self._theta),
-                y_offset=-Ly * np.cos(self._theta),
                 one_dimensional=one_dimensional,
             )
         )
 
     def _single_blob(
         self,
-        x_prop: Union[int, NDArray],
-        y_perp: Union[int, NDArray],
+        x: Union[int, NDArray],
+        y: Union[int, NDArray],
         t: Union[int, NDArray],
         Ly: float,
         periodic_y: bool,
         number_of_y_propagations: Union[NDArray, int] = 0,
-        x_offset: Union[NDArray, int] = 0,
-        y_offset: Union[NDArray, int] = 0,
         one_dimensional: bool = False,
     ) -> NDArray:
         """
@@ -236,10 +216,10 @@ class Blob:
 
         Parameters
         ----------
-        x_prop : NDArray
-            Propagation direction coordinates.
-        y_perp : NDArray
-            Perpendicular coordinates.
+        x : NDArray
+            x-coordinate
+        y : NDArray
+            y-coordinate
         t : NDArray
             Time coordinates.
         Ly : float
@@ -248,10 +228,6 @@ class Blob:
             Flag indicating periodicity in the y-direction.
         number_of_y_propagations : NDArray, optional
             Number of times the blob propagates through the domain in y-direction (default: 0).
-        x_offset : NDArray, optional
-            Offset in the x-direction (default: 0).
-        y_offset : NDArray, optional
-            Offset in the y-direction (default: 0).
         one_dimensional : bool, optional
             Flag indicating a one-dimensional blob (default: False).
 
@@ -261,27 +237,46 @@ class Blob:
             Discretized blob.
 
         """
+        # Blob frame coordinates
+        xr, yr = self._rotate(
+            origin=(self.pos_x, self.pos_y), x=x, y=y, angle=-self._theta
+        )
+
+        pos_x = self._blob_trajectory_x(t)
+        pos_y = self._blob_trajectory_y(t)
+
+        pos_xr, pos_yr = self._rotate(
+            origin=(self.pos_x, self.pos_y), x=pos_x, y=pos_y, angle=-self._theta
+        )
+
+        if periodic_y:
+            periodicity_correction_x = (
+                number_of_y_propagations * Ly * np.sin(self._theta)
+            )
+            periodicity_correction_y = (
+                number_of_y_propagations * Ly * np.cos(self._theta)
+            )
+
+        else:
+            periodicity_correction_x = 0
+            periodicity_correction_y = 0
+
+        theta_x = (xr - pos_xr + periodicity_correction_x) / self.width_p
+        theta_y = (yr - pos_yr + periodicity_correction_y) / self.width_s
+        primary_axis_shape = self.blob_shape.get_blob_shape_prop(
+            theta_x, **self.prop_shape_parameters
+        )
+
+        secondary_axis_shape = (
+            1
+            if one_dimensional
+            else self.blob_shape.get_blob_shape_perp(
+                theta_y, **self.perp_shape_parameters
+            )
+        )
+
         return (
-            self.amplitude
-            * self._drain(t)
-            * self._propagation_direction_shape(
-                x_prop + x_offset,
-                t,
-                Ly,
-                periodic_y,
-                number_of_y_propagations=number_of_y_propagations,
-            )
-            * (
-                1
-                if one_dimensional
-                else self._perpendicular_direction_shape(
-                    y_perp + y_offset,
-                    t,
-                    Ly,
-                    periodic_y,
-                    number_of_y_propagations=number_of_y_propagations,
-                )
-            )
+            self.amplitude * self._drain(t) * primary_axis_shape * secondary_axis_shape
         )
 
     def _drain(self, t: Union[int, NDArray]) -> NDArray:
@@ -303,121 +298,15 @@ class Blob:
             return np.exp(-(t - self.t_init) / float(self.t_drain))
         return np.exp(-(t - self.t_init) / self.t_drain[np.newaxis, :, np.newaxis])
 
-    def _propagation_direction_shape(
-        self,
-        x: Union[int, NDArray],
-        t: Union[int, NDArray],
-        Ly: float,
-        periodic_y: bool,
-        number_of_y_propagations: Union[int, NDArray],
-    ) -> NDArray:
+    def _blob_trajectory_x(self, t: Union[int, NDArray]) -> Any:
         """
-        Calculate the shape in the propagation direction.
-
-        Parameters
-        ----------
-        x : NDArray
-            Coordinates in the x-direction.
-        t : NDArray
-            Time coordinates.
-        Ly : float
-            Length of domain in the y-direction.
-        periodic_y : bool
-            Flag indicating periodicity in the y-direction.
-        number_of_y_propagations : NDArray
-            Number of times the blob propagates through the domain in y-direction.
-
-        Returns
-        -------
-        shape : NDArray
-            Shape in the propagation direction.
-
-        """
-        if periodic_y:
-            x_diffs = (
-                x
-                - self._prop_dir_blob_position(t)
-                + number_of_y_propagations * Ly * np.sin(self._theta)
-            )
-        else:
-            x_diffs = x - self._prop_dir_blob_position(t)
-        theta_x = x_diffs / self.width_prop
-        return self.blob_shape.get_blob_shape_prop(
-            theta_x, **self.prop_shape_parameters
-        )
-
-    def _perpendicular_direction_shape(
-        self,
-        y: Union[int, NDArray],
-        t: Union[int, NDArray],
-        Ly: float,
-        periodic_y: bool,
-        number_of_y_propagations: Union[int, NDArray],
-    ) -> NDArray:
-        """
-        Calculate the shape in the perpendicular direction.
-
-        Parameters
-        ----------
-        y : NDArray
-            Coordinates in the y-direction.
-        Ly : float
-            Length of domain in the y-direction.
-        periodic_y : bool
-            Flag indicating periodicity in the y-direction.
-        number_of_y_propagations : NDArray
-            Number of times the blob propagates through the domain in y-direction.
-
-        Returns
-        -------
-        shape : NDArray
-            Blob shape in the perpendicular direction.
-
-        """
-        if periodic_y:
-            y_diffs = (
-                y
-                - self._perp_dir_blob_position(t)
-                + number_of_y_propagations * Ly * np.cos(self._theta)
-            )
-        else:
-            y_diffs = y - self._perp_dir_blob_position(t)
-        theta_y = y_diffs / self.width_perp
-        return self.blob_shape.get_blob_shape_perp(
-            theta_y, **self.perp_shape_parameters
-        )
-
-    def _prop_dir_blob_position(self, t: Union[int, NDArray]) -> Any:
-        """
-        Calculate the position of the blob in the propagation direction.
-
-        Parameters
-        ----------
-        t : NDArray
-            Time coordinates.
-
-        Returns
-        -------
-        position : NDArray
-            Position of the blob in the propagation direction.
-
+        Position of the blob in the x-direction at a given time t.
         """
         return self.pos_x + self.v_x * (t - self.t_init)
 
-    def _perp_dir_blob_position(self, t: Union[int, NDArray]) -> Any:
+    def _blob_trajectory_y(self, t: Union[int, NDArray]) -> Any:
         """
-        Return the position of the blob in the perpendicular direction.
-
-        Parameters
-        ----------
-        t : NDArray
-            Time coordinates.
-
-        Returns
-        -------
-        position : float
-            Position of the blob in the perpendicular direction.
-
+        Position of the blob in the y-direction at a given time t.
         """
         return self.pos_y + self.v_y * (t - self.t_init)
 
