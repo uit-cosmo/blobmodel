@@ -335,7 +335,7 @@ class Model:
             int(
                 (
                     np.abs(blob.t_init * blob.v_x)
-                    + blob.width_prop * np.log(error * np.sqrt(np.pi))
+                    + blob.width_p * np.log(error * np.sqrt(np.pi))
                     + blob.pos_x
                     - self._geometry.t[0] * blob.v_x
                 )
@@ -349,7 +349,7 @@ class Model:
             int(
                 (
                     np.abs(blob.t_init * blob.v_x)
-                    - blob.width_prop * np.log(error * np.sqrt(np.pi))
+                    - blob.width_p * np.log(error * np.sqrt(np.pi))
                     + self._geometry.Lx
                     - blob.pos_x
                 )

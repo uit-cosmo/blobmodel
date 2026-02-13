@@ -16,7 +16,7 @@ class TestComputeStartStop(unittest.TestCase):
         self.blob = Mock()
         self.blob.t_init = 2.0  # Default initial time
         self.blob.v_x = 10.0  # Default velocity
-        self.blob.width_prop = 1.0  # Default width property
+        self.blob.width_p = 1.0  # Default width property
         self.blob.pos_x = 0.0  # Default initial position
         self.model = Model()
         self.model._geometry = self.geometry

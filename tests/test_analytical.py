@@ -9,7 +9,6 @@ import xarray as xr
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 # use DefaultBlobFactory to define distribution functions fo random variables
 bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros)
 
