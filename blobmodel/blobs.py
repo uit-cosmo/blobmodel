@@ -166,7 +166,7 @@ class Blob:
             )
 
         time = t if type(t) in [int, float] else t[0][0]
-        vertical_prop = self.v_y * time + self.pos_y0
+        vertical_prop = self.v_y * (time - self.t_init) + self.pos_y0
         number_of_y_propagations = vertical_prop // Ly
 
         # Sum of a centered blob is two "ghost blobs" at vertical positions +-Ly.
