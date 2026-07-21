@@ -330,32 +330,16 @@ class Model:
         """
         if not speed_up or blob.v_x == 0:
             return 0, self._geometry.t.size
-        start = np.maximum(
-            0,
-            int(
-                (
-                    np.abs(blob.t_init * blob.v_x)
-                    + blob.width_p * np.log(error * np.sqrt(np.pi))
-                    + blob.pos_x0
-                    - self._geometry.t[0] * blob.v_x
-                )
-                / np.abs(self._geometry.dt * blob.v_x)
-            ),
+
+        dt, t0 = self._geometry.dt, self._geometry.t[0]
+        idx_x0 = (blob.t_init - t0) / dt + (self._geometry.x[0] - blob.pos_x0) / (
+            blob.v_x * dt
         )
-        start = np.minimum(self._geometry.t.size, start)
-        # ignores t_drain when calculating stop time
-        stop = np.minimum(
-            self._geometry.t.size,
-            int(
-                (
-                    np.abs(blob.t_init * blob.v_x)
-                    - blob.width_p * np.log(error * np.sqrt(np.pi))
-                    + self._geometry.Lx
-                    - blob.pos_x0
-                )
-                / np.abs(blob.v_x * self._geometry.dt)
-            ),
-        )
+        idx_Lx = idx_x0 + self._geometry.Lx / (blob.v_x * dt)
+        margin = -blob.width_p * np.log(error * np.sqrt(np.pi)) / np.abs(blob.v_x * dt)
+        start = int(np.clip(min(idx_x0, idx_Lx) - margin, 0, self._geometry.t.size))
+        stop = int(np.clip(max(idx_x0, idx_Lx) + margin, 0, self._geometry.t.size))
+
         return start, stop
 
     def _reset_fields(self):
