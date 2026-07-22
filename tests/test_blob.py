@@ -286,3 +286,54 @@ def test_get_blobs():
     model.make_realization()
     blob_list = model.get_blobs()
     assert len(blob_list) == 3
+
+
+def _make_blob(blob_alignment=False, theta=None):
+    return Blob(
+        blob_id=0,
+        blob_shape=BlobShapeImpl(),
+        amplitude=1,
+        width_p=1,
+        width_s=1,
+        v_x=1,
+        v_y=1,
+        pos_x0=0,
+        pos_y0=0,
+        t_init=0,
+        t_drain=10**10,
+        blob_alignment=blob_alignment,
+        theta=theta,
+    )
+
+
+def test_explicit_theta_overrides_alignment():
+    """An explicitly provided theta takes precedence and blob_alignment is ignored."""
+    blob = _make_blob(blob_alignment=True, theta=1.0)
+    assert blob._theta == 1.0
+
+
+def test_alignment_used_when_theta_is_none():
+    """With theta=None and blob_alignment=True, theta is the velocity phase."""
+    blob = _make_blob(blob_alignment=True, theta=None)
+    assert np.isclose(blob._theta, np.pi / 4)  # v_x = v_y = 1
+
+
+def test_no_tilt_when_theta_none_and_no_alignment():
+    """With theta=None and blob_alignment=False, the blob is axis-aligned (theta=0)."""
+    blob = _make_blob(blob_alignment=False, theta=None)
+    assert blob._theta == 0
+
+
+def test_theta_setter_overrides_factory_alignment():
+    """A registered theta_setter wins over the factory's blob_alignment default (True)."""
+    bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, blob_alignment=True)
+    bf.set_theta_setter(lambda: 0.5)
+    blobs = bf.sample_blobs(Ly=10, T=1, num_blobs=3, blob_shape=BlobShapeImpl(), t_drain=1e10)
+    assert all(b._theta == 0.5 for b in blobs)
+
+
+def test_factory_alignment_used_without_theta_setter():
+    """Without a theta_setter, the factory falls back to blob_alignment (velocity phase)."""
+    bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, blob_alignment=True)
+    blobs = bf.sample_blobs(Ly=10, T=1, num_blobs=3, blob_shape=BlobShapeImpl(), t_drain=1e10)
+    assert all(np.isclose(b._theta, np.arctan2(b.v_y, b.v_x)) for b in blobs)
