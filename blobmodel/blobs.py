@@ -147,14 +147,18 @@ class Blob:
         Parameters
         ----------
         x : NDArray
-            Grid coordinates in the x-direction, as a meshgrid array of shape
-            (Ny, Nx, Nt).
+            Grid coordinates in the x-direction, as an array broadcastable to
+            shape (Ny, Nx, Nt): either a full meshgrid array or a 1D
+            coordinate array reshaped as ``x[np.newaxis, :, np.newaxis]``.
         y : NDArray
-            Grid coordinates in the y-direction, as a meshgrid array of shape
-            (Ny, Nx, Nt).
+            Grid coordinates in the y-direction, as an array broadcastable to
+            shape (Ny, Nx, Nt): either a full meshgrid array or a 1D
+            coordinate array reshaped as ``y[:, np.newaxis, np.newaxis]``.
         t : NDArray
-            Time coordinates, as a meshgrid array of shape (Ny, Nx, Nt).
-            A scalar t (single time point) is also accepted.
+            Time coordinates, as an array broadcastable to shape (Ny, Nx, Nt):
+            either a full meshgrid array or a 1D coordinate array reshaped as
+            ``t[np.newaxis, np.newaxis, :]``. A scalar t (single time point)
+            is also accepted.
         Ly : float
             Length of domain in the y-direction.
         periodic_y : bool, optional

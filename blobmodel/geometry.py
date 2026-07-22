@@ -8,7 +8,9 @@ import numpy as np
 class Geometry:
     """
     Represents the space and time grid used by the Model class to discretize the blob evolution.
-    It builds a meshgrid based on the desired resolution and length in each coordinate.
+    It stores one 1D coordinate array per dimension (`x`, `y` and `t`) based on the desired
+    resolution and length in each coordinate; the Model broadcasts them against each other
+    instead of materializing full (Ny, Nx, Nt) meshgrids.
     """
 
     def __init__(
@@ -56,15 +58,14 @@ class Geometry:
         self.periodic_y = periodic_y
 
         # calculate x, y and t coordinates
-        self.x: NDArray[Literal[64], Any] = np.arange(0, self.Lx, self.Lx / self.Nx)
+        self.x: NDArray[Literal[64], Any] = np.linspace(
+            0, self.Lx, num=self.Nx, endpoint=False
+        )
         if self.Ly == 0:
             self.y: NDArray[Literal[64], Any] = np.array([0])
         else:
-            self.y = np.arange(0, self.Ly, self.Ly / self.Ny)
+            self.y = np.linspace(0, self.Ly, num=self.Ny, endpoint=False)
         self.t: NDArray[Literal[64], Any] = np.arange(t_init, self.T, self.dt)
-        self.x_matrix, self.y_matrix, self.t_matrix = np.meshgrid(
-            self.x, self.y, self.t
-        )
 
     def __str__(self) -> str:
         """
