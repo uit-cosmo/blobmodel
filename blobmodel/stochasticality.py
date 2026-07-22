@@ -52,6 +52,109 @@ class BlobFactory(ABC):
         self.rng = rng
 
 
+class BlobListFactory(BlobFactory):
+    """BlobFactory that returns a pre-built list of blobs.
+
+    Use this (typically through `Model.from_blobs`) when the blobs are
+    constructed by hand instead of sampled from distributions. All
+    `sample_blobs` arguments (`num_blobs`, `blob_shape`, `t_drain`, ...) are
+    ignored: each `Blob` already carries its own parameters.
+    """
+
+    def __init__(self, blobs: List[Blob]) -> None:
+        """
+        Initialize the factory with the list of blobs to realize.
+
+        Parameters
+        ----------
+        blobs : List[Blob]
+            Blobs returned by every `sample_blobs` call.
+        """
+        self._blobs = list(blobs)
+
+    def sample_blobs(
+        self,
+        Ly: float,
+        T: float,
+        num_blobs: int,
+        blob_shape: AbstractBlobShape,
+        t_drain: Union[float, NDArray],
+    ) -> List[Blob]:
+        """Return the stored blob list. All arguments are ignored."""
+        return list(self._blobs)
+
+    def is_one_dimensional(self) -> bool:
+        """
+        Returns True if all stored blobs have zero perpendicular velocity.
+
+        Returns
+        -------
+        bool
+            True if `v_y == 0` for every blob, False otherwise.
+        """
+        return all(blob.v_y == 0 for blob in self._blobs)
+
+
+class CallableBlobFactory(BlobFactory):
+    """BlobFactory that builds each blob by calling a user-provided getter.
+
+    The getter receives the factory's random number generator, so blobs
+    sampled through this factory are reproducible via
+    `CallableBlobFactory(seed=...)` or `Model(seed=...)` — provided the getter
+    draws its random numbers from the generator it is given instead of the
+    global `np.random` state.
+    """
+
+    def __init__(
+        self,
+        blob_getter: Callable[[np.random.Generator], Blob],
+        one_dimensional: bool = False,
+        seed: Union[int, np.random.Generator, None] = None,
+    ) -> None:
+        """
+        Initialize the factory with a blob getter.
+
+        Parameters
+        ----------
+        blob_getter : Callable[[np.random.Generator], Blob]
+            Function called once per blob with the factory's random number
+            generator; must return a `Blob`.
+        one_dimensional : bool, optional
+            Whether the blobs produced by the getter are compatible with a
+            one-dimensional model (i.e. have `v_y == 0`). Cannot be inferred
+            from the getter, so it must be declared. By default False.
+        seed : int, np.random.Generator or None, optional
+            Seed (or an already constructed `numpy.random.Generator`) for the
+            generator passed to `blob_getter`. A seed passed to `Model` takes
+            precedence: it replaces this factory's generator via `set_rng`.
+            By default None, i.e. a freshly seeded generator
+            (non-reproducible).
+        """
+        self._blob_getter = blob_getter
+        self._one_dimensional = one_dimensional
+        self.rng = np.random.default_rng(seed)
+
+    def sample_blobs(
+        self,
+        Ly: float,
+        T: float,
+        num_blobs: int,
+        blob_shape: AbstractBlobShape,
+        t_drain: Union[float, NDArray],
+    ) -> List[Blob]:
+        """
+        Create `num_blobs` blobs by calling the getter with `self.rng`.
+
+        `Ly`, `T`, `blob_shape` and `t_drain` are ignored: the getter is
+        expected to fully specify each blob.
+        """
+        return [self._blob_getter(self.rng) for _ in range(num_blobs)]
+
+    def is_one_dimensional(self) -> bool:
+        """Return the `one_dimensional` flag declared at construction."""
+        return self._one_dimensional
+
+
 class DefaultBlobFactory(BlobFactory):
     """Default implementation of BlobFactory.
 

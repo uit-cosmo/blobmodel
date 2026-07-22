@@ -5,7 +5,7 @@ import xarray as xr
 from tqdm import tqdm
 from typing import List, Union
 from .blobs import Blob
-from .stochasticality import BlobFactory, DefaultBlobFactory
+from .stochasticality import BlobFactory, BlobListFactory, DefaultBlobFactory
 from .geometry import Geometry
 from nptyping import NDArray
 import warnings
@@ -52,7 +52,8 @@ class Model:
             Number of blobs.
         t_drain : float or array-like, optional
             Drain time scale of the blobs (exponential decay). Can be a single
-            float value or an array-like of length Nx.
+            float value or an array-like of length Nx. Use `np.inf` for no
+            draining.
         blob_factory : BlobFactory, optional
             BlobFactory instance for setting blob parameter distributions.
             By default None, in which case a `DefaultBlobFactory` is created.
@@ -81,6 +82,13 @@ class Model:
             constructed with; custom factories only honor it if they draw from
             `self.rng`. By default None, i.e. the factory's own generator is
             kept (non-reproducible unless the factory was seeded).
+
+        Notes
+        -----
+        - `num_blobs`, `blob_shape` and `t_drain` are only forwarded to the
+          blob factory's `sample_blobs`; a custom factory may ignore any of
+          them (`BlobListFactory` ignores all three). For pre-built blob
+          lists prefer `Model.from_blobs`, which hides these parameters.
 
         Raises
         ------
@@ -161,6 +169,56 @@ class Model:
         return (
             f"2d Blob Model with"
             + f" num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
+        )
+
+    @classmethod
+    def from_blobs(
+        cls,
+        blobs: List[Blob],
+        geometry: Union[Geometry, None] = None,
+        labels: str = "off",
+        label_border: float = 0.75,
+        one_dimensional: bool = False,
+        verbose: bool = True,
+    ) -> "Model":
+        """
+        Create a Model that realizes a pre-built list of blobs.
+
+        Shortcut for the hand-built-blobs workflow: wraps `blobs` in a
+        `BlobListFactory`, so the sampling parameters of `Model.__init__`
+        (`num_blobs`, `blob_shape`, `t_drain`) need not be supplied — each
+        `Blob` already carries its own parameters.
+
+        Parameters
+        ----------
+        blobs : List[Blob]
+            Blobs to sum in `make_realization`.
+        geometry : Geometry, optional
+            Grid on which the blobs are discretized, as in `Model.__init__`.
+        labels : str, optional
+            Blob label setting, as in `Model.__init__`.
+        label_border : float, optional
+            Defines region of blob, as in `Model.__init__`.
+        one_dimensional : bool, optional
+            If True, the perpendicular shape of the blobs is discarded, as in
+            `Model.__init__`.
+        verbose : bool, optional
+            If True, print a loading bar.
+
+        Returns
+        -------
+        Model
+            Model whose realizations sum exactly the given blobs.
+        """
+        return cls(
+            geometry=geometry,
+            num_blobs=len(blobs),
+            t_drain=np.inf,
+            blob_factory=BlobListFactory(blobs),
+            labels=labels,
+            label_border=label_border,
+            one_dimensional=one_dimensional,
+            verbose=verbose,
         )
 
     @property

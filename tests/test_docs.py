@@ -164,6 +164,69 @@ def test_blob_factory():
     # PLACEHOLDER blob_factory_1
 
 
+def test_prebuilt_blobs():
+    # PLACEHOLDER prebuilt_blobs_0
+    from blobmodel import Blob, BlobShapeImpl, Geometry, Model
+    import numpy as np
+
+    blobs = [
+        Blob(
+            blob_id=i,
+            blob_shape=BlobShapeImpl(),
+            amplitude=1,
+            width_p=1,
+            width_s=1,
+            v_x=1,
+            v_y=0,
+            pos_x0=0,
+            pos_y0=pos_y0,
+            t_init=t_init,
+            t_drain=np.inf,  # no draining
+        )
+        for i, (pos_y0, t_init) in enumerate([(2, 0), (5, 2), (8, 4)])
+    ]
+
+    bm = Model.from_blobs(
+        blobs, geometry=Geometry(Nx=10, Ny=10, Lx=10, Ly=10, dt=0.1, T=10)
+    )
+    ds = bm.make_realization()
+    # PLACEHOLDER prebuilt_blobs_1
+
+
+def test_callable_blob_factory():
+    # PLACEHOLDER callable_blob_factory_0
+    from blobmodel import Blob, BlobShapeImpl, CallableBlobFactory, Geometry, Model
+    import numpy as np
+
+    def blob_getter(rng: np.random.Generator) -> Blob:
+        # Draw random numbers from the generator you are given (not from the
+        # global np.random state) so that the realization is reproducible
+        # through CallableBlobFactory(seed=...) or Model(seed=...).
+        return Blob(
+            blob_id=0,
+            blob_shape=BlobShapeImpl(),
+            amplitude=rng.exponential(),
+            width_p=1,
+            width_s=1,
+            v_x=1,
+            v_y=0,
+            pos_x0=0,
+            pos_y0=rng.uniform(0, 10),
+            t_init=rng.uniform(0, 10),
+            t_drain=np.inf,
+        )
+
+    bf = CallableBlobFactory(blob_getter, seed=42)
+
+    bm = Model(
+        geometry=Geometry(Nx=10, Ny=10, Lx=10, Ly=10, dt=0.1, T=10),
+        num_blobs=10,  # blob_getter is called num_blobs times
+        blob_factory=bf,
+    )
+    ds = bm.make_realization()
+    # PLACEHOLDER callable_blob_factory_1
+
+
 def test_custom_blob_factory():
     # PLACEHOLDER custom_blob_factory_0
     from blobmodel import BlobFactory, AbstractBlobShape, Blob, Geometry, Model

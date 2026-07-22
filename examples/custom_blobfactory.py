@@ -9,6 +9,11 @@ from blobmodel import (
 import numpy as np
 
 # Example of implementing a BlobFactory, which allows to set blob parameters in any desirable way.
+# For simpler cases you may not need a subclass at all:
+# - Model.from_blobs(blobs) realizes a pre-built list of Blob objects,
+# - CallableBlobFactory(blob_getter) builds each blob by calling
+#   blob_getter(rng), which keeps realizations seedable if the getter draws
+#   its random numbers from the rng it is given.
 
 
 # create custom class that inherits from BlobFactory

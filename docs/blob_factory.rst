@@ -57,6 +57,36 @@ We chose the defualt distributions for all other blob parameters. We would set u
    :start-after: # PLACEHOLDER blob_factory_0
    :end-before: # PLACEHOLDER blob_factory_1
 
+++++++++++++++++++++++++++++++++++
+Pre-built blobs: Model.from_blobs
+++++++++++++++++++++++++++++++++++
+
+If you already know exactly which blobs you want to realize, you don't need parameter distributions at all:
+build the ``Blob`` objects yourself and hand the list to ``Model.from_blobs``.
+Each ``Blob`` carries its own parameters, so the sampling arguments of ``Model``
+(``num_blobs``, ``blob_shape`` and ``t_drain``) are not needed:
+
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER prebuilt_blobs_0
+   :end-before: # PLACEHOLDER prebuilt_blobs_1
+
+``Model.from_blobs`` is a shortcut for wrapping the list in a ``BlobListFactory``, which you can also use directly with ``Model(blob_factory=...)``.
+Note that ``t_drain=np.inf`` is the documented way of specifying non-draining blobs.
+
++++++++++++++++++++
+CallableBlobFactory
++++++++++++++++++++
+
+If you want custom randomness per blob without writing a whole ``BlobFactory`` subclass, use ``CallableBlobFactory``:
+it builds each blob by calling a getter function with the factory's random number generator.
+Drawing the random numbers from that generator (instead of the global ``np.random`` state) makes the realization reproducible via ``CallableBlobFactory(seed=...)`` or ``Model(seed=...)``:
+
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER callable_blob_factory_0
+   :end-before: # PLACEHOLDER callable_blob_factory_1
+
 +++++++++++++++++
 CustomBlobFactory
 +++++++++++++++++
