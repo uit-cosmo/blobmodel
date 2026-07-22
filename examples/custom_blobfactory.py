@@ -13,8 +13,10 @@ import numpy as np
 # create custom class that inherits from BlobFactory
 # here you can define your custom parameter distributions
 class CustomBlobFactory(BlobFactory):
-    def __init__(self) -> None:
-        pass
+    def __init__(self, seed=None) -> None:
+        # Draw random numbers from self.rng: a seed passed to Model replaces it
+        # (via BlobFactory.set_rng), making realizations reproducible.
+        self.rng = np.random.default_rng(seed)
 
     def sample_blobs(
         self,
@@ -31,8 +33,8 @@ class CustomBlobFactory(BlobFactory):
         vy = np.linspace(0.01, 1, num=num_blobs)
 
         posx = np.zeros(num_blobs)
-        posy = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
-        t_init = np.random.uniform(low=0, high=T, size=num_blobs)
+        posy = self.rng.uniform(low=0.0, high=Ly, size=num_blobs)
+        t_init = self.rng.uniform(low=0, high=T, size=num_blobs)
 
         # sort blobs by _t_init
         t_init = np.sort(t_init)

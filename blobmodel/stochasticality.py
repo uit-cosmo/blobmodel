@@ -33,6 +33,22 @@ class BlobFactory(ABC):
         model."""
         raise NotImplementedError
 
+    def set_rng(self, rng: np.random.Generator) -> None:
+        """
+        Set the random number generator used when sampling blob parameters.
+
+        Called by `Model` when it is given a `seed`. The default implementation
+        stores the generator as `self.rng`; custom factories that want to be
+        seedable through `Model` should draw their random numbers from
+        `self.rng`.
+
+        Parameters
+        ----------
+        rng : np.random.Generator
+            Random number generator to use for sampling.
+        """
+        self.rng = rng
+
 
 class DefaultBlobFactory(BlobFactory):
     """Default implementation of BlobFactory.
@@ -58,6 +74,7 @@ class DefaultBlobFactory(BlobFactory):
         shape_param_p_parameter: float = 0.5,
         shape_param_s_parameter: float = 0.5,
         blob_alignment: bool = False,
+        seed: Union[int, np.random.Generator, None] = None,
     ) -> None:
         """
         Default implementation of BlobFactory.
@@ -100,6 +117,13 @@ class DefaultBlobFactory(BlobFactory):
             If blob_alignment == False, the blob shapes are independent of the propagation direction.
             By default False (matching the Blob class default). This is ignored
             once a tilt angle has been registered with `set_theta_setter`.
+        seed : int, np.random.Generator or None, optional
+            Seed (or an already constructed `numpy.random.Generator`) for the
+            random number generator used to sample blob parameters. Two
+            factories constructed with the same seed produce identical blobs.
+            By default None, i.e. a freshly seeded generator (non-reproducible).
+            Note that a seed passed to `Model` takes precedence: it replaces
+            this factory's generator via `set_rng`.
 
         Notes
         -----
@@ -158,12 +182,13 @@ class DefaultBlobFactory(BlobFactory):
         self.shape_param_s_parameter = shape_param_s_parameter
         self.blob_alignment = blob_alignment
         self.theta_setter: Union[Callable[[], float], None] = None
+        self.rng = np.random.default_rng(seed)
 
     def _draw_random_variables(
         self, dist: DistributionEnum, free_parameter: float, num_blobs: int
     ) -> np.ndarray:
         """Draws random variables from a specified distribution."""
-        return DISTRIBUTIONS[dist](num_blobs, free_param=free_parameter)
+        return DISTRIBUTIONS[dist](num_blobs, self.rng, free_param=free_parameter)
 
     def sample_blobs(
         self,
@@ -223,8 +248,8 @@ class DefaultBlobFactory(BlobFactory):
         spxs_dict = [{"lam": s} for s in spxs]
         spys_dict = [{"lam": s} for s in spys]
         posxs = np.zeros(num_blobs)
-        posys = np.random.uniform(low=0.0, high=Ly, size=num_blobs)
-        t_inits = np.random.uniform(low=0, high=T, size=num_blobs)
+        posys = self.rng.uniform(low=0.0, high=Ly, size=num_blobs)
+        t_inits = self.rng.uniform(low=0, high=T, size=num_blobs)
 
         blobs = [
             Blob(

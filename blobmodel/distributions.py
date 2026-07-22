@@ -27,50 +27,51 @@ class AbstractDistribution(ABC):
         raise NotImplementedError
 
 
-def _sample_deg(num_blobs, **kwargs):
+def _sample_deg(num_blobs, rng, **kwargs):
     free_param = kwargs["free_param"]
     return free_param * np.ones(num_blobs).astype(np.float64)
 
 
-def _sample_zeros(num_blobs, **kwargs):
+def _sample_zeros(num_blobs, rng, **kwargs):
     return np.zeros(num_blobs).astype(np.float64)
 
 
-def _sample_exp(num_blobs, **kwargs):
+def _sample_exp(num_blobs, rng, **kwargs):
     free_param = kwargs["free_param"]
-    return np.random.exponential(scale=free_param, size=num_blobs).astype(np.float64)
+    return rng.exponential(scale=free_param, size=num_blobs).astype(np.float64)
 
 
-def _sample_gamma(num_blobs, **kwargs):
+def _sample_gamma(num_blobs, rng, **kwargs):
     free_param = kwargs["free_param"]
-    return np.random.gamma(
-        shape=free_param, scale=1 / free_param, size=num_blobs
-    ).astype(np.float64)
-
-
-def _sample_normal(num_blobs, **kwargs):
-    free_param = kwargs["free_param"]
-    return np.random.normal(loc=0, scale=free_param, size=num_blobs).astype(np.float64)
-
-
-def _sample_uniform(num_blobs, **kwargs):
-    # Support is [1 - free_param / 2, 1 + free_param / 2]: mean 1 and width
-    # free_param. Note that free_param > 2 produces negative samples, which is
-    # invalid for widths and amplitudes (DefaultBlobFactory raises for widths).
-    free_param = kwargs["free_param"]
-    return np.random.uniform(
-        low=1 - free_param / 2, high=1 + free_param / 2, size=num_blobs
-    ).astype(np.float64)
-
-
-def _sample_rayleigh(num_blobs, **kwargs):
-    # The free parameter is intentionally ignored: the scale is fixed to
-    # sqrt(2 / pi) so that the distribution always has mean 1.
-    return np.random.rayleigh(scale=np.sqrt(2.0 / np.pi), size=num_blobs).astype(
+    return rng.gamma(shape=free_param, scale=1 / free_param, size=num_blobs).astype(
         np.float64
     )
 
 
+def _sample_normal(num_blobs, rng, **kwargs):
+    free_param = kwargs["free_param"]
+    return rng.normal(loc=0, scale=free_param, size=num_blobs).astype(np.float64)
+
+
+def _sample_uniform(num_blobs, rng, **kwargs):
+    # Support is [1 - free_param / 2, 1 + free_param / 2]: mean 1 and width
+    # free_param. Note that free_param > 2 produces negative samples, which is
+    # invalid for widths and amplitudes (DefaultBlobFactory raises for widths).
+    free_param = kwargs["free_param"]
+    return rng.uniform(
+        low=1 - free_param / 2, high=1 + free_param / 2, size=num_blobs
+    ).astype(np.float64)
+
+
+def _sample_rayleigh(num_blobs, rng, **kwargs):
+    # The free parameter is intentionally ignored: the scale is fixed to
+    # sqrt(2 / pi) so that the distribution always has mean 1.
+    return rng.rayleigh(scale=np.sqrt(2.0 / np.pi), size=num_blobs).astype(np.float64)
+
+
+# Sampling functions take (num_blobs, rng, **kwargs) where rng is a
+# numpy.random.Generator; the free parameter is passed as the `free_param`
+# keyword argument.
 DISTRIBUTIONS = {
     DistributionEnum.deg: _sample_deg,
     DistributionEnum.zeros: _sample_zeros,
