@@ -57,7 +57,7 @@ class DefaultBlobFactory(BlobFactory):
         vy_parameter: float = 1.0,
         shape_param_p_parameter: float = 0.5,
         shape_param_s_parameter: float = 0.5,
-        blob_alignment: bool = True,
+        blob_alignment: bool = False,
     ) -> None:
         """
         Default implementation of BlobFactory.
@@ -98,7 +98,7 @@ class DefaultBlobFactory(BlobFactory):
         blob_alignment : bool, optional
             If blob_alignment == True, the blob shapes are rotated in the propagation direction of the blob.
             If blob_alignment == False, the blob shapes are independent of the propagation direction.
-            By default True (note that the Blob class defaults it to False). This is ignored
+            By default False (matching the Blob class default). This is ignored
             once a tilt angle has been registered with `set_theta_setter`.
 
         Notes
@@ -107,10 +107,20 @@ class DefaultBlobFactory(BlobFactory):
             - exp: exponential distribution with mean 1
             - gamma: gamma distribution with `free_parameter` as shape parameter and mean 1
             - normal: normal distribution with zero mean and `free_parameter` as scale parameter
-            - uniform: uniorm distribution with mean 1 and `free_parameter` as width
-            - ray: rayleight distribution with mean 1
+            - uniform: uniform distribution with mean 1 and `free_parameter` as width,
+              i.e. support [1 - `free_parameter` / 2, 1 + `free_parameter` / 2].
+              `free_parameter` > 2 produces negative samples and is therefore
+              rejected with a ValueError for the width distributions.
+            - rayleigh: rayleigh distribution with mean 1. `free_parameter` is
+              intentionally ignored: the scale is fixed to sqrt(2 / pi).
             - deg: degenerate distribution at `free_parameter`
             - zeros: array of zeros
+
+        Raises
+        ------
+        ValueError
+            If a width distribution (`wp_dist` or `ws_dist`) is uniform with
+            `free_parameter` > 2, which would produce negative blob widths.
 
         """
         assert isinstance(A_dist, DistributionEnum)
@@ -120,6 +130,17 @@ class DefaultBlobFactory(BlobFactory):
         assert isinstance(vy_dist, DistributionEnum)
         assert isinstance(spp_dist, DistributionEnum)
         assert isinstance(sps_dist, DistributionEnum)
+
+        for name, dist, parameter in (
+            ("wp", wp_dist, wp_parameter),
+            ("ws", ws_dist, ws_parameter),
+        ):
+            if dist == DistributionEnum.uniform and parameter > 2:
+                raise ValueError(
+                    f"{name}_parameter = {parameter} with {name}_dist = uniform would produce "
+                    f"negative blob widths: the uniform distribution has support "
+                    f"[1 - {name}_parameter / 2, 1 + {name}_parameter / 2], so {name}_parameter must be <= 2."
+                )
 
         self.amplitude_dist = A_dist
         self.width_p_dist = wp_dist

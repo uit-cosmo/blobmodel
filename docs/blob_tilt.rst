@@ -5,9 +5,9 @@ Blob tilt
 
 The code for generating the realizations presented in this file is located in examples/blob_tilting.py
 
-By default, the blob shape is rotated to its propagation direction. This means that the rotation angle
-:math:`\theta` is calculated as ``cmath.phase(vx + vy * 1j)``. This behaviour is set when the blob_alignment
-attribute in the Blob class is set to True, which is the default.
+The blob shape can be rotated to its propagation direction by setting the ``blob_alignment``
+attribute to True (both ``Blob`` and ``DefaultBlobFactory`` default it to False). In that case the
+rotation angle :math:`\theta` is calculated as ``cmath.phase(vx + vy * 1j)``.
 
 An example of a realization with aligned blobs is shown below.
 
@@ -16,7 +16,7 @@ An example of a realization with aligned blobs is shown below.
    :align: center
    :scale: 80%
 
-Alternatively, we can force force any tilt angle by setting blob_alignment = False for each blob. If you use a ``DefaultBlobFactory``, this can be done by setting a False ``blob_alignment`` flag:
+Alternatively, we can set any tilt angle explicitly. With a ``DefaultBlobFactory``, leave ``blob_alignment`` False (the default, shown explicitly here):
 
 .. literalinclude:: ../tests/test_docs.py
    :language: python

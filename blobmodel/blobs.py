@@ -81,8 +81,7 @@ class Blob:
         blob_alignment : bool, optional
             Only used when ``theta is None``. If True, the blob shape is rotated to
             align with the blob propagation direction; if False, the blob shape is
-            axis-aligned (no rotation). Default False. Note that DefaultBlobFactory
-            defaults this to True instead.
+            axis-aligned (no rotation). Default False.
         theta : float or None, optional
             Blob rotation angle with respect to the x-axis (not the velocity
             vector). If not None, this angle is used directly and ``blob_alignment``
