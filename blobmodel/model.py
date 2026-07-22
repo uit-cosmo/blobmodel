@@ -334,10 +334,12 @@ class Model:
             Numerical error when the blob gets truncated.
         """
         _start, _stop = self._compute_start_stop(blob, speed_up, error)
+        # 1D coordinate arrays shaped to broadcast against each other as
+        # (Ny, Nx, Nt) — avoids materializing three full meshgrids.
         _single_blob = blob.discretize_blob(
-            x=self._geometry.x_matrix[:, :, _start:_stop],
-            y=self._geometry.y_matrix[:, :, _start:_stop],
-            t=self._geometry.t_matrix[:, :, _start:_stop],
+            x=self._geometry.x[np.newaxis, :, np.newaxis],
+            y=self._geometry.y[:, np.newaxis, np.newaxis],
+            t=self._geometry.t[np.newaxis, np.newaxis, _start:_stop],
             periodic_y=self._geometry.periodic_y,
             Ly=self._geometry.Ly,
             one_dimensional=self._one_dimensional,
