@@ -54,6 +54,9 @@ def _sample_normal(num_blobs, **kwargs):
 
 
 def _sample_uniform(num_blobs, **kwargs):
+    # Support is [1 - free_param / 2, 1 + free_param / 2]: mean 1 and width
+    # free_param. Note that free_param > 2 produces negative samples, which is
+    # invalid for widths and amplitudes (DefaultBlobFactory raises for widths).
     free_param = kwargs["free_param"]
     return np.random.uniform(
         low=1 - free_param / 2, high=1 + free_param / 2, size=num_blobs
@@ -61,6 +64,8 @@ def _sample_uniform(num_blobs, **kwargs):
 
 
 def _sample_rayleigh(num_blobs, **kwargs):
+    # The free parameter is intentionally ignored: the scale is fixed to
+    # sqrt(2 / pi) so that the distribution always has mean 1.
     return np.random.rayleigh(scale=np.sqrt(2.0 / np.pi), size=num_blobs).astype(
         np.float64
     )

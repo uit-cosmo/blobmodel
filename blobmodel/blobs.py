@@ -1,7 +1,7 @@
 """This module defines a Blob class and related functions for discretizing and manipulating blobs."""
 
 import warnings
-from typing import Union, Any
+from typing import Union, Any, Optional
 from nptyping import NDArray
 import numpy as np
 from .blob_shape import AbstractBlobShape
@@ -45,7 +45,7 @@ class Blob:
         shape_parameters_p: Union[dict, None] = None,
         shape_parameters_s: Union[dict, None] = None,
         blob_alignment: bool = False,
-        theta: float = 0,
+        theta: Optional[float] = None,
     ) -> None:
         """
         Initialize a single blob.
@@ -79,14 +79,14 @@ class Blob:
         shape_parameters_s : dict
             Additional shape parameters for the perpendicular direction.
         blob_alignment : bool, optional
-            If blob_alignment == True, the blob shapes are rotated in the propagation direction of the blob
-            If blob_alignment == False, the blob shapes are independent of the propagation direction
-        theta : float
-            Blob rotation with respect to the x-axis.
-
-            it is computed according to blob_alignment. If set to a no None value,
-        the blob alignment flag is ignored. Important: the blob angle is measured with respect to the x axis, not with
-         respect to the velocity vector.
+            Only used when ``theta is None``. If True, the blob shape is rotated to
+            align with the blob propagation direction; if False, the blob shape is
+            axis-aligned (no rotation). Default False.
+        theta : float or None, optional
+            Blob rotation angle with respect to the x-axis (not the velocity
+            vector). If not None, this angle is used directly and ``blob_alignment``
+            is ignored. If None (the default), the angle is determined by
+            ``blob_alignment``: the velocity phase when it is True, or 0 when False.
 
         """
         assert isinstance(blob_shape, AbstractBlobShape)
@@ -110,9 +110,12 @@ class Blob:
             {} if shape_parameters_s is None else shape_parameters_s
         )
         self.blob_alignment = blob_alignment
-        self._theta = theta
-        if blob_alignment:
+        if theta is not None:
+            self._theta = theta
+        elif blob_alignment:
             self._theta = cmath.phase(self.v_x + self.v_y * 1j)
+        else:
+            self._theta = 0
 
     def discretize_blob(
         self,
