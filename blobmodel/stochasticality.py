@@ -22,10 +22,15 @@ class BlobFactory(ABC):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: Union[float, NDArray],
     ) -> List[Blob]:
         """
         Creates a list of Blobs used in Model.
+
+        Notes
+        -----
+        - Blob draining is owned by the factory, not the `Model`: each `Blob`
+          carries its own `t_drain` (`DefaultBlobFactory` takes it as a
+          constructor argument, `np.inf` — no draining — by default).
         """
         raise NotImplementedError
 
@@ -78,7 +83,6 @@ class BlobListFactory(BlobFactory):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: Union[float, NDArray],
     ) -> List[Blob]:
         """Return the stored blob list. All arguments are ignored."""
         return list(self._blobs)
@@ -140,13 +144,12 @@ class CallableBlobFactory(BlobFactory):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: Union[float, NDArray],
     ) -> List[Blob]:
         """
         Create `num_blobs` blobs by calling the getter with `self.rng`.
 
-        `Ly`, `T`, `blob_shape` and `t_drain` are ignored: the getter is
-        expected to fully specify each blob.
+        `Ly`, `T` and `blob_shape` are ignored: the getter is expected to
+        fully specify each blob.
         """
         return [self._blob_getter(self.rng) for _ in range(num_blobs)]
 
@@ -178,6 +181,7 @@ class DefaultBlobFactory(BlobFactory):
         vy_parameter: float = 1.0,
         shape_param_p_parameter: float = 0.5,
         shape_param_s_parameter: float = 0.5,
+        t_drain: Union[float, NDArray, int] = np.inf,
         blob_alignment: bool = False,
         seed: Union[int, np.random.Generator, None] = None,
     ) -> None:
@@ -217,6 +221,11 @@ class DefaultBlobFactory(BlobFactory):
             Free parameter for the shape parameter distribution in the principal direction, by default 0.5
         shape_param_s_parameter : float, optional
             Free parameter for the shape parameter distribution in the secondary direction, by default 0.5
+        t_drain : float or array-like, optional
+            Drain time scale of the blobs (exponential decay), applied to every
+            sampled blob. Can be a single value or an array-like of length Nx
+            (the number of grid points of the model's geometry in the
+            x-direction). By default `np.inf`, i.e. no draining.
         blob_alignment : bool, optional
             If blob_alignment == True, the blob shapes are rotated in the propagation direction of the blob.
             If blob_alignment == False, the blob shapes are independent of the propagation direction.
@@ -251,7 +260,8 @@ class DefaultBlobFactory(BlobFactory):
             If a distribution argument is not a DistributionEnum member.
         ValueError
             If a width distribution (`wp_dist` or `ws_dist`) is uniform with
-            `free_parameter` > 2, which would produce negative blob widths.
+            `free_parameter` > 2, which would produce negative blob widths,
+            or if `t_drain` is not positive.
 
         """
         for name, dist in (
@@ -291,8 +301,12 @@ class DefaultBlobFactory(BlobFactory):
         self.width_s_parameter = ws_parameter
         self.velocity_x_parameter = vx_parameter
         self.velocity_y_parameter = vy_parameter
+        if np.any(np.asarray(t_drain) <= 0):
+            raise ValueError(f"t_drain must be positive, got t_drain = {t_drain}.")
+
         self.shape_param_p_parameter = shape_param_p_parameter
         self.shape_param_s_parameter = shape_param_s_parameter
+        self.t_drain = t_drain
         self.blob_alignment = blob_alignment
         self.theta_setter: Union[Callable[[], float], None] = None
         self.rng = np.random.default_rng(seed)
@@ -309,10 +323,12 @@ class DefaultBlobFactory(BlobFactory):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: Union[float, NDArray],
     ) -> List[Blob]:
         """
         Creates a list of Blobs used in the Model.
+
+        Every blob is given the factory's `t_drain` (a constructor argument,
+        `np.inf` — no draining — by default).
 
         Parameters
         ----------
@@ -325,9 +341,6 @@ class DefaultBlobFactory(BlobFactory):
             Number of blobs to generate.
         blob_shape : AbstractBlobShape
             Object representing the shape of the blobs.
-        t_drain : float or NDArray
-            Drain time scale of the blobs (exponential decay). Either a
-            scalar or an array of length Nx.
 
         Returns
         -------
@@ -386,7 +399,7 @@ class DefaultBlobFactory(BlobFactory):
                 pos_x0=posxs[i],
                 pos_y0=posys[i],
                 t_init=t_inits[i],
-                t_drain=t_drain,
+                t_drain=self.t_drain,
                 shape_parameters_p=spxs_dict[i],
                 shape_parameters_s=spys_dict[i],
                 blob_alignment=self.blob_alignment,

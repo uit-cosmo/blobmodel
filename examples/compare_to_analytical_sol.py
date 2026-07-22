@@ -16,14 +16,12 @@ import numpy as np
 bf = DefaultBlobFactory(
     A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros, vy_parameter=10
 )
-t_drain = 1e10
 
 tmp = Model(
     geometry=Geometry(
         Nx=10, Ny=10, Lx=10, Ly=10, dt=0.1, T=10000, periodic_y=True, t_init=10
     ),
     blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian, BlobShapeEnum.gaussian),
-    t_drain=1e10,
     num_blobs=10000,
     blob_factory=bf,
     one_dimensional=False,

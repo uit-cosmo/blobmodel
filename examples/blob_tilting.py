@@ -37,7 +37,6 @@ bm = Model(
     ),
     blob_shape=BlobShapeImpl(BlobShapeEnum.rect, BlobShapeEnum.rect),
     num_blobs=100,
-    t_drain=1e10,
     blob_factory=bf,
 )
 ds = bm.make_realization(speed_up=True, error=1e-2)
@@ -69,7 +68,6 @@ bm = Model(
     ),
     blob_shape=BlobShapeImpl(BlobShapeEnum.rect, BlobShapeEnum.rect),
     num_blobs=100,
-    t_drain=1e10,
     blob_factory=bf,
 )
 ds = bm.make_realization(speed_up=True, error=1e-2)

@@ -7,7 +7,6 @@ bm = Model(
         Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=20, periodic_y=True, t_init=10
     ),
     num_blobs=100,
-    t_drain=1e10,
 )
 
 # Make a realization and store it in a DataSet object

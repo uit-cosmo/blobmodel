@@ -147,23 +147,33 @@ def test_model_rejects_wrong_types():
         Model(blob_factory="default")
 
 
-def test_model_rejects_bad_t_drain():
+def test_factory_rejects_nonpositive_t_drain():
     """
-    Model raises ValueError for t_drain arrays of the wrong length and for
-    non-positive t_drain values.
+    DefaultBlobFactory raises ValueError for non-positive t_drain values
+    (t_drain moved from Model to the factory).
     """
     with pytest.raises(ValueError, match="t_drain"):
-        Model(
-            geometry=Geometry(Nx=5),
-            t_drain=np.ones(3),
-        )
+        DefaultBlobFactory(t_drain=-1)
     with pytest.raises(ValueError, match="t_drain"):
-        Model(t_drain=-1)
+        DefaultBlobFactory(t_drain=np.array([1.0, 0.0]))
+
+
+def test_realization_rejects_wrong_length_t_drain():
+    """
+    make_realization raises ValueError when a sampled blob carries an
+    array-valued t_drain whose length does not match the geometry's Nx.
+    """
+    model = Model(
+        geometry=Geometry(Nx=5, Ny=1, Lx=5, Ly=0, dt=1, T=2),
+        num_blobs=2,
+        blob_factory=DefaultBlobFactory(
+            t_drain=np.ones(3), vy_dist=DistributionEnum.zeros
+        ),
+        one_dimensional=True,
+        verbose=False,
+    )
     with pytest.raises(ValueError, match="t_drain"):
-        Model(
-            geometry=Geometry(Nx=2),
-            t_drain=np.array([1.0, 0.0]),
-        )
+        model.make_realization()
 
 
 def test_periodic_y_width_warning_fired_once_with_values():

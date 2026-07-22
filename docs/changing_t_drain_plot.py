@@ -1,27 +1,38 @@
-from blobmodel import Geometry, Model, DefaultBlobFactory
+from blobmodel import (
+    BlobShapeEnum,
+    BlobShapeImpl,
+    DefaultBlobFactory,
+    DistributionEnum,
+    Geometry,
+    Model,
+)
 import matplotlib.pyplot as plt
 import numpy as np
-
-bf = DefaultBlobFactory(A_dist="deg", wp_dist="deg", vx_dist="deg", vy_dist="zeros")
 
 t_drain = np.linspace(2, 1, 100)
 
 tmp = Model(
     geometry=Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=1, T=1000, periodic_y=False),
-    blob_shape="exp",
-    t_drain=t_drain,
+    blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
     num_blobs=10000,
-    blob_factory=bf,
+    blob_factory=DefaultBlobFactory(
+        A_dist=DistributionEnum.deg,
+        vy_dist=DistributionEnum.zeros,
+        t_drain=t_drain,
+    ),
 )
 
 ds_changing_t_drain = tmp.make_realization(speed_up=False)
 
 tmp = Model(
     geometry=Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=1, T=1000, periodic_y=False),
-    blob_shape="exp",
-    t_drain=2,
+    blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
     num_blobs=10000,
-    blob_factory=bf,
+    blob_factory=DefaultBlobFactory(
+        A_dist=DistributionEnum.deg,
+        vy_dist=DistributionEnum.zeros,
+        t_drain=2,
+    ),
 )
 
 ds_constant_drain = tmp.make_realization(speed_up=False)

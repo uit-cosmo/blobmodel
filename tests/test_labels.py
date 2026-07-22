@@ -15,7 +15,6 @@ class CustomBlobFactory(BlobFactory):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: float,
     ) -> List[Blob]:
         return [
             Blob(
@@ -29,7 +28,7 @@ class CustomBlobFactory(BlobFactory):
                 pos_x0=0,
                 pos_y0=Ly / 2,
                 t_init=0,
-                t_drain=t_drain,
+                t_drain=np.inf,
             )
             for i in range(num_blobs)
         ]
@@ -50,7 +49,6 @@ def test_bloblabels(labels, speed_up):
         geometry=Geometry(Nx=5, Ny=1, Lx=5, Ly=5, dt=1, T=5, periodic_y=True),
         num_blobs=1,
         blob_factory=bf,
-        t_drain=1e10,
         labels=labels,
     )
     ds = bm.make_realization(speed_up=speed_up)

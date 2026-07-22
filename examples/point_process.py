@@ -22,7 +22,6 @@ model = bm.Model(
     geometry=bm.Geometry(Nx=1, Ny=1, Lx=1, Ly=0, dt=dt, T=T, t_init=0),
     num_blobs=num_blobs,
     blob_shape=bm.BlobShapeImpl(bm.BlobShapeEnum.exp, bm.BlobShapeEnum.gaussian),
-    t_drain=1e10,
     blob_factory=bm.DefaultBlobFactory(
         A_dist=bm.DistributionEnum.exp, vy_dist=bm.DistributionEnum.zeros
     ),

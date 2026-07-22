@@ -11,14 +11,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # use DefaultBlobFactory to define distribution functions fo random variables
-bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros)
-
 t_drain = 2
+bf = DefaultBlobFactory(
+    A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros, t_drain=t_drain
+)
+
 Nx, Lx = 10, 10
 tmp = Model(
     geometry=Geometry(Nx=Nx, Ny=1, Lx=Lx, Ly=0, dt=1, T=1000, periodic_y=False),
     blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
-    t_drain=t_drain,
     num_blobs=10000,
     blob_factory=bf,
     one_dimensional=True,

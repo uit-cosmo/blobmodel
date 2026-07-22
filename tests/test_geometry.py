@@ -103,7 +103,7 @@ class _ListBlobFactory(BlobFactory):
     def __init__(self, blobs):
         self._blobs = blobs
 
-    def sample_blobs(self, Ly, T, num_blobs, blob_shape, t_drain):
+    def sample_blobs(self, Ly, T, num_blobs, blob_shape):
         return self._blobs
 
     def is_one_dimensional(self):

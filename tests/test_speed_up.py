@@ -39,7 +39,6 @@ class SingleBlobFactory(BlobFactory):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: float,
     ) -> List[Blob]:
         return [Blob(blob_id=0, blob_shape=blob_shape, **self._params)]
 
@@ -70,7 +69,6 @@ def _make_model(
             x0=x0,
         ),
         blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian, BlobShapeEnum.gaussian),
-        t_drain=1e10,
         num_blobs=1,
         blob_factory=factory,
         one_dimensional=True,
@@ -83,7 +81,6 @@ def _single_blob(factory: SingleBlobFactory) -> Blob:
         T=12,
         num_blobs=1,
         blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian, BlobShapeEnum.gaussian),
-        t_drain=1e10,
     )[0]
 
 

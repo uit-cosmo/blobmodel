@@ -3,7 +3,8 @@
 Drainage Time
 =============
 
-By default, the drainage time is set to a constant value in the whole domain. In this case ``t_drain`` is simply set to an integer or float.
+Blob draining is owned by the blob factory: ``DefaultBlobFactory`` takes a ``t_drain`` argument which it assigns to every sampled blob.
+By default ``t_drain`` is ``np.inf``, i.e. the blobs do not drain. Setting it to an integer or float gives a constant drainage time in the whole domain.
 We can also set ``t_drain`` to an array like of length ``Nx``. In this case ``t_drain`` will vary accordingly with x.
 
 Let's take a look at a quick example. Let's assume we want ``t_drain`` to decrease linearly with x. We could implement this as follows:

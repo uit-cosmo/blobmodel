@@ -36,9 +36,7 @@ def test_blob_list_factory_returns_given_blobs():
     """sample_blobs returns exactly the stored blobs; all arguments are ignored."""
     blobs = [_make_blob(blob_id=i) for i in range(3)]
     bf = BlobListFactory(blobs)
-    sampled = bf.sample_blobs(
-        Ly=10, T=10, num_blobs=1000, blob_shape=BlobShapeImpl(), t_drain=10
-    )
+    sampled = bf.sample_blobs(Ly=10, T=10, num_blobs=1000, blob_shape=BlobShapeImpl())
     assert sampled == blobs
 
 
@@ -71,7 +69,6 @@ def test_from_blobs_matches_explicit_model():
         geometry=_geometry(),
         num_blobs=len(blobs),
         blob_shape=BlobShapeImpl(),
-        t_drain=1e10,
         blob_factory=BlobListFactory(blobs),
         verbose=False,
     ).make_realization()
@@ -94,19 +91,17 @@ def _random_blob_getter(rng):
 def test_callable_factory_uses_num_blobs():
     """The getter is called once per requested blob."""
     bf = CallableBlobFactory(_random_blob_getter, seed=42)
-    sampled = bf.sample_blobs(
-        Ly=10, T=10, num_blobs=7, blob_shape=BlobShapeImpl(), t_drain=10
-    )
+    sampled = bf.sample_blobs(Ly=10, T=10, num_blobs=7, blob_shape=BlobShapeImpl())
     assert len(sampled) == 7
 
 
 def test_callable_factory_same_seed_same_blobs():
     """Two factories with the same seed produce identical blobs."""
     blobs_1 = CallableBlobFactory(_random_blob_getter, seed=42).sample_blobs(
-        Ly=10, T=10, num_blobs=10, blob_shape=BlobShapeImpl(), t_drain=10
+        Ly=10, T=10, num_blobs=10, blob_shape=BlobShapeImpl()
     )
     blobs_2 = CallableBlobFactory(_random_blob_getter, seed=42).sample_blobs(
-        Ly=10, T=10, num_blobs=10, blob_shape=BlobShapeImpl(), t_drain=10
+        Ly=10, T=10, num_blobs=10, blob_shape=BlobShapeImpl()
     )
     assert [b.amplitude for b in blobs_1] == [b.amplitude for b in blobs_2]
 
@@ -158,6 +153,12 @@ def test_t_drain_inf_means_no_draining():
     assert ds_drain.n.values[0, -1, -1] < ds.n.values[0, -1, -1]
 
 
-def test_model_accepts_t_drain_inf():
-    """Model validation accepts t_drain=np.inf (documented no-drain value)."""
-    Model(geometry=_geometry(), t_drain=np.inf, verbose=False)
+def test_default_factory_default_is_no_drain():
+    """DefaultBlobFactory defaults to t_drain=np.inf (documented no-drain
+    value), so Model() produces non-draining blobs."""
+    from blobmodel import DefaultBlobFactory
+
+    bf = DefaultBlobFactory()
+    assert bf.t_drain == np.inf
+    blobs = bf.sample_blobs(Ly=10, T=10, num_blobs=2, blob_shape=BlobShapeImpl())
+    assert all(b.t_drain == np.inf for b in blobs)

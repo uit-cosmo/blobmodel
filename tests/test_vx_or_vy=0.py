@@ -20,7 +20,6 @@ class CustomBlobFactoryVy0(BlobFactory):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: float,
     ) -> List[Blob]:
         # set custom parameter distributions
         _amp = np.ones(num_blobs)
@@ -44,7 +43,7 @@ class CustomBlobFactoryVy0(BlobFactory):
                 pos_x0=_posx[i],
                 pos_y0=_posy[i],
                 t_init=_t_init[i],
-                t_drain=t_drain,
+                t_drain=np.inf,
             )
             for i in range(num_blobs)
         ]
@@ -63,7 +62,6 @@ class CustomBlobFactoryVx0(BlobFactory):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: float,
     ) -> List[Blob]:
         # set custom parameter distributions
         _amp = np.ones(num_blobs)
@@ -87,7 +85,7 @@ class CustomBlobFactoryVx0(BlobFactory):
                 pos_x0=_posx[i],
                 pos_y0=_posy[i],
                 t_init=_t_init[i],
-                t_drain=t_drain,
+                t_drain=np.inf,
             )
             for i in range(num_blobs)
         ]
@@ -102,7 +100,6 @@ bm_vy_0 = Model(
     geometry=Geometry(Nx=10, Ny=10, Lx=10, Ly=10, dt=1, T=1, periodic_y=True),
     num_blobs=1,
     blob_factory=bf_vy_0,
-    t_drain=1e10,
 )
 
 bf_vx_0 = CustomBlobFactoryVx0()
@@ -111,7 +108,6 @@ bm_vx_0 = Model(
     geometry=Geometry(Nx=10, Ny=10, Lx=10, Ly=10, dt=1, T=1, periodic_y=True),
     num_blobs=1,
     blob_factory=bf_vx_0,
-    t_drain=1e10,
 )
 
 

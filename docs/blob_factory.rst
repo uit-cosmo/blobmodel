@@ -64,7 +64,7 @@ Pre-built blobs: Model.from_blobs
 If you already know exactly which blobs you want to realize, you don't need parameter distributions at all:
 build the ``Blob`` objects yourself and hand the list to ``Model.from_blobs``.
 Each ``Blob`` carries its own parameters, so the sampling arguments of ``Model``
-(``num_blobs``, ``blob_shape`` and ``t_drain``) are not needed:
+(``num_blobs`` and ``blob_shape``) are not needed:
 
 .. literalinclude:: ../tests/test_docs.py
    :language: python

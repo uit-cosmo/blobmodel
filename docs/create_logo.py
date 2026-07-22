@@ -22,7 +22,6 @@ class CustomBlobFactory(BlobFactory):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: float,
     ) -> List[Blob]:
         # set custom parameter distributions
         amp = [1, 1, 1]
@@ -49,7 +48,7 @@ class CustomBlobFactory(BlobFactory):
                 pos_x0=posx[i],
                 pos_y0=posy[i],
                 t_init=t_init[i],
-                t_drain=t_drain,
+                t_drain=np.inf,
             )
             for i in range(num_blobs)
         ]
@@ -62,7 +61,6 @@ bf = CustomBlobFactory()
 tmp = Model(
     geometry=Geometry(Nx=64, Ny=64, Lx=10, Ly=10, dt=1, T=10, periodic_y=True),
     blob_shape="gauss",
-    t_drain=100000,
     num_blobs=3,
     blob_factory=bf,
 )
