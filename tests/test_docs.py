@@ -1,7 +1,11 @@
 # The following tests check that the docs examples run, if they fail make sure to change the docs too!
 
 
-def test_getting_started():
+def test_getting_started(tmp_path, monkeypatch):
+    # Write example.nc into a temp directory instead of the repo root. The
+    # chdir happens outside the PLACEHOLDER markers so the docs snippet
+    # (docs/getting_started.rst) is unaffected.
+    monkeypatch.chdir(tmp_path)
     # PLACEHOLDER getting_started_0
     from blobmodel import Model
 

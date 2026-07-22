@@ -1,10 +1,12 @@
 """This module defines a class for generating blob parameters."""
 
+from abc import ABC, abstractmethod
 from nptyping import NDArray
 from typing import List, Union, Callable
+import numpy as np
 from .blobs import Blob
 from .blob_shape import AbstractBlobShape
-from .distributions import *
+from .distributions import DISTRIBUTIONS, DistributionEnum
 
 
 class BlobFactory(ABC):
