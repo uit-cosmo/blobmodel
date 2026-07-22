@@ -3,17 +3,11 @@ import sys
 from unittest.mock import patch
 
 import matplotlib.pyplot as plt
-from blobmodel import Model, show_model
+from blobmodel import Geometry, Model, show_model
 import warnings
 
 bm_2d = Model(
-    Nx=10,
-    Ny=10,
-    Lx=10,
-    Ly=10,
-    dt=0.1,
-    T=1,
-    periodic_y=False,
+    geometry=Geometry(Nx=10, Ny=10, Lx=10, Ly=10, dt=0.1, T=1, periodic_y=False),
     num_blobs=1,
 )
 
@@ -35,13 +29,7 @@ def test_plot_2d(mock_show):
 
 
 bm_1d = Model(
-    Nx=10,
-    Ny=1,
-    Lx=10,
-    Ly=1,
-    dt=0.1,
-    T=1,
-    periodic_y=False,
+    geometry=Geometry(Nx=10, Ny=1, Lx=10, Ly=1, dt=0.1, T=1, periodic_y=False),
     num_blobs=1,
 )
 

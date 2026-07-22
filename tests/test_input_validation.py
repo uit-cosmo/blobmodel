@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 from blobmodel import (
+    Geometry,
     Blob,
     BlobShapeEnum,
     BlobShapeImpl,
@@ -152,11 +153,17 @@ def test_model_rejects_bad_t_drain():
     non-positive t_drain values.
     """
     with pytest.raises(ValueError, match="t_drain"):
-        Model(Nx=5, t_drain=np.ones(3))
+        Model(
+            geometry=Geometry(Nx=5),
+            t_drain=np.ones(3),
+        )
     with pytest.raises(ValueError, match="t_drain"):
         Model(t_drain=-1)
     with pytest.raises(ValueError, match="t_drain"):
-        Model(Nx=2, t_drain=np.array([1.0, 0.0]))
+        Model(
+            geometry=Geometry(Nx=2),
+            t_drain=np.array([1.0, 0.0]),
+        )
 
 
 def test_periodic_y_width_warning_fired_once_with_values():
@@ -165,13 +172,7 @@ def test_periodic_y_width_warning_fired_once_with_values():
     Model (not once per blob) and reports the offending width and Ly.
     """
     model = Model(
-        Nx=5,
-        Ny=5,
-        Lx=5,
-        Ly=1,
-        dt=1,
-        T=2,
-        periodic_y=True,
+        geometry=Geometry(Nx=5, Ny=5, Lx=5, Ly=1, dt=1, T=2, periodic_y=True),
         num_blobs=10,
         verbose=False,
         seed=42,
@@ -189,13 +190,7 @@ def test_periodic_y_no_width_warning_for_small_widths():
     No width warning is emitted when the blob widths are small compared to Ly.
     """
     model = Model(
-        Nx=5,
-        Ny=5,
-        Lx=5,
-        Ly=10,
-        dt=1,
-        T=2,
-        periodic_y=True,
+        geometry=Geometry(Nx=5, Ny=5, Lx=5, Ly=10, dt=1, T=2, periodic_y=True),
         num_blobs=10,
         verbose=False,
         seed=42,

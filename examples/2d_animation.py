@@ -1,18 +1,13 @@
-from blobmodel import Model, show_model
+from blobmodel import Geometry, Model, show_model
 
 # Example of a simple two-dimensional realization and animation.
 
 bm = Model(
-    Nx=100,
-    Ny=100,
-    Lx=10,
-    Ly=10,
-    dt=0.1,
-    T=20,
-    periodic_y=True,
+    geometry=Geometry(
+        Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=20, periodic_y=True, t_init=10
+    ),
     num_blobs=100,
     t_drain=1e10,
-    t_init=10,
 )
 
 # Make a realization and store it in a DataSet object

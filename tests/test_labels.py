@@ -1,5 +1,5 @@
 import pytest
-from blobmodel import Model, BlobFactory, Blob, AbstractBlobShape
+from blobmodel import Geometry, Model, BlobFactory, Blob, AbstractBlobShape
 import numpy as np
 import warnings
 from typing import List
@@ -47,13 +47,7 @@ def test_bloblabels(labels, speed_up):
     warnings.filterwarnings("ignore")
     bf = CustomBlobFactory()
     bm = Model(
-        Nx=5,
-        Ny=1,
-        Lx=5,
-        Ly=5,
-        dt=1,
-        T=5,
-        periodic_y=True,
+        geometry=Geometry(Nx=5, Ny=1, Lx=5, Ly=5, dt=1, T=5, periodic_y=True),
         num_blobs=1,
         blob_factory=bf,
         t_drain=1e10,

@@ -3,6 +3,7 @@
 import numpy as np
 import pytest
 from blobmodel import (
+    Geometry,
     Model,
     DefaultBlobFactory,
     DistributionEnum,
@@ -31,12 +32,7 @@ def _sample_default_blobs(factory, num_blobs=10):
 
 def _random_model(seed=None, blob_factory=None):
     return Model(
-        Nx=8,
-        Ny=8,
-        Lx=2,
-        Ly=2,
-        dt=0.5,
-        T=2,
+        geometry=Geometry(Nx=8, Ny=8, Lx=2, Ly=2, dt=0.5, T=2),
         num_blobs=10,
         blob_factory=blob_factory,
         verbose=False,

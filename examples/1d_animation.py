@@ -1,4 +1,5 @@
 from blobmodel import (
+    Geometry,
     Model,
     show_model,
     DefaultBlobFactory,
@@ -12,13 +13,7 @@ from blobmodel import (
 bf = DefaultBlobFactory(vy_dist=DistributionEnum.zeros)
 
 bm = Model(
-    Nx=100,
-    Ny=1,
-    Lx=10,
-    Ly=0,
-    dt=0.1,
-    T=10,
-    periodic_y=False,
+    geometry=Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=0.1, T=10, periodic_y=False),
     blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.exp),
     num_blobs=20,
     t_drain=10,

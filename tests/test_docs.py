@@ -7,19 +7,14 @@ def test_getting_started(tmp_path, monkeypatch):
     # (docs/getting_started.rst) is unaffected.
     monkeypatch.chdir(tmp_path)
     # PLACEHOLDER getting_started_0
-    from blobmodel import Model
+    from blobmodel import Geometry, Model
 
     bm = Model(
-        Nx=10,
-        Ny=10,
-        Lx=10,
-        Ly=10,
-        dt=0.1,
-        T=20,
-        periodic_y=True,
+        geometry=Geometry(
+            Nx=10, Ny=10, Lx=10, Ly=10, dt=0.1, T=20, periodic_y=True, t_init=10
+        ),
         num_blobs=100,
         t_drain=1e10,
-        t_init=10,
     )
     # PLACEHOLDER getting_started_1
     ds = bm.make_realization(file_name="example.nc")
@@ -31,19 +26,13 @@ def test_getting_started(tmp_path, monkeypatch):
 def test_drainage_time():
     # PLACEHOLDER drainage_time_0
     import numpy as np
-    from blobmodel import Model
+    from blobmodel import Geometry, Model
 
     t_drain = np.linspace(2, 1, 100)
 
     tmp = Model(
-        Nx=100,
-        Ny=1,
-        Lx=10,
-        Ly=0,
-        dt=1,
-        T=1000,
+        geometry=Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=1, T=1000, periodic_y=False),
         t_drain=t_drain,
-        periodic_y=False,
         num_blobs=10,
     )
     tmp.make_realization()
@@ -53,6 +42,7 @@ def test_drainage_time():
 def test_one_dim():
     # PLACEHOLDER one_dim_0
     from blobmodel import (
+        Geometry,
         Model,
         DefaultBlobFactory,
         DistributionEnum,
@@ -68,13 +58,7 @@ def test_one_dim():
     )
 
     bm = Model(
-        Nx=100,
-        Ny=1,
-        Lx=10,
-        Ly=0,
-        dt=0.1,
-        T=10,
-        periodic_y=False,
+        geometry=Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=0.1, T=10, periodic_y=False),
         blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
         num_blobs=20,
         t_drain=10,
@@ -88,6 +72,7 @@ def test_one_dim():
 def test_blob_shapes():
     # PLACEHOLDER blob_shapes_0
     from blobmodel import (
+        Geometry,
         Model,
         BlobShapeImpl,
         BlobShapeEnum,
@@ -96,15 +81,9 @@ def test_blob_shapes():
     )
 
     bm = Model(
-        Nx=100,
-        Ny=100,
-        Lx=10,
-        Ly=10,
-        dt=0.1,
-        T=10,
+        geometry=Geometry(Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=10, periodic_y=True),
         num_blobs=10,
         blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.lorentz),
-        periodic_y=True,
         t_drain=1e10,
     )
     # PLACEHOLDER blob_shapes_1
@@ -117,12 +96,7 @@ def test_blob_shapes():
         shape_param_s_parameter=0.5,
     )
     bm = Model(
-        Nx=100,
-        Ny=100,
-        Lx=10,
-        Ly=10,
-        dt=0.1,
-        T=10,
+        geometry=Geometry(Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=10),
         num_blobs=10,
         blob_shape=BlobShapeImpl(BlobShapeEnum.double_exp, BlobShapeEnum.double_exp),
         t_drain=1e10,
@@ -155,16 +129,10 @@ def test_blob_tilt():
 
 def test_blob_labels():
     # PLACEHOLDER blob_labels_0
-    from blobmodel import Model, BlobShapeImpl, BlobShapeEnum
+    from blobmodel import Geometry, Model, BlobShapeImpl, BlobShapeEnum
 
     bm = Model(
-        Nx=10,
-        Ny=10,
-        Lx=20,
-        Ly=20,
-        dt=0.1,
-        T=20,
-        periodic_y=True,
+        geometry=Geometry(Nx=10, Ny=10, Lx=20, Ly=20, dt=0.1, T=20, periodic_y=True),
         blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
         num_blobs=10,
         t_drain=1e10,
@@ -181,17 +149,12 @@ def test_blob_labels():
 
 def test_blob_factory():
     # PLACEHOLDER blob_factory_0
-    from blobmodel import DefaultBlobFactory, DistributionEnum, Model
+    from blobmodel import DefaultBlobFactory, DistributionEnum, Geometry, Model
 
     my_blob_factory = DefaultBlobFactory(A_dist=DistributionEnum.normal, A_parameter=5)
 
     bm = Model(
-        Nx=10,
-        Ny=10,
-        Lx=10,
-        Ly=10,
-        dt=0.1,
-        T=20,
+        geometry=Geometry(Nx=10, Ny=10, Lx=10, Ly=10, dt=0.1, T=20),
         blob_factory=my_blob_factory,
         t_drain=100,
         num_blobs=100,
@@ -203,7 +166,7 @@ def test_blob_factory():
 
 def test_custom_blob_factory():
     # PLACEHOLDER custom_blob_factory_0
-    from blobmodel import BlobFactory, AbstractBlobShape, Blob, Model
+    from blobmodel import BlobFactory, AbstractBlobShape, Blob, Geometry, Model
     import numpy as np
 
     class CustomBlobFactory(BlobFactory):
@@ -257,14 +220,8 @@ def test_custom_blob_factory():
 
     bf = CustomBlobFactory()
     tmp = Model(
-        Nx=10,
-        Ny=10,
-        Lx=2,
-        Ly=2,
-        dt=0.1,
-        T=10,
+        geometry=Geometry(Nx=10, Ny=10, Lx=2, Ly=2, dt=0.1, T=10, periodic_y=True),
         t_drain=2,
-        periodic_y=True,
         num_blobs=10,
         blob_factory=bf,
     )

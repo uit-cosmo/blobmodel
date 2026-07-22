@@ -49,6 +49,35 @@ convention:
 - Behavior changes must be covered by tests (see `tests/test_speed_up.py` for
   the property-based style used for item 1).
 
+## Ongoing effort: API-improvement work package (feedback.md)
+
+`feedback.md` at the repo root is a second tracking document (created
+2026-07-22, distinct from feedback.txt): API-usability suggestions derived from
+surveying how downstream repos actually use blobmodel. The downstream repos
+live locally at `../fusion_scripts` and `../imaging-methods` (directory has a
+hyphen; the package inside is `imaging_methods`) — grep them before changing
+public API.
+
+Key survey finding driving the package: downstream almost never uses
+`DefaultBlobFactory`; the dominant workflow is hand-built `Blob` lists wrapped
+in a trivial factory, plus boilerplate converting the output dataset to the
+GPI/APD `frames(y, x, time)` + `R`/`Z` format.
+
+- Same working convention as feedback.txt: one branch/PR per item, tests for
+  behavior changes.
+- Four open GitHub issues map onto items and should be closed by the
+  implementing PRs: #140 Geometry flexibility (→ item 1, the P0 — downstream
+  pokes `model._geometry` and that hack is half-broken since meshgrids were
+  dropped), #93 t_drain belongs in stochasticality (→ item 3), #132 dataset in
+  cmod_functions format (→ item 6), #101 rework DefaultBlobFactory config
+  (→ item 10, low priority).
+- Suggested order is at the bottom of feedback.md: 1) Geometry (x0/y0 offsets,
+  accept a user-built `Geometry` in `Model`, expose `model.geometry`);
+  2) `BlobListFactory`/`CallableBlobFactory` + `Model.from_blobs`;
+  3) Blob defaults, `t_drain=inf`, `lam` convention docs; 4) output-layout
+  helper, speed_up default.
+- No items have been started yet.
+
 ## Commands
 
 ```bash
@@ -77,9 +106,12 @@ CI is `.github/workflows/workflow.yml` (currently duplicated jobs on Python
   `Blob` and `DefaultBlobFactory` default `blob_alignment=False` (the factory
   defaulted `True` before v1.2.2's theta fix — a behavior change worth a
   changelog mention).
-- **Randomness** is currently the legacy global `np.random.*` API — there is no
-  per-model seed yet (item 5 proposes threading a `numpy.random.Generator`
-  through). Don't introduce more global-state randomness.
+- **Randomness**: seeding exists — `Model(seed=...)` and
+  `DefaultBlobFactory(seed=...)` thread a `numpy.random.Generator` through
+  (`BlobFactory.set_rng` / `self.rng`); a seed passed to `Model` overrides the
+  factory's. Custom factories are only seedable if they draw from `self.rng`
+  — downstream ones currently don't (see feedback.md item 8). Don't introduce
+  global-state `np.random.*` randomness.
 - **Angles** (`theta`) are measured from the x-axis, not from the velocity
   vector.
 - `t_drain` is a drain *time scale* (exponential decay), not a start time; it

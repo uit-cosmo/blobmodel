@@ -1,4 +1,5 @@
 from blobmodel import (
+    Geometry,
     Model,
     show_model,
 )
@@ -6,13 +7,7 @@ from blobmodel import (
 # Example of a realization with a single blob
 
 bm = Model(
-    Nx=10,
-    Ny=10,
-    Lx=10,
-    Ly=10,
-    dt=0.1,
-    T=10,
-    periodic_y=True,
+    geometry=Geometry(Nx=10, Ny=10, Lx=10, Ly=10, dt=0.1, T=10, periodic_y=True),
     num_blobs=1,
     t_drain=1e10,
 )

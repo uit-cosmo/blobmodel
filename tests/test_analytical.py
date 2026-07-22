@@ -1,4 +1,5 @@
 from blobmodel import (
+    Geometry,
     Model,
     DefaultBlobFactory,
     DistributionEnum,
@@ -15,15 +16,9 @@ bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.ze
 t_drain = 2
 Nx, Lx = 10, 10
 tmp = Model(
-    Nx=Nx,
-    Ny=1,
-    Lx=Lx,
-    Ly=0,
-    dt=1,
-    T=1000,
+    geometry=Geometry(Nx=Nx, Ny=1, Lx=Lx, Ly=0, dt=1, T=1000, periodic_y=False),
     blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
     t_drain=t_drain,
-    periodic_y=False,
     num_blobs=10000,
     blob_factory=bf,
     one_dimensional=True,

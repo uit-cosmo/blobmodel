@@ -19,22 +19,15 @@ start_index = int(100 / dt)
 
 # Blobmodel
 model = bm.Model(
-    Nx=1,
-    Ny=1,
-    Lx=1,
-    Ly=0,
-    dt=dt,
-    T=T,
+    geometry=bm.Geometry(Nx=1, Ny=1, Lx=1, Ly=0, dt=dt, T=T, t_init=0),
     num_blobs=num_blobs,
     blob_shape=bm.BlobShapeImpl(bm.BlobShapeEnum.exp, bm.BlobShapeEnum.gaussian),
-    periodic_y=False,
     t_drain=1e10,
     blob_factory=bm.DefaultBlobFactory(
         A_dist=bm.DistributionEnum.exp, vy_dist=bm.DistributionEnum.zeros
     ),
     verbose=True,
-    t_init=0,
-    one_dimensional=True,  # Sets Ly = 0, Ny = 1, and checks vy = 0, and sets the y blob shape to 1.
+    one_dimensional=True,  # Checks vy = 0 and sets the y blob shape to 1.
 )
 ds = model.make_realization(speed_up=True, error=1e-10)
 ds = ds.isel(t=slice(start_index, int(1e50)))

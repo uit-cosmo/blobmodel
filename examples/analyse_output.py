@@ -1,4 +1,4 @@
-from blobmodel import Model, BlobShapeImpl, BlobShapeEnum
+from blobmodel import Geometry, Model, BlobShapeImpl, BlobShapeEnum
 import xarray as xr
 import matplotlib.pyplot as plt
 import os
@@ -8,12 +8,7 @@ import os
 
 if not os.path.isfile("./example.nc"):
     bm = Model(
-        Nx=100,
-        Ny=100,
-        Lx=10,
-        Ly=10,
-        dt=0.1,
-        T=10,
+        geometry=Geometry(Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=10),
         blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
         num_blobs=1000,
     )

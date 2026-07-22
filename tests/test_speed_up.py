@@ -1,4 +1,5 @@
 from blobmodel import (
+    Geometry,
     Model,
     BlobFactory,
     Blob,
@@ -47,22 +48,29 @@ class SingleBlobFactory(BlobFactory):
 
 
 def _make_model(
-    factory: SingleBlobFactory, T: float = 12, geometry_t0: float = 0.0
+    factory: SingleBlobFactory,
+    T: float = 12,
+    geometry_t0: float = 0.0,
+    x0: float = 0.0,
 ) -> Model:
     # Nx == Lx puts grid points on the integers. Only the geometry is used
     # here (no realization is computed), so the model stays cheap. geometry_t0
-    # (Model's t_init) sets where the time axis np.arange(t0, T, dt) starts.
+    # (the geometry's t_init) sets where the time axis np.arange(t0, T, dt)
+    # starts; x0 sets where the x-domain [x0, x0 + Lx) starts.
     return Model(
-        Nx=10,
-        Ny=1,
-        Lx=10,
-        Ly=0,
-        dt=0.1,
-        T=T,
-        t_init=geometry_t0,
+        geometry=Geometry(
+            Nx=10,
+            Ny=1,
+            Lx=10,
+            Ly=0,
+            dt=0.1,
+            T=T,
+            t_init=geometry_t0,
+            periodic_y=False,
+            x0=x0,
+        ),
         blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian, BlobShapeEnum.gaussian),
         t_drain=1e10,
-        periodic_y=False,
         num_blobs=1,
         blob_factory=factory,
         one_dimensional=True,
@@ -80,10 +88,14 @@ def _single_blob(factory: SingleBlobFactory) -> Blob:
 
 
 def _start_stop(
-    factory, speed_up: bool = True, error: float = ERROR, geometry_t0: float = 0.0
+    factory,
+    speed_up: bool = True,
+    error: float = ERROR,
+    geometry_t0: float = 0.0,
+    x0: float = 0.0,
 ):
     """Call _compute_start_stop directly; no discretization is performed."""
-    model = _make_model(factory, geometry_t0=geometry_t0)
+    model = _make_model(factory, geometry_t0=geometry_t0, x0=x0)
     blob = _single_blob(factory)
     start, stop = model._compute_start_stop(blob, speed_up, error)
     return start, stop, model, blob
@@ -182,6 +194,50 @@ def test_compute_start_stop_with_shifted_time_grid(geometry_t0, blob_kwargs):
     assert support.size > 0
     assert start <= support.min()
     assert stop > support.max()  # stop is an exclusive slice bound
+
+
+# (x0, blob_kwargs). The x-domain is [x0, x0 + Lx), so x[0] != 0 and blob
+# positions are absolute coordinates that generally differ from x0.
+OFFSET_X_CONFIGS = [
+    (-5.0, dict(pos_x0=-5.0, v_x=1.0, t_init=0.0)),  # born at the inflow edge
+    (-5.0, dict(pos_x0=0.0, v_x=1.0, t_init=0.0)),  # born mid-domain
+    (-5.0, dict(pos_x0=-8.0, v_x=1.0, t_init=0.0)),  # born left of domain, drifts in
+    (-5.0, dict(pos_x0=3.0, v_x=-2.0, t_init=2.0)),  # leftward, born near right edge
+    (20.0, dict(pos_x0=20.0, v_x=1.0, t_init=0.0)),  # domain far from the origin
+]
+
+
+@pytest.mark.parametrize("x0, blob_kwargs", OFFSET_X_CONFIGS)
+def test_compute_start_stop_with_offset_x_domain(x0, blob_kwargs):
+    """
+    The truncation window is derived from geometry.x[0] and geometry.Lx, so a
+    domain-origin offset x0 must not shift the window off the blob's support
+    (a stale assumption of x[0] == 0 would).
+    """
+    start, stop, model, blob = _start_stop(SingleBlobFactory(**blob_kwargs), x0=x0)
+    size = model._geometry.t.size
+
+    assert model._geometry.x[0] == pytest.approx(x0)
+    assert isinstance(start, numbers.Integral)
+    assert isinstance(stop, numbers.Integral)
+    assert 0 <= start <= stop <= size
+
+    support = _support_indices(model, blob, ERROR)
+    assert support.size > 0
+    assert start <= support.min()
+    assert stop > support.max()  # stop is an exclusive slice bound
+
+
+@pytest.mark.parametrize("x0, blob_kwargs", OFFSET_X_CONFIGS)
+def test_speed_up_realization_matches_full_on_offset_domain(x0, blob_kwargs):
+    """
+    End-to-end guard for offset domains: with speed_up the realization must
+    match the untruncated one to within the truncation error.
+    """
+    factory = SingleBlobFactory(**blob_kwargs)
+    ds_full = _make_model(factory, x0=x0).make_realization(speed_up=False)
+    ds_fast = _make_model(factory, x0=x0).make_realization(speed_up=True, error=ERROR)
+    np.testing.assert_allclose(ds_fast.n.values, ds_full.n.values, atol=10 * ERROR)
 
 
 @pytest.mark.parametrize("speed_up, v_x", [(False, 1.0), (True, 0.0)])

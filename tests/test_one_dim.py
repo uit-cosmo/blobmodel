@@ -1,5 +1,6 @@
 import pytest
 from blobmodel import (
+    Geometry,
     Model,
     DefaultBlobFactory,
     DistributionEnum,
@@ -12,15 +13,9 @@ import numpy as np
 bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros)
 
 one_dim_model = Model(
-    Nx=100,
-    Ny=1,
-    Lx=10,
-    Ly=0,
-    dt=1,
-    T=1000,
+    geometry=Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=1, T=1000, periodic_y=False),
     blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
     t_drain=2,
-    periodic_y=False,
     num_blobs=10000,
     blob_factory=bf,
     one_dimensional=True,
@@ -50,22 +45,29 @@ def test_one_dim_converges_to_analytical():
     assert error < 0.1, "Numerical error too big"
 
 
-def test_1d_warning():
+def test_1d_geometry_mismatch_raises():
     """
-    Checks model warning when instantiating a one-dimensional model with Ny!=0.
+    A one-dimensional model rejects a geometry that is not Ny=1, Ly=0
+    (the geometry is user-provided, so it is not silently overwritten).
     """
-    with pytest.warns(UserWarning):
+    with pytest.raises(ValueError, match="Ny=1"):
         Model(
-            Nx=100,
-            Ny=100,
-            Lx=10,
-            Ly=10,
-            dt=1,
-            T=1000,
+            geometry=Geometry(
+                Nx=100, Ny=100, Lx=10, Ly=10, dt=1, T=1000, periodic_y=False
+            ),
             blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
             t_drain=2,
-            periodic_y=False,
             num_blobs=1,
             blob_factory=bf,
             one_dimensional=True,
         )
+
+
+def test_1d_default_geometry():
+    """
+    With no geometry given, a one-dimensional model builds a default
+    Ny=1, Ly=0 geometry instead of the 2D default.
+    """
+    model = Model(one_dimensional=True, blob_factory=bf, num_blobs=1, verbose=False)
+    assert model.geometry.Ny == 1
+    assert model.geometry.Ly == 0

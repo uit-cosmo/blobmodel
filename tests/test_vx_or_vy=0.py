@@ -1,4 +1,11 @@
-from blobmodel import Model, BlobFactory, Blob, AbstractBlobShape, BlobShapeImpl
+from blobmodel import (
+    Geometry,
+    Model,
+    BlobFactory,
+    Blob,
+    AbstractBlobShape,
+    BlobShapeImpl,
+)
 import numpy as np
 from typing import List
 
@@ -92,13 +99,7 @@ class CustomBlobFactoryVx0(BlobFactory):
 bf_vy_0 = CustomBlobFactoryVy0()
 
 bm_vy_0 = Model(
-    Nx=10,
-    Ny=10,
-    Lx=10,
-    Ly=10,
-    dt=1,
-    T=1,
-    periodic_y=True,
+    geometry=Geometry(Nx=10, Ny=10, Lx=10, Ly=10, dt=1, T=1, periodic_y=True),
     num_blobs=1,
     blob_factory=bf_vy_0,
     t_drain=1e10,
@@ -107,13 +108,7 @@ bm_vy_0 = Model(
 bf_vx_0 = CustomBlobFactoryVx0()
 
 bm_vx_0 = Model(
-    Nx=10,
-    Ny=10,
-    Lx=10,
-    Ly=10,
-    dt=1,
-    T=1,
-    periodic_y=True,
+    geometry=Geometry(Nx=10, Ny=10, Lx=10, Ly=10, dt=1, T=1, periodic_y=True),
     num_blobs=1,
     blob_factory=bf_vx_0,
     t_drain=1e10,

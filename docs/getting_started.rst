@@ -7,7 +7,7 @@ Getting Started
 Creating a model
 ++++++++++++++++
 
-We create a grid on which the blobs are discretized with using the ``Model`` class. Here, we specify the geometry of the model by the number of grid points, the lengths of the domain, the time step, the time length and the initial time of our realization.
+We create a grid on which the blobs are discretized using the ``Geometry`` class. Here, we specify the number of grid points, the lengths of the domain, the time step, the time length and the initial time of our realization. The grid is then passed to the ``Model`` class (leaving it out uses a default ``Geometry()``).
 
 In addition, we can specify the blob shape, drainage time and the number of blobs when creating a ``Model`` object. For more details about the geometry, take a look at the :ref:`blobmodel-geometry` section.
 
@@ -32,7 +32,7 @@ If we provide a ``file_name`` to the ``make_realization`` method, it will store 
 The ``make_realization`` method can take two more arguments, ``speed_up`` and ``error``, which can be helpful for integrating very large datasets.
 By setting ``spee_up`` to ``True``, the code will truncate the blobs when the blob values fall under the given ``error`` value. 
 The code assumes an exponential shape for the blobs when calculating the truncation position (see :ref:`blob-shapes` for further details).
-Increasing the spatial resolution (the `Nx` and `Ny` arguments in the `Model) will lead to something like this:
+Increasing the spatial resolution (the ``Nx`` and ``Ny`` arguments of the ``Geometry``) will lead to something like this:
 
 
 .. image:: 2d_animation.gif

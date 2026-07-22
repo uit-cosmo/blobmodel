@@ -54,9 +54,11 @@ python -m pip install -e .
 Create a grid on which the blobs are discretized using the `Model` class. The `make_realization()` method computes the output as an xarray dataset which can also be written out as a `netcdf` file if the argument `file_name` is specified. A simple example is shown below:
 
 ```Python
-from blobmodel import Model, show_model
+from blobmodel import Geometry, Model, show_model
 
-bm = Model(Nx=200, Ny=100, Lx=10, Ly=10, dt=0.1, T=20, num_blobs=100)
+bm = Model(
+    geometry=Geometry(Nx=200, Ny=100, Lx=10, Ly=10, dt=0.1, T=20), num_blobs=100
+)
 
 ds = bm.make_realization(file_name="example.nc")
 ```
@@ -67,19 +69,14 @@ show_model(ds)
 You can specify the blob parameters with a BlobFactory class. The DefaultBlobFactory class has some of the most common distribution functions implemented. An example would look like this:
 
 ```Python
-from blobmodel import DefaultBlobFactory, DistributionEnum, Model
+from blobmodel import DefaultBlobFactory, DistributionEnum, Geometry, Model
 
 # use DefaultBlobFactory to define distribution functions of random variables
 my_blob_factory = DefaultBlobFactory(A_dist=DistributionEnum.normal, A_parameter=5)
 
 # pass on my_blob_factory when creating the Model
 bm = Model(
-        Nx=100,
-        Ny=100,
-        Lx=10,
-        Ly=10,
-        dt=0.1,
-        T=20,
+        geometry=Geometry(Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=20),
         blob_factory=my_blob_factory,
         t_drain=100,
         num_blobs=100,
