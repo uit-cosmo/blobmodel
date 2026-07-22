@@ -147,11 +147,14 @@ class Blob:
         Parameters
         ----------
         x : NDArray
-            Grid coordinates in the x-direction.
+            Grid coordinates in the x-direction, as a meshgrid array of shape
+            (Ny, Nx, Nt).
         y : NDArray
-            Grid coordinates in the y-direction.
+            Grid coordinates in the y-direction, as a meshgrid array of shape
+            (Ny, Nx, Nt).
         t : NDArray
-            Time coordinates.
+            Time coordinates, as a meshgrid array of shape (Ny, Nx, Nt).
+            A scalar t (single time point) is also accepted.
         Ly : float
             Length of domain in the y-direction.
         periodic_y : bool, optional
@@ -167,7 +170,8 @@ class Blob:
         Returns
         -------
         discretized_blob : NDArray
-            Discretized blob on a 3D array with dimensions (x, y, t).
+            Discretized blob on a 3D array with dimensions (y, x, t),
+            i.e. shape (Ny, Nx, Nt).
 
         Raises
         ------

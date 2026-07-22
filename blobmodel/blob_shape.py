@@ -182,43 +182,73 @@ def _get_dipole_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
 
 
 class BlobShapeImpl(AbstractBlobShape):
-    """Implementation of the AbstractPulseShape class."""
+    """Implementation of the AbstractBlobShape class."""
 
     def __init__(
         self,
-        pulse_shape_p=BlobShapeEnum.gaussian,
-        pulse_shape_s=BlobShapeEnum.gaussian,
+        pulse_shape_p: BlobShapeEnum = BlobShapeEnum.gaussian,
+        pulse_shape_s: BlobShapeEnum = BlobShapeEnum.gaussian,
     ):
         """Initialize the BlobShapeImpl object.
 
-        Attributes
+        Parameters
         ----------
-        pulse_shape_p : str, optional
-            Type of pulse shape in the principal direction, by default "gauss".
-        pulse_shape_s : str, optional
-            Type of pulse shape in the secondary direction, by default "gauss".
+        pulse_shape_p : BlobShapeEnum, optional
+            Type of pulse shape in the principal direction,
+            by default BlobShapeEnum.gaussian.
+        pulse_shape_s : BlobShapeEnum, optional
+            Type of pulse shape in the secondary direction,
+            by default BlobShapeEnum.gaussian.
+
+        Raises
+        ------
+        NotImplementedError
+            If a pulse shape is not a member of BlobShapeEnum with an
+            implemented shape function.
         """
         if (
-            pulse_shape_p not in BlobShapeImpl.__GENERATORS.keys()
-            or pulse_shape_s not in BlobShapeImpl.__GENERATORS.keys()
+            pulse_shape_p not in BlobShapeImpl.__GENERATORS
+            or pulse_shape_s not in BlobShapeImpl.__GENERATORS
         ):
             raise NotImplementedError(
                 f"{self.__class__.__name__}.blob_shape not implemented"
             )
-        self.get_blob_shape_p = BlobShapeImpl.__GENERATORS.get(pulse_shape_p)
-        self.get_blob_shape_s = BlobShapeImpl.__GENERATORS.get(pulse_shape_s)
+        self._shape_p = BlobShapeImpl.__GENERATORS[pulse_shape_p]
+        self._shape_s = BlobShapeImpl.__GENERATORS[pulse_shape_s]
 
     def get_blob_shape_p(self, theta: np.ndarray, **kwargs) -> np.ndarray:
+        """Compute the pulse shape in the principal direction.
+
+        Parameters
+        ----------
+        theta : np.ndarray
+            Array of theta values.
+        kwargs
+            Additional keyword arguments passed to the shape function.
+
+        Returns
+        -------
+        np.ndarray
+            Array representing the pulse shape in the principal direction.
         """
-        Compute the pulse shape in the principal direction.
-        """
-        raise NotImplementedError
+        return self._shape_p(theta, **kwargs)
 
     def get_blob_shape_s(self, theta: np.ndarray, **kwargs) -> np.ndarray:
+        """Compute the pulse shape in the secondary direction.
+
+        Parameters
+        ----------
+        theta : np.ndarray
+            Array of theta values.
+        kwargs
+            Additional keyword arguments passed to the shape function.
+
+        Returns
+        -------
+        np.ndarray
+            Array representing the pulse shape in the secondary direction.
         """
-        Compute the pulse shape in the secondary direction.
-        """
-        raise NotImplementedError
+        return self._shape_s(theta, **kwargs)
 
     __GENERATORS = {
         BlobShapeEnum.exp: _get_exponential_shape,
