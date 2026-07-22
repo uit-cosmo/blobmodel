@@ -1,8 +1,7 @@
 """This module defines the Geometry class for creating a grid for the Model."""
 
-from typing import Any
+from typing import Any, Literal
 from nptyping import NDArray
-from typing_extensions import Literal
 import numpy as np
 
 

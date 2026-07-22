@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -11,7 +11,7 @@ authors = [
 ]
 license = { file = "LICENSE" }
 readme = "README.md"
-requires-python = ">=3"
+requires-python = ">=3.10"
 dependencies = [
     "numpy",
     "xarray",
@@ -19,9 +19,16 @@ dependencies = [
     "nptyping",
     "matplotlib",
     "netcdf4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
     "pytest-cov",
     "black",
     "mypy",
+]
+docs = [
     "sphinx",
     "sphinx-rtd-theme",
 ]
