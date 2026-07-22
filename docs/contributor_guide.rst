@@ -15,11 +15,14 @@ Next, install the package in development mode:
 .. code-block:: bash
 
   # replace your_account with appropriate name
-  git clone https://github.com/your_account/blobmodel.git 
+  git clone https://github.com/your_account/blobmodel.git
   cd blobmodel
-  pip install -e .
+  pip install -e .[dev]
 
 The :py:mod:`-e` specifies that this will be an `editable installation <https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs>`_.
+The :py:mod:`[dev]` extra installs the development tools (pytest, black, mypy).
+If you also want to build the documentation locally, install the docs extra
+with :py:mod:`pip install -e .[docs]`.
 
 .. tip::
 
