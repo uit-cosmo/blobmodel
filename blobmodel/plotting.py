@@ -1,11 +1,10 @@
 """This module provides functions to create and display animations of model output."""
 
-import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-import numpy as np
+from typing import Union, Any, TYPE_CHECKING
 import xarray as xr
-from matplotlib import animation
-from typing import Union, Any
+
+if TYPE_CHECKING:
+    from matplotlib import animation
 
 
 def show_model(
@@ -14,7 +13,8 @@ def show_model(
     interval: int = 100,
     gif_name: Union[str, None] = None,
     fps: int = 10,
-) -> None:
+    show: bool = True,
+) -> "animation.FuncAnimation":
     """
     Creates an animation that shows the evolution of a specific variable over time.
 
@@ -27,28 +27,34 @@ def show_model(
     interval : int, optional
         Time interval between frames in milliseconds (default: 100).
     gif_name : str, optional
-        If not None, save the animation as a GIF and name it acoridingly.
+        If not None, save the animation as a GIF and name it accordingly.
     fps : int, optional
         Set the frames per second for the saved GIF (default: 10).
+    show : bool, optional
+        If True (the default), display the animation in an interactive window
+        with ``plt.show()``, which blocks until the window is closed. Set to
+        False in scripts and CI, e.g. when only saving a GIF.
 
     Returns
     -------
-    None
+    matplotlib.animation.FuncAnimation
+        The animation object. Keep a reference to it as long as the animation
+        should stay alive.
 
     Notes
     -----
     - This function chooses between a 1D and 2D visualizations based on the dimensionality of the dataset.
+    - The color scale is fixed to the global minimum and maximum of `variable`
+      over the whole dataset.
 
     """
+    import matplotlib.pyplot as plt
+    from matplotlib import animation
+
     fig = plt.figure()
 
-    dt = dataset.t.values[1] - dataset.t.values[0]
-
-    frames = []
-
-    for timestep in dataset.t.values:
-        frame = dataset[variable].sel(t=timestep).values
-        frames.append(frame)
+    data = dataset[variable]
+    t_values = dataset.t.values
 
     def animate_1d(i: int) -> Any:
         """
@@ -64,10 +70,8 @@ def show_model(
         None
 
         """
-        x = dataset.x
-        y = frames[i]
-        line.set_data(x, y)
-        plt.title(f"t = {i*dt:.2f}")
+        line.set_data(dataset.x.values, data.isel(t=i).values.ravel())
+        tx.set_text(f"t = {t_values[i]:.2f}")
 
     def animate_2d(i: int) -> Any:
         """
@@ -83,28 +87,25 @@ def show_model(
         None
 
         """
-        arr = frames[i]
-        vmax = np.max(arr)
-        vmin = np.min(arr)
-        im.set_data(arr)
-        im.set_extent((dataset.x[0], dataset.x[-1], dataset.y[0], dataset.y[-1]))
-        im.set_clim(vmin, vmax)
-        tx.set_text(f"t = {i*dt:.2f}")
+        im.set_data(data.isel(t=i).values)
+        tx.set_text(f"t = {t_values[i]:.2f}")
 
     if dataset.y.size == 1:
         line, tx = _setup_1d_plot(dataset=dataset, variable=variable)
         ani = animation.FuncAnimation(
-            fig, animate_1d, frames=dataset["t"].values.size, interval=interval
+            fig, animate_1d, frames=t_values.size, interval=interval
         )
     else:
-        im, tx = _setup_2d_plot(fig=fig, cv0=frames[0])
+        im, tx = _setup_2d_plot(fig=fig, dataset=dataset, variable=variable)
         ani = animation.FuncAnimation(
-            fig, animate_2d, frames=dataset["t"].values.size, interval=interval
+            fig, animate_2d, frames=t_values.size, interval=interval
         )
 
     if gif_name:
         ani.save(gif_name, writer="ffmpeg", fps=fps)
-    plt.show()
+    if show:
+        plt.show()
+    return ani
 
 
 def _setup_1d_plot(dataset, variable):
@@ -126,6 +127,8 @@ def _setup_1d_plot(dataset, variable):
         Text object for the plot title.
 
     """
+    import matplotlib.pyplot as plt
+
     ax = plt.axes(xlim=(0, dataset.x[-1]), ylim=(0, dataset[variable].max()))
     tx = ax.set_title(r"$t = 0$")
     (line,) = ax.plot([], [], lw=2)
@@ -134,7 +137,7 @@ def _setup_1d_plot(dataset, variable):
     return line, tx
 
 
-def _setup_2d_plot(fig, cv0):
+def _setup_2d_plot(fig, dataset, variable):
     """
     Set up a 2D plot for the animation.
 
@@ -142,8 +145,10 @@ def _setup_2d_plot(fig, cv0):
     ----------
     fig : matplotlib.figure.Figure
         Figure object for the plot.
-    cv0 : numpy.ndarray
-        Initial 2D array for the plot.
+    dataset : xr.Dataset
+        Model data.
+    variable : str
+        Variable to be animated.
 
     Returns
     -------
@@ -153,10 +158,24 @@ def _setup_2d_plot(fig, cv0):
         Text object for the plot title.
 
     """
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+    data = dataset[variable]
     ax = fig.add_subplot(111)
     tx = ax.set_title("t = 0")
     div = make_axes_locatable(ax)
     cax = div.append_axes("right", "5%", "5%")
-    im = ax.imshow(cv0, origin="lower")
+    im = ax.imshow(
+        data.isel(t=0).values,
+        origin="lower",
+        extent=(
+            float(dataset.x[0]),
+            float(dataset.x[-1]),
+            float(dataset.y[0]),
+            float(dataset.y[-1]),
+        ),
+        vmin=float(data.min()),
+        vmax=float(data.max()),
+    )
     fig.colorbar(im, cax=cax)
     return im, tx
