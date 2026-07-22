@@ -142,18 +142,26 @@ class DefaultBlobFactory(BlobFactory):
 
         Raises
         ------
+        TypeError
+            If a distribution argument is not a DistributionEnum member.
         ValueError
             If a width distribution (`wp_dist` or `ws_dist`) is uniform with
             `free_parameter` > 2, which would produce negative blob widths.
 
         """
-        assert isinstance(A_dist, DistributionEnum)
-        assert isinstance(wp_dist, DistributionEnum)
-        assert isinstance(ws_dist, DistributionEnum)
-        assert isinstance(vx_dist, DistributionEnum)
-        assert isinstance(vy_dist, DistributionEnum)
-        assert isinstance(spp_dist, DistributionEnum)
-        assert isinstance(sps_dist, DistributionEnum)
+        for name, dist in (
+            ("A_dist", A_dist),
+            ("wp_dist", wp_dist),
+            ("ws_dist", ws_dist),
+            ("vx_dist", vx_dist),
+            ("vy_dist", vy_dist),
+            ("spp_dist", spp_dist),
+            ("sps_dist", sps_dist),
+        ):
+            if not isinstance(dist, DistributionEnum):
+                raise TypeError(
+                    f"{name} must be a DistributionEnum, got {type(dist).__name__}."
+                )
 
         for name, dist, parameter in (
             ("wp", wp_dist, wp_parameter),
@@ -218,8 +226,16 @@ class DefaultBlobFactory(BlobFactory):
         -------
         List[Blob]
             List of Blob objects generated for the Model.
+
+        Raises
+        ------
+        TypeError
+            If blob_shape is not an AbstractBlobShape instance.
         """
-        assert isinstance(blob_shape, AbstractBlobShape)
+        if not isinstance(blob_shape, AbstractBlobShape):
+            raise TypeError(
+                f"blob_shape must be an AbstractBlobShape, got {type(blob_shape).__name__}."
+            )
 
         amps = self._draw_random_variables(
             self.amplitude_dist,

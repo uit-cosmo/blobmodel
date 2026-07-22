@@ -101,8 +101,12 @@ class Model:
 
         Raises
         ------
-        AssertionError
-            If t_drain is not a single value or an array-like of length Nx.
+        TypeError
+            If blob_shape is not an AbstractBlobShape instance or blob_factory
+            is not a BlobFactory instance.
+        ValueError
+            If t_drain is neither a single value nor an array-like of length Nx,
+            or if t_drain is not positive.
 
         Warns
         -----
@@ -116,8 +120,20 @@ class Model:
             blob_shape = BlobShapeImpl()
         if blob_factory is None:
             blob_factory = DefaultBlobFactory()
-        assert isinstance(blob_shape, AbstractBlobShape)
-        assert isinstance(blob_factory, BlobFactory)
+        if not isinstance(blob_shape, AbstractBlobShape):
+            raise TypeError(
+                f"blob_shape must be an AbstractBlobShape, got {type(blob_shape).__name__}."
+            )
+        if not isinstance(blob_factory, BlobFactory):
+            raise TypeError(
+                f"blob_factory must be a BlobFactory, got {type(blob_factory).__name__}."
+            )
+        if not isinstance(t_drain, (int, float)) and len(t_drain) != Nx:
+            raise ValueError(
+                f"t_drain must be a scalar or of length Nx = {Nx}, got length {len(t_drain)}."
+            )
+        if np.any(np.asarray(t_drain) <= 0):
+            raise ValueError(f"t_drain must be positive, got t_drain = {t_drain}.")
         if seed is not None:
             blob_factory.set_rng(np.random.default_rng(seed))
         self._one_dimensional = one_dimensional
@@ -146,10 +162,6 @@ class Model:
         self.blob_shape = blob_shape
         self.num_blobs: int = num_blobs
         self.t_drain: Union[float, NDArray] = t_drain
-
-        assert (
-            isinstance(t_drain, (int, float)) or len(t_drain) == Nx
-        ), "t_drain must be of either length 1 or Nx"
 
         self._blobs: List[Blob] = []
         self._blob_factory = blob_factory
@@ -219,6 +231,13 @@ class Model:
             the model is one-dimensional, the vertical coordinate `y` will be of length 1.
 
 
+        Warns
+        -----
+        UserWarning
+            If periodic_y is set and a sampled blob width is large compared to
+            the domain size Ly, in which case the mirror blobs used to
+            implement the periodicity may become apparent.
+
         Notes
         -----
         - speed_up is only a good approximation for blob_shape="exp"
@@ -234,6 +253,14 @@ class Model:
             blob_shape=self.blob_shape,
             t_drain=self.t_drain,
         )
+
+        if self._geometry.periodic_y and not self._one_dimensional and self._blobs:
+            max_width = max(max(blob.width_p, blob.width_s) for blob in self._blobs)
+            if max_width > self._geometry.Ly / 3:
+                warnings.warn(
+                    f"Blob width up to {max_width:.3g} is big compared to "
+                    f"Ly = {self._geometry.Ly:.3g}, mirrored blobs might become apparent."
+                )
 
         iterable = (
             tqdm(self._blobs, desc="Summing up Blobs") if self._verbose else self._blobs

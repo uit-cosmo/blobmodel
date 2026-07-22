@@ -1,6 +1,5 @@
 """This module defines a Blob class and related functions for discretizing and manipulating blobs."""
 
-import warnings
 from typing import Union, Any, Optional
 from nptyping import NDArray
 import numpy as np
@@ -88,10 +87,26 @@ class Blob:
             is ignored. If None (the default), the angle is determined by
             ``blob_alignment``: the velocity phase when it is True, or 0 when False.
 
-        """
-        assert isinstance(blob_shape, AbstractBlobShape)
+        Raises
+        ------
+        TypeError
+            If ``blob_shape`` is not an ``AbstractBlobShape`` instance.
+        ValueError
+            If ``width_p`` or ``width_s`` is not positive, or if ``t_drain``
+            is not positive (every element, when it is an array).
 
-        self.int = int
+        """
+        if not isinstance(blob_shape, AbstractBlobShape):
+            raise TypeError(
+                f"blob_shape must be an AbstractBlobShape, got {type(blob_shape).__name__}."
+            )
+        if width_p <= 0 or width_s <= 0:
+            raise ValueError(
+                f"Blob widths must be positive, got width_p = {width_p} and width_s = {width_s}."
+            )
+        if np.any(np.asarray(t_drain) <= 0):
+            raise ValueError(f"t_drain must be positive, got t_drain = {t_drain}.")
+
         self.blob_id = blob_id
         self.blob_shape = blob_shape
         self.amplitude = amplitude
@@ -154,21 +169,21 @@ class Blob:
         discretized_blob : NDArray
             Discretized blob on a 3D array with dimensions (x, y, t).
 
-        """
-        # If one_dimensional, then Ly should be 0.
-        assert (one_dimensional and Ly == 0) or not one_dimensional
+        Raises
+        ------
+        ValueError
+            If ``one_dimensional`` is True and ``Ly`` is not 0.
 
-        if (self.width_s > Ly / 3 or self.width_p > Ly / 3) and periodic_y:
-            warnings.warn(
-                "blob width big compared to Ly, mirrored blobs might become apparent."
-            )
+        """
+        if one_dimensional and Ly != 0:
+            raise ValueError(f"One dimensional blobs require Ly == 0, got Ly = {Ly}.")
 
         if not periodic_y or one_dimensional:
             return self._single_blob(
                 x, y, t, Ly, periodic_y, one_dimensional=one_dimensional
             )
 
-        time = t if type(t) in [int, float] else t[0][0]
+        time = t if np.ndim(t) == 0 else t[0][0]
         vertical_prop = self.v_y * (time - self.t_init) + self.pos_y0
         number_of_y_propagations = vertical_prop // Ly
 

@@ -85,18 +85,29 @@ def _get_double_exponential_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
     kwargs
         Additional keyword arguments.
         lam : float
-            Asymmetry parameter controlling the shape.
+            Asymmetry parameter controlling the shape, in the interval [0, 1].
+            The limits are the one-sided shapes: lam = 0 is a pure decay
+            (nonzero only for theta >= 0), lam = 1 a pure rise (nonzero only
+            for theta < 0).
 
     Returns
     -------
     np.ndarray
         Array representing the double-exponential pulse shape.
+
+    Raises
+    ------
+    ValueError
+        If lam lies outside the interval [0, 1].
     """
     lam = kwargs["lam"]
-    assert (lam > 0.0) & (lam < 1.0)
+    if not 0.0 <= lam <= 1.0:
+        raise ValueError(f"lam must be in the interval [0, 1], got lam = {lam}.")
     kern = np.zeros(shape=np.shape(theta))
-    kern[theta < 0] = np.exp(theta[theta < 0] / lam)
-    kern[theta >= 0] = np.exp(-theta[theta >= 0] / (1 - lam))
+    if lam > 0.0:
+        kern[theta < 0] = np.exp(theta[theta < 0] / lam)
+    if lam < 1.0:
+        kern[theta >= 0] = np.exp(-theta[theta >= 0] / (1 - lam))
     return kern
 
 

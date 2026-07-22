@@ -35,11 +35,10 @@ def test_mean_of_distribution():
 
 def test_not_implemented_distribution():
     """
-    Checks that a KeyError is thrown when using unknown strings as distributions.
+    Checks that a TypeError is thrown when using unknown strings as distributions.
     """
-    with pytest.raises(AssertionError):
-        bf = DefaultBlobFactory(A_dist="something_different")
-        bf.sample_blobs(1, 1, 1, BlobShapeImpl(), 1)
+    with pytest.raises(TypeError, match="A_dist"):
+        DefaultBlobFactory(A_dist="something_different")
 
 
 def test_uniform_width_parameter_too_big_raises():
