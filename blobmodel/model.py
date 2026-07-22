@@ -57,7 +57,9 @@ class Model:
         dt : float, optional
             Time step.
         T : float, optional
-            Time length.
+            End time of the simulation. The time grid is
+            ``np.arange(t_init, T, dt)``, so the realized time length is
+            ``T - t_init``.
         periodic_y : bool, optional
             Allow periodicity in the y-direction.
             Important: only good approximation for Ly >> blob width
@@ -67,8 +69,8 @@ class Model:
         num_blobs : int, optional
             Number of blobs.
         t_drain : float or array-like, optional
-            Drain time for the blobs. Can be a single float value or an array-like
-            of length Nx.
+            Drain time scale of the blobs (exponential decay). Can be a single
+            float value or an array-like of length Nx.
         blob_factory : BlobFactory, optional
             BlobFactory instance for setting blob parameter distributions.
             By default None, in which case a `DefaultBlobFactory` is created.
@@ -227,7 +229,8 @@ class Model:
             - x: Horizontal coordinate
             - y: Vertical coordinate
             - t: Time coordinate
-            The resulting blob density, evaluated in the grid, is given by the `DataArray`, `n`. In case that
+            The resulting blob density, evaluated in the grid, is given by the `DataArray`, `n`, with
+            dimension order (y, x, t), i.e. shape (Ny, Nx, Nt). In case that
             the model is one-dimensional, the vertical coordinate `y` will be of length 1.
 
 

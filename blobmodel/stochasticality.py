@@ -214,13 +214,15 @@ class DefaultBlobFactory(BlobFactory):
         Ly : float
             Size of the domain in the y-direction.
         T : float
-            Total time duration.
+            End time of the simulation. Blob arrival times are sampled
+            uniformly in [0, T).
         num_blobs : int
             Number of blobs to generate.
         blob_shape : AbstractBlobShape
             Object representing the shape of the blobs.
-        t_drain : float
-            Time at which the blobs start draining.
+        t_drain : float or NDArray
+            Drain time scale of the blobs (exponential decay). Either a
+            scalar or an array of length Nx.
 
         Returns
         -------

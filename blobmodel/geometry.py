@@ -39,9 +39,11 @@ class Geometry:
         dt : float
             Time step.
         T : float
-            Time length.
+            End time of the simulation. The time grid is
+            ``np.arange(t_init, T, dt)``, so the realized time length is
+            ``T - t_init``.
         t_init : float
-            Initial time
+            Initial time.
         periodic_y : bool
             Flag indicating whether periodicity is allowed in the y-direction.
         """
