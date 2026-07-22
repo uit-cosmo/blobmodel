@@ -23,18 +23,11 @@ class Model:
 
     def __init__(
         self,
-        Nx: int = 100,
-        Ny: int = 100,
-        Lx: float = 10,
-        Ly: float = 10,
-        dt: float = 0.1,
-        T: float = 10,
-        periodic_y: bool = False,
+        geometry: Union[Geometry, None] = None,
         blob_shape: Union[AbstractBlobShape, None] = None,
         num_blobs: int = 1000,
         t_drain: Union[float, NDArray, int] = 10,
         blob_factory: Union[BlobFactory, None] = None,
-        t_init: float = 0,
         labels: str = "off",
         label_border: float = 0.75,
         one_dimensional: bool = False,
@@ -46,23 +39,12 @@ class Model:
 
         Parameters
         ----------
-        Nx : int, optional
-            Number of grid points in x.
-        Ny : int, optional
-            Number of grid points in y.
-        Lx : float, optional
-            Length of the domain in x.
-        Ly : float, optional
-            Length of the domain in y.
-        dt : float, optional
-            Time step.
-        T : float, optional
-            End time of the simulation. The time grid is
-            ``np.arange(t_init, T, dt)``, so the realized time length is
-            ``T - t_init``.
-        periodic_y : bool, optional
-            Allow periodicity in the y-direction.
-            Important: only good approximation for Ly >> blob width
+        geometry : Geometry, optional
+            Grid on which the blobs are discretized. By default None, in which
+            case a default `Geometry` is created (`Geometry()` for a 2D model,
+            `Geometry(Ny=1, Ly=0)` if ``one_dimensional``). Use
+            `Geometry.from_arrays` to build a geometry from explicit
+            coordinate arrays.
         blob_shape : AbstractBlobShape, optional
             Shape of the blobs. Can be an instance of AbstractBlobShape.
             By default None, in which case a gaussian `BlobShapeImpl` is created.
@@ -74,8 +56,6 @@ class Model:
         blob_factory : BlobFactory, optional
             BlobFactory instance for setting blob parameter distributions.
             By default None, in which case a `DefaultBlobFactory` is created.
-        t_init : float, optional
-            Initial time for simulation, default 0.
         labels : str, optional
             Blob label setting. Possible values: "off", "same", "individual".
             "off": no blob labels returned
@@ -86,9 +66,10 @@ class Model:
             Defines region of blob as region where density >= label_border * amplitude of Blob
             Only used if labels = "same" or "individual"
         one_dimensional : bool, optional
-            If True, the perpendicular shape of the blobs will be discarded.
-            Parameters for the y-component (Ny and Ly) will be overwritten to Ny=1, Ly=0.
-            The perpendicular blob shape will be set to 1.
+            If True, the perpendicular shape of the blobs will be discarded
+            and the perpendicular blob shape will be set to 1. Requires a
+            geometry with Ny=1 and Ly=0 (the default geometry is adjusted
+            accordingly).
         verbose : bool, optional
             If True, print a loading bar.
         seed : int, np.random.Generator or None, optional
@@ -104,17 +85,16 @@ class Model:
         Raises
         ------
         TypeError
-            If blob_shape is not an AbstractBlobShape instance or blob_factory
-            is not a BlobFactory instance.
+            If geometry is not a Geometry instance, blob_shape is not an
+            AbstractBlobShape instance or blob_factory is not a BlobFactory
+            instance.
         ValueError
             If t_drain is neither a single value nor an array-like of length Nx,
-            or if t_drain is not positive.
+            or if t_drain is not positive, or if the model is one-dimensional
+            and the geometry does not have Ny=1 and Ly=0.
 
         Warns
         -----
-        UserWarning
-            If the model is one-dimensional and Ny and Ly are not appropriate.
-
         UserWarning
             If the model is one-dimensional and the blob factory is not one-dimensional.
         """
@@ -122,6 +102,12 @@ class Model:
             blob_shape = BlobShapeImpl()
         if blob_factory is None:
             blob_factory = DefaultBlobFactory()
+        if geometry is None:
+            geometry = Geometry(Ny=1, Ly=0) if one_dimensional else Geometry()
+        if not isinstance(geometry, Geometry):
+            raise TypeError(
+                f"geometry must be a Geometry, got {type(geometry).__name__}."
+            )
         if not isinstance(blob_shape, AbstractBlobShape):
             raise TypeError(
                 f"blob_shape must be an AbstractBlobShape, got {type(blob_shape).__name__}."
@@ -130,9 +116,10 @@ class Model:
             raise TypeError(
                 f"blob_factory must be a BlobFactory, got {type(blob_factory).__name__}."
             )
-        if not isinstance(t_drain, (int, float)) and len(t_drain) != Nx:
+        if not isinstance(t_drain, (int, float)) and len(t_drain) != geometry.Nx:
             raise ValueError(
-                f"t_drain must be a scalar or of length Nx = {Nx}, got length {len(t_drain)}."
+                f"t_drain must be a scalar or of length Nx = {geometry.Nx}, "
+                f"got length {len(t_drain)}."
             )
         if np.any(np.asarray(t_drain) <= 0):
             raise ValueError(f"t_drain must be positive, got t_drain = {t_drain}.")
@@ -140,27 +127,17 @@ class Model:
             blob_factory.set_rng(np.random.default_rng(seed))
         self._one_dimensional = one_dimensional
         if self._one_dimensional:
-            if Ny != 1 or Ly != 0:
-                warnings.warn(
-                    "Overwritting Ny=1 and Ly=0 to allow one dimensional model"
+            if geometry.Ny != 1 or geometry.Ly != 0:
+                raise ValueError(
+                    "A one dimensional model requires a geometry with Ny=1 and "
+                    f"Ly=0, got Ny={geometry.Ny} and Ly={geometry.Ly}."
                 )
-                Ny = 1
-                Ly = 0
             if not blob_factory.is_one_dimensional():
                 warnings.warn(
                     "Using a one dimensional model with a blob factory that is not one-dimensional. Are you sure you know what you are doing?"
                 )
 
-        self._geometry: Geometry = Geometry(
-            Nx=Nx,
-            Ny=Ny,
-            Lx=Lx,
-            Ly=Ly,
-            dt=dt,
-            T=T,
-            t_init=t_init,
-            periodic_y=periodic_y,
-        )
+        self._geometry: Geometry = geometry
         self.blob_shape = blob_shape
         self.num_blobs: int = num_blobs
         self.t_drain: Union[float, NDArray] = t_drain
@@ -185,6 +162,11 @@ class Model:
             f"2d Blob Model with"
             + f" num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
         )
+
+    @property
+    def geometry(self) -> Geometry:
+        """Geometry: The grid the model discretizes the blobs on (read-only)."""
+        return self._geometry
 
     def get_blobs(self) -> List[Blob]:
         """
@@ -343,6 +325,7 @@ class Model:
             periodic_y=self._geometry.periodic_y,
             Ly=self._geometry.Ly,
             one_dimensional=self._one_dimensional,
+            y0=self._geometry.y0,
         )
 
         self._density[:, :, _start:_stop] += _single_blob

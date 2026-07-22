@@ -1,4 +1,11 @@
-from blobmodel import Model, DefaultBlobFactory, Blob, BlobShapeImpl, DistributionEnum
+from blobmodel import (
+    Geometry,
+    Model,
+    DefaultBlobFactory,
+    Blob,
+    BlobShapeImpl,
+    DistributionEnum,
+)
 import numpy as np
 from unittest.mock import MagicMock
 
@@ -272,14 +279,8 @@ def test_get_blobs():
     """
     bf = DefaultBlobFactory(A_dist=DistributionEnum.deg)
     model = Model(
-        Nx=100,
-        Ny=100,
-        Lx=10,
-        Ly=10,
-        dt=1,
-        T=1,
+        geometry=Geometry(Nx=100, Ny=100, Lx=10, Ly=10, dt=1, T=1, periodic_y=False),
         t_drain=1e10,
-        periodic_y=False,
         num_blobs=3,
         blob_factory=bf,
     )

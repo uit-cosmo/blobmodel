@@ -1,4 +1,5 @@
 from blobmodel import (
+    Geometry,
     Model,
     BlobFactory,
     Blob,
@@ -62,14 +63,8 @@ class CustomBlobFactory(BlobFactory):
 
 bf = CustomBlobFactory()
 tmp = Model(
-    Nx=32,
-    Ny=32,
-    Lx=10,
-    Ly=10,
-    dt=0.1,
-    T=10,
+    geometry=Geometry(Nx=32, Ny=32, Lx=10, Ly=10, dt=0.1, T=10, periodic_y=True),
     t_drain=2,
-    periodic_y=True,
     num_blobs=100,
     blob_factory=bf,
 )

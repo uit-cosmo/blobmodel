@@ -140,6 +140,7 @@ class Blob:
         Ly: float,
         periodic_y: bool = False,
         one_dimensional: bool = False,
+        y0: float = 0,
     ) -> NDArray:
         """
         Discretize blob on grid. If one_dimensional the secondary pulse shape is ignored.
@@ -165,6 +166,10 @@ class Blob:
             Flag indicating periodicity in the y-direction (default: False).
         one_dimensional : bool, optional
             Flag indicating a one-dimensional blob (default: False).
+        y0 : float, optional
+            Origin of the domain in the y-direction (default: 0). Only used
+            when ``periodic_y`` is True, where the blob position is wrapped
+            into the domain ``[y0, y0 + Ly)``.
 
         Notes
         -----
@@ -193,7 +198,8 @@ class Blob:
 
         time = t if np.ndim(t) == 0 else t[0][0]
         vertical_prop = self.v_y * (time - self.t_init) + self.pos_y0
-        number_of_y_propagations = vertical_prop // Ly
+        # Wrap the blob position into the domain [y0, y0 + Ly).
+        number_of_y_propagations = (vertical_prop - y0) // Ly
 
         # Sum of a centered blob is two "ghost blobs" at vertical positions +-Ly.
         return (

@@ -1,16 +1,10 @@
-from blobmodel import Model
+from blobmodel import Geometry, Model
 
 # Example of use of labels, which returns a new field with the blob labels in the same discretization grid
 # as the blob density n.
 
 bm = Model(
-    Nx=100,
-    Ny=100,
-    Lx=20,
-    Ly=20,
-    dt=0.1,
-    T=20,
-    periodic_y=True,
+    geometry=Geometry(Nx=100, Ny=100, Lx=20, Ly=20, dt=0.1, T=20, periodic_y=True),
     num_blobs=10,
     t_drain=1e10,
     labels="individual",
