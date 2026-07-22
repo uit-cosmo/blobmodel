@@ -1,5 +1,4 @@
 from enum import Enum
-from abc import ABC, abstractmethod
 import numpy as np
 
 
@@ -13,18 +12,6 @@ class DistributionEnum(Enum):
     normal = 5
     uniform = 6
     rayleigh = 7
-
-
-class AbstractDistribution(ABC):
-    """Abstract class used to represent and implement a distribution function."""
-
-    @abstractmethod
-    def sample(
-        self,
-        num_blobs: int,
-        **kwargs,
-    ) -> np.ndarray:
-        raise NotImplementedError
 
 
 def _sample_deg(num_blobs, rng, **kwargs):
