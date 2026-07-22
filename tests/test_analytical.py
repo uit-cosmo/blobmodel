@@ -27,6 +27,7 @@ tmp = Model(
     num_blobs=10000,
     blob_factory=bf,
     one_dimensional=True,
+    seed=42,
 )
 
 

@@ -30,15 +30,16 @@ class Model:
         dt: float = 0.1,
         T: float = 10,
         periodic_y: bool = False,
-        blob_shape: AbstractBlobShape = BlobShapeImpl(),
+        blob_shape: Union[AbstractBlobShape, None] = None,
         num_blobs: int = 1000,
         t_drain: Union[float, NDArray, int] = 10,
-        blob_factory: BlobFactory = DefaultBlobFactory(),
+        blob_factory: Union[BlobFactory, None] = None,
         t_init: float = 0,
         labels: str = "off",
         label_border: float = 0.75,
         one_dimensional: bool = False,
         verbose: bool = True,
+        seed: Union[int, np.random.Generator, None] = None,
     ) -> None:
         """
         Initialize the 2D Model of propagating blobs.
@@ -61,7 +62,8 @@ class Model:
             Allow periodicity in the y-direction.
             Important: only good approximation for Ly >> blob width
         blob_shape : AbstractBlobShape, optional
-            Shape of the blobs. Can be an instance of AbstractBlobShape. Defaults to gaussian.
+            Shape of the blobs. Can be an instance of AbstractBlobShape.
+            By default None, in which case a gaussian `BlobShapeImpl` is created.
         num_blobs : int, optional
             Number of blobs.
         t_drain : float or array-like, optional
@@ -69,6 +71,7 @@ class Model:
             of length Nx.
         blob_factory : BlobFactory, optional
             BlobFactory instance for setting blob parameter distributions.
+            By default None, in which case a `DefaultBlobFactory` is created.
         t_init : float, optional
             Initial time for simulation, default 0.
         labels : str, optional
@@ -86,6 +89,15 @@ class Model:
             The perpendicular blob shape will be set to 1.
         verbose : bool, optional
             If True, print a loading bar.
+        seed : int, np.random.Generator or None, optional
+            Seed (or an already constructed `numpy.random.Generator`) for the
+            random number generator used to sample blob parameters. Two models
+            constructed with the same seed and parameters produce identical
+            realizations. The generator is handed to the blob factory via
+            `BlobFactory.set_rng`, replacing any seed the factory was
+            constructed with; custom factories only honor it if they draw from
+            `self.rng`. By default None, i.e. the factory's own generator is
+            kept (non-reproducible unless the factory was seeded).
 
         Raises
         ------
@@ -100,8 +112,14 @@ class Model:
         UserWarning
             If the model is one-dimensional and the blob factory is not one-dimensional.
         """
+        if blob_shape is None:
+            blob_shape = BlobShapeImpl()
+        if blob_factory is None:
+            blob_factory = DefaultBlobFactory()
         assert isinstance(blob_shape, AbstractBlobShape)
         assert isinstance(blob_factory, BlobFactory)
+        if seed is not None:
+            blob_factory.set_rng(np.random.default_rng(seed))
         self._one_dimensional = one_dimensional
         if self._one_dimensional:
             if Ny != 1 or Ly != 0:

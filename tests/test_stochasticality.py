@@ -6,7 +6,7 @@ def test_mean_of_distribution():
     """
     Checks that the distributions are normalized.
     """
-    bf = DefaultBlobFactory()
+    bf = DefaultBlobFactory(seed=42)
     distributions_mean_1 = [
         DistributionEnum.exp,
         DistributionEnum.gamma,
@@ -67,7 +67,7 @@ def test_rayleigh_ignores_free_parameter():
     The rayleigh distribution intentionally ignores its free parameter: the
     scale is fixed to sqrt(2 / pi) so the mean is always 1.
     """
-    bf = DefaultBlobFactory()
+    bf = DefaultBlobFactory(seed=42)
     for free_parameter in [1, 100]:
         tmp = bf._draw_random_variables(
             dist=DistributionEnum.rayleigh,
