@@ -1,4 +1,4 @@
-from .model import Model
+from .model import Model, to_imaging_dataset
 from .blobs import Blob
 from .plotting import show_model
 from .stochasticality import (

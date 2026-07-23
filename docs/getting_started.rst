@@ -49,9 +49,14 @@ Such animation can be plotted with the following code:
 
 Here, all the blobs move with the same speed and have the same shape and size. We will learn how to set distribution functions for the blobs parameters in :ref:`parameter-distributions`
 
-The ``make_realization`` method returns the realization in the form of an `xarray dataset <https://docs.xarray.dev/en/stable/index.html>`_. 
+The ``make_realization`` method returns the realization in the form of an `xarray dataset <https://docs.xarray.dev/en/stable/index.html>`_.
 The superposed pulses are stored in the ``n`` variable of the dataset. The dimension coordinates are ``x``, ``y`` and
 ``t`` for the horizontal, vertical and time coordinate, respectively.
+
+If you work with analysis tooling that expects experimental gas-puff-imaging (GPI) data, pass ``layout="imaging"``
+to ``make_realization`` to instead obtain the dataset in the imaging format: the density stored as ``frames(y, x, time)``
+with two-dimensional coordinate arrays ``R(y, x)`` and ``Z(y, x)`` holding the grid. The same conversion is available
+for an already-computed dataset via ``blobmodel.to_imaging_dataset``.
 
 We can now analyse the data using the convenient xarray syntax, for example:
 
