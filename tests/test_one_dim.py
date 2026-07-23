@@ -28,7 +28,7 @@ def test_one_dim_converges_to_analytical():
     Checks that one-dimensional realizations of the process agree with analytical results (see
     O. E. Garcia et al. Phys. Plasmas 1 May 2016; 23 (5): 052308. https://doi.org/10.1063/1.4951016)
     """
-    ds = one_dim_model.make_realization(speed_up=True, error=1e-2)
+    ds = one_dim_model.make_realization(truncation_error=1e-2)
     model_profile = ds.n.mean(dim=("t"))
 
     x = np.linspace(0, 10, 100)

@@ -212,25 +212,32 @@ class Model:
 
     def get_blobs(self) -> List[Blob]:
         """
-        Return the list of blobs.
+        Return the list of blobs summed up in the last realization.
 
         Returns
         -------
         List[Blob]
             List of Blob objects.
 
-        Notes
-        -----
-        - Note that if Model.sample_blobs has not been called, the list will be empty
+        Raises
+        ------
+        RuntimeError
+            If no blobs have been sampled yet. Blobs are sampled by
+            ``make_realization``; call it first.
 
         """
+        if not self._blobs:
+            raise RuntimeError(
+                "No blobs have been sampled yet: blobs are sampled by "
+                "make_realization(), call it first."
+            )
         return self._blobs
 
     def make_realization(
         self,
         file_name: Union[str, None] = None,
-        speed_up: bool = False,
-        error: float = 1e-10,
+        speed_up: bool = True,
+        truncation_error: float = 1e-10,
         layout: str = "default",
     ) -> xr.Dataset:
         """
@@ -241,10 +248,14 @@ class Model:
         file_name : str, optional
             File name for the .nc file containing data as an xarray dataset.
         speed_up : bool, optional
-            Flag for speeding up the code by discretizing each single blob at smaller time window
-            when blob values fall under given error value the blob gets discarded
-        error : float, optional
-            Numerical error at x = Lx when the blob gets truncated.
+            Speed up the code by summing up each blob only over the time
+            window where its amplitude on the grid exceeds
+            ``truncation_error``; the rest of the blob is discarded.
+            Enabled by default; set to False for blob shapes with
+            slowly-decaying tails (see Notes).
+        truncation_error : float, optional
+            Amplitude below which a blob is truncated when ``speed_up`` is
+            enabled.
         layout : str, optional
             Layout of the returned (and saved) dataset. Possible values:
             "default": density `n(y, x, t)` with 1D coordinates `x`, `y`, `t`.
@@ -285,7 +296,9 @@ class Model:
 
         Notes
         -----
-        - speed_up is only a good approximation for blob_shape="exp"
+        - The truncation window used by speed_up assumes an exponentially
+          decaying pulse shape (blob_shape="exp"). For shapes with more
+          slowly decaying tails (e.g. lorentz) pass ``speed_up=False``.
         """
         # Validate the layout before doing any expensive work.
         if layout not in {"default", "imaging"}:
@@ -332,7 +345,7 @@ class Model:
             tqdm(self._blobs, desc="Summing up Blobs") if self._verbose else self._blobs
         )
         for blob_index, blob in enumerate(iterable):
-            self._sum_up_blobs(blob, blob_index, speed_up, error)
+            self._sum_up_blobs(blob, blob_index, speed_up, truncation_error)
 
         dataset = self._create_xr_dataset()
         if layout == "imaging":
@@ -393,7 +406,7 @@ class Model:
         blob: Blob,
         blob_index: int,
         speed_up: bool,
-        error: float,
+        truncation_error: float,
     ):
         """
         Sum up the contribution of a single blob to the density field.
@@ -407,10 +420,10 @@ class Model:
             blob label when ``labels="individual"``.
         speed_up : bool
             Flag for speeding up the code by discretizing each single blob at a smaller time window.
-        error : float
-            Numerical error when the blob gets truncated.
+        truncation_error : float
+            Amplitude below which the blob is truncated.
         """
-        _start, _stop = self._compute_start_stop(blob, speed_up, error)
+        _start, _stop = self._compute_start_stop(blob, speed_up, truncation_error)
         # 1D coordinate arrays shaped to broadcast against each other as
         # (Ny, Nx, Nt) — avoids materializing three full meshgrids.
         _single_blob = blob.discretize_blob(
@@ -438,7 +451,7 @@ class Model:
                 _single_blob >= __max_amplitudes * self._label_border
             ] = (blob_index + 1)
 
-    def _compute_start_stop(self, blob: Blob, speed_up: bool, error: float):
+    def _compute_start_stop(self, blob: Blob, speed_up: bool, truncation_error: float):
         """
         Compute the start and stop indices for summing up the contribution of a single blob.
 
@@ -448,8 +461,8 @@ class Model:
             Blob object.
         speed_up : bool
             Flag for speeding up the code by discretizing each single blob at a smaller time window.
-        error : float
-            Numerical error when the blob gets truncated.
+        truncation_error : float
+            Amplitude below which the blob is truncated.
 
         Returns
         -------
@@ -464,7 +477,11 @@ class Model:
             blob.v_x * dt
         )
         idx_Lx = idx_x0 + self._geometry.Lx / (blob.v_x * dt)
-        margin = -blob.width_p * np.log(error * np.sqrt(np.pi)) / np.abs(blob.v_x * dt)
+        margin = (
+            -blob.width_p
+            * np.log(truncation_error * np.sqrt(np.pi))
+            / np.abs(blob.v_x * dt)
+        )
         start = int(np.clip(min(idx_x0, idx_Lx) - margin, 0, self._geometry.t.size))
         stop = int(np.clip(max(idx_x0, idx_Lx) + margin, 0, self._geometry.t.size))
 

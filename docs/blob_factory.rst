@@ -104,3 +104,22 @@ By assigning an array like to the variables ``amp``, ``width``, ``vx``, ``vy``, 
 .. note::
 
    When using ``CustomBlobFactory`` it is your responsibility to make sure all blob variables have the correct dimensions. Also, if you wish to normalize the parameters you have to do this manually.
+
+++++++++++++++++++++++++++
+Stationarity and burn-in
+++++++++++++++++++++++++++
+
+``DefaultBlobFactory`` samples blob arrival times uniformly in ``[0, T)``, the same window the output is computed on.
+Since no blobs have arrived before ``t = 0``, the first part of the realization is a transient in which the mean density is still building up towards its stationary value.
+A common workaround is to discard an initial time slice of the output, but this wastes computed data.
+
+Instead, sample the arrival times on ``[-burn_in, T)`` while keeping the output grid on ``[0, T)``:
+blobs born at negative times have already propagated into the domain when the output starts, so the realization is stationary from ``t = 0``.
+Blob ``t_init`` values may be negative and blobs that never reach the domain within the output window are handled (and, with the default ``speed_up``, skipped cheaply):
+
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER burn_in_0
+   :end-before: # PLACEHOLDER burn_in_1
+
+Note that ``num_blobs`` should be scaled by ``(T + burn_in) / T`` to keep the arrival rate — and thus the stationary mean density — unchanged.

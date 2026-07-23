@@ -23,7 +23,7 @@ decreasing_t_drain = Model(
     ),
 )
 
-ds_decreasing = decreasing_t_drain.make_realization(speed_up=True, error=1e-2)
+ds_decreasing = decreasing_t_drain.make_realization(truncation_error=1e-2)
 ds_decreasing.n.mean(dim=("t")).plot(label="decreasing t_drain")
 
 constant_t_drain = Model(
@@ -35,7 +35,7 @@ constant_t_drain = Model(
     ),
 )
 
-ds_constant = constant_t_drain.make_realization(speed_up=True, error=1e-2)
+ds_constant = constant_t_drain.make_realization(truncation_error=1e-2)
 ds_constant.n.mean(dim=("t")).plot(label="constant t_drain")
 
 plt.yscale("log")

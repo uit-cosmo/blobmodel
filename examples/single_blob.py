@@ -12,7 +12,7 @@ bm = Model(
 )
 
 # create data
-ds = bm.make_realization(speed_up=True, error=1e-2)
+ds = bm.make_realization(truncation_error=1e-2)
 
 # show animation and save as gif
 show_model(dataset=ds, interval=100, gif_name="example.gif", fps=10)

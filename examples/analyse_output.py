@@ -12,7 +12,7 @@ if not os.path.isfile("./example.nc"):
         blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
         num_blobs=1000,
     )
-    bm.make_realization(file_name="example.nc", speed_up=True, error=1e-2)
+    bm.make_realization(file_name="example.nc", truncation_error=1e-2)
 
 # use xarray to open output
 ds = xr.open_dataset("example.nc")

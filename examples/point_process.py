@@ -28,7 +28,7 @@ model = bm.Model(
     verbose=True,
     one_dimensional=True,  # Checks vy = 0 and sets the y blob shape to 1.
 )
-ds = model.make_realization(speed_up=True, error=1e-10)
+ds = model.make_realization(truncation_error=1e-10)
 ds = ds.isel(t=slice(start_index, int(1e50)))
 bm_signal = ds.n.isel(x=0).values
 

@@ -29,9 +29,9 @@ If we provide a ``file_name`` to the ``make_realization`` method, it will store 
    :start-after: # PLACEHOLDER getting_started_1
    :end-before: # PLACEHOLDER getting_started_2
 
-The ``make_realization`` method can take two more arguments, ``speed_up`` and ``error``, which can be helpful for integrating very large datasets.
-By setting ``spee_up`` to ``True``, the code will truncate the blobs when the blob values fall under the given ``error`` value. 
-The code assumes an exponential shape for the blobs when calculating the truncation position (see :ref:`blob-shapes` for further details).
+The ``make_realization`` method can take two more arguments, ``speed_up`` and ``truncation_error``, which are helpful for integrating very large datasets.
+By default (``speed_up=True``), each blob is only summed up over the time window where its amplitude exceeds ``truncation_error`` (default ``1e-10``); the rest is discarded.
+The code assumes an exponential shape for the blobs when calculating the truncation position (see :ref:`blob-shapes` for further details), so pass ``speed_up=False`` for shapes with slowly decaying tails.
 Increasing the spatial resolution (the ``Nx`` and ``Ny`` arguments of the ``Geometry``) will lead to something like this:
 
 

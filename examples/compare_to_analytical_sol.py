@@ -27,7 +27,7 @@ tmp = Model(
     one_dimensional=False,
 )
 
-ds = tmp.make_realization(speed_up=True, error=1e-10)
+ds = tmp.make_realization(truncation_error=1e-10)
 
 mean = ds.n.mean(dim="t").values
 
