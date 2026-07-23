@@ -29,7 +29,7 @@ We can use the ``DefaultBlobFactory`` class in order to change the distribution 
    * - "spp" / "sps"
      - pulse shape parameters in the principal and secondary direction
 
-By default, the amplitude is exponentially distributed with mean 1 and all other parameters are constant (widths and velocities 1, shape parameters 0.5).
+By default, the amplitude is exponentially distributed with mean 1, the perpendicular velocity ``vy`` is zero, and all other parameters are constant (widths and ``vx`` 1, shape parameters 0.5).
 Individual parameters are reconfigured with the ``set_sampler`` method, which takes the parameter name and either one of the built-in distributions or a custom sampling callable. The following distribution functions are implemented:
 
 .. list-table:: 

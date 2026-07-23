@@ -322,15 +322,16 @@ class Model:
 
         # Array-valued t_drain (drain time varying along x) must match the
         # grid; only the model knows Nx, so this cannot be checked by the
-        # factory or the blob itself.
+        # factory or the blob itself. Blob normalizes t_drain to a float
+        # scalar or a float array at construction.
         for blob in self._blobs:
             if (
-                not isinstance(blob.t_drain, (int, float))
-                and len(blob.t_drain) != self._geometry.Nx
+                isinstance(blob.t_drain, np.ndarray)
+                and blob.t_drain.size != self._geometry.Nx
             ):
                 raise ValueError(
                     f"t_drain must be a scalar or of length Nx = {self._geometry.Nx}, "
-                    f"got length {len(blob.t_drain)}."
+                    f"got length {blob.t_drain.size}."
                 )
 
         if self._geometry.periodic_y and not self._one_dimensional and self._blobs:
@@ -477,10 +478,15 @@ class Model:
             blob.v_x * dt
         )
         idx_Lx = idx_x0 + self._geometry.Lx / (blob.v_x * dt)
+        # Decay length of the blob along the x-axis: the blob-frame widths
+        # projected onto x through the tilt angle (width_p for an untilted
+        # blob, width_s at theta = pi/2).
+        width_x = (
+            np.abs(np.cos(blob.theta)) * blob.width_p
+            + np.abs(np.sin(blob.theta)) * blob.width_s
+        )
         margin = (
-            -blob.width_p
-            * np.log(truncation_error * np.sqrt(np.pi))
-            / np.abs(blob.v_x * dt)
+            -width_x * np.log(truncation_error * np.sqrt(np.pi)) / np.abs(blob.v_x * dt)
         )
         start = int(np.clip(min(idx_x0, idx_Lx) - margin, 0, self._geometry.t.size))
         stop = int(np.clip(max(idx_x0, idx_Lx) + margin, 0, self._geometry.t.size))

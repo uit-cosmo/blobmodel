@@ -169,9 +169,11 @@ class DefaultBlobFactory(BlobFactory):
 
     Samples each blob parameter independently. Every parameter defaults to a
     degenerate (constant) distribution except the amplitude, which is
-    exponential with mean 1 (the canonical FPP choice). Individual parameters
-    are reconfigured with `set_sampler`, which accepts either a
-    `DistributionEnum` or an arbitrary sampling callable.
+    exponential with mean 1 (the canonical FPP choice), and the perpendicular
+    velocity ``vy``, which is zero (matching the `Blob` default ``v_y=0``, and
+    making the default factory compatible with one-dimensional models).
+    Individual parameters are reconfigured with `set_sampler`, which accepts
+    either a `DistributionEnum` or an arbitrary sampling callable.
     """
 
     # Configurable parameter names -> (default distribution, free parameter).
@@ -180,7 +182,7 @@ class DefaultBlobFactory(BlobFactory):
         "wp": (DistributionEnum.deg, 1.0),
         "ws": (DistributionEnum.deg, 1.0),
         "vx": (DistributionEnum.deg, 1.0),
-        "vy": (DistributionEnum.deg, 1.0),
+        "vy": (DistributionEnum.zeros, 0.0),
         "spp": (DistributionEnum.deg, 0.5),
         "sps": (DistributionEnum.deg, 0.5),
     }
@@ -195,9 +197,14 @@ class DefaultBlobFactory(BlobFactory):
         Default implementation of BlobFactory.
 
         Blob parameter distributions are configured with `set_sampler`; the
-        defaults are an exponential amplitude with mean 1 and degenerate
-        (constant) distributions for everything else: widths and velocities 1,
-        shape parameters 0.5.
+        defaults are an exponential amplitude with mean 1, zero perpendicular
+        velocity ``vy``, and degenerate (constant) distributions for
+        everything else: widths and ``vx`` 1, shape parameters 0.5.
+
+        .. versionchanged:: 2.0.0
+            ``vy`` previously defaulted to the constant 1, so a bare factory
+            produced diagonally propagating blobs (inconsistent with the
+            `Blob` default ``v_y=0``) and was not one-dimensional-compatible.
 
         Parameters
         ----------

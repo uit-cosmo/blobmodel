@@ -72,8 +72,8 @@ You can specify the blob parameters with a BlobFactory class. The DefaultBlobFac
 from blobmodel import DefaultBlobFactory, DistributionEnum, Geometry, Model
 
 # use DefaultBlobFactory to define distribution functions of random variables
-my_blob_factory = DefaultBlobFactory(
-    A_dist=DistributionEnum.normal, A_parameter=5, t_drain=100
+my_blob_factory = DefaultBlobFactory(t_drain=100).set_sampler(
+    "amplitude", DistributionEnum.normal, free_parameter=5
 )
 
 # pass on my_blob_factory when creating the Model

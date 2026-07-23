@@ -3,6 +3,7 @@ import sys
 from unittest.mock import patch
 
 import matplotlib.pyplot as plt
+import pytest
 from blobmodel import Geometry, Model, show_model
 import warnings
 
@@ -86,6 +87,37 @@ def test_color_scale_is_global():
     im = fig.axes[0].images[0]
     assert im.get_clim() == (float(ds_2d.n.min()), float(ds_2d.n.max()))
     plt.close("all")
+
+
+@patch("matplotlib.pyplot.show")
+def test_1d_plot_honors_domain_origin(mock_show):
+    """
+    The 1D plot x-limits must start at the domain origin (x0 may be nonzero),
+    not at a hardcoded 0.
+    """
+    warnings.filterwarnings("ignore")
+    bm = Model(
+        geometry=Geometry(Nx=10, Ny=1, Lx=10, Ly=0, dt=0.1, T=1, x0=100.0),
+        num_blobs=1,
+        one_dimensional=True,
+    )
+    ds = bm.make_realization()
+    show_model(dataset=ds, show=False)
+    xlim = plt.gca().get_xlim()
+    assert xlim[0] == pytest.approx(float(ds.x[0]))
+    assert xlim[1] == pytest.approx(float(ds.x[-1]))
+    plt.close("all")
+
+
+def test_imaging_layout_raises_clear_error():
+    """
+    Imaging-layout datasets (frames/time, no t coordinate) are not plottable
+    with show_model; the failure must be a clear ValueError instead of an
+    AttributeError from deep inside.
+    """
+    ds_imaging = bm_2d.make_realization(layout="imaging")
+    with pytest.raises(ValueError, match="imaging"):
+        show_model(dataset=ds_imaging, variable="frames")
 
 
 def test_import_does_not_pull_matplotlib():

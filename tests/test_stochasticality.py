@@ -122,8 +122,9 @@ def test_callable_sampler_wrong_shape_raises():
 def test_default_factory_defaults():
     """
     A bare DefaultBlobFactory samples exponential amplitudes with mean 1 (the
-    canonical FPP choice) and constant values for everything else: widths and
-    velocities 1, shape parameters 0.5.
+    canonical FPP choice), zero perpendicular velocity (matching the Blob
+    default v_y=0) and constant values for everything else: widths and vx 1,
+    shape parameters 0.5.
     """
     bf = DefaultBlobFactory(seed=42)
     blobs = bf.sample_blobs(Ly=10, T=10, num_blobs=1000, blob_shape=BlobShapeImpl())
@@ -131,18 +132,19 @@ def test_default_factory_defaults():
     assert 0.9 <= amps.mean() <= 1.1
     assert amps.std() > 0
     assert all(b.width_p == 1 and b.width_s == 1 for b in blobs)
-    assert all(b.v_x == 1 and b.v_y == 1 for b in blobs)
+    assert all(b.v_x == 1 and b.v_y == 0 for b in blobs)
 
 
 def test_is_one_dimensional_only_for_zeros_enum():
     """
     Only the built-in zeros distribution for "vy" marks the factory as
-    one-dimensional; a callable sampler does not, even if it returns zeros.
+    one-dimensional (the default since vy defaults to zeros); a callable
+    sampler does not, even if it returns zeros.
     """
-    assert not DefaultBlobFactory().is_one_dimensional()
-    assert (
+    assert DefaultBlobFactory().is_one_dimensional()
+    assert not (
         DefaultBlobFactory()
-        .set_sampler("vy", DistributionEnum.zeros)
+        .set_sampler("vy", DistributionEnum.deg)
         .is_one_dimensional()
     )
     assert not (
