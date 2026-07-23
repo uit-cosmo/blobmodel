@@ -39,8 +39,8 @@ ds_constant_drain = tmp.make_realization(speed_up=False)
 
 
 def plot_cahnging_t_drain(changing, constant):
-    changing.n.isel(y=0).mean(dim=("t")).plot(label="decreasing t_drain")
-    constant.n.isel(y=0).mean(dim=("t")).plot(label="constant t_drain")
+    changing.n.mean(dim=("t")).plot(label="decreasing t_drain")
+    constant.n.mean(dim=("t")).plot(label="constant t_drain")
     plt.yscale("log")
     plt.legend()
     plt.show()

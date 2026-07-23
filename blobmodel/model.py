@@ -261,8 +261,9 @@ class Model:
             - y: Vertical coordinate
             - t: Time coordinate
             The resulting blob density, evaluated in the grid, is given by the `DataArray`, `n`, with
-            dimension order (y, x, t), i.e. shape (Ny, Nx, Nt). In case that
-            the model is one-dimensional, the vertical coordinate `y` will be of length 1.
+            dimension order (y, x, t), i.e. shape (Ny, Nx, Nt). For a grid
+            with Ly = 0 (one-dimensional model), the `y` dimension is dropped
+            and `n` has dimensions (x, t).
             With ``layout="imaging"`` the density is instead the `DataArray`
             `frames` with dimensions (y, x, time), see `to_imaging_dataset`.
 
@@ -352,16 +353,22 @@ class Model:
             xarray dataset with the density field data.
         """
         if self._geometry.Ly == 0:
+            # 1D output: drop the size-1 y dimension entirely, so consumers
+            # get n(x, t) without having to .squeeze().
             dataset = xr.Dataset(
                 data_vars=dict(
-                    n=(["y", "x", "t"], self._density),
+                    n=(["x", "t"], self._density[0]),
                 ),
                 coords=dict(
                     x=(["x"], self._geometry.x),
                     t=(["t"], self._geometry.t),
                 ),
-                attrs=dict(description="2D propagating blobs."),
+                attrs=dict(description="1D propagating blobs."),
             )
+            if self._labels in {"same", "individual"}:
+                dataset = dataset.assign(
+                    blob_labels=(["x", "t"], self._labels_field[0])
+                )
         else:
             dataset = xr.Dataset(
                 data_vars=dict(
@@ -374,8 +381,10 @@ class Model:
                 ),
                 attrs=dict(description="2D propagating blobs."),
             )
-        if self._labels in {"same", "individual"}:
-            dataset = dataset.assign(blob_labels=(["y", "x", "t"], self._labels_field))
+            if self._labels in {"same", "individual"}:
+                dataset = dataset.assign(
+                    blob_labels=(["y", "x", "t"], self._labels_field)
+                )
 
         return dataset
 

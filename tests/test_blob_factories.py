@@ -142,7 +142,7 @@ def test_t_drain_inf_means_no_draining():
         [blob_inf], geometry=geometry, one_dimensional=True, verbose=False
     ).make_realization()
     # The blob center sits at x = t; the peak amplitude must not decay.
-    peaks = ds.n.values[0, np.arange(10), np.arange(10)]
+    peaks = ds.n.values[np.arange(10), np.arange(10)]
     np.testing.assert_allclose(peaks, peaks[0])
 
     # And it must exceed the equivalent draining blob at late times.
@@ -150,7 +150,7 @@ def test_t_drain_inf_means_no_draining():
     ds_drain = Model.from_blobs(
         [blob_drain], geometry=geometry, one_dimensional=True, verbose=False
     ).make_realization()
-    assert ds_drain.n.values[0, -1, -1] < ds.n.values[0, -1, -1]
+    assert ds_drain.n.values[-1, -1] < ds.n.values[-1, -1]
 
 
 def test_default_factory_default_is_no_drain():

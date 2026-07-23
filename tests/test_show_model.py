@@ -49,6 +49,22 @@ def test_plot_1d(mock_show):
 
 
 @patch("matplotlib.pyplot.show")
+def test_plot_1d_squeezed(mock_show):
+    """
+    Checks that show model runs on true 1D output (Ly = 0), which has no y
+    dimension at all.
+    """
+    warnings.filterwarnings("ignore")
+    bm = Model(
+        geometry=Geometry(Nx=10, Ny=1, Lx=10, Ly=0, dt=0.1, T=1, periodic_y=False),
+        num_blobs=1,
+        one_dimensional=True,
+    )
+    show_model(dataset=bm.make_realization(), interval=100, gif_name=None, fps=10)
+    plt.close("all")
+
+
+@patch("matplotlib.pyplot.show")
 def test_show_false_does_not_block(mock_show):
     """
     show=False must not call plt.show(), so scripts and CI are not blocked.
