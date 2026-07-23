@@ -231,6 +231,7 @@ class Model:
         file_name: Union[str, None] = None,
         speed_up: bool = False,
         error: float = 1e-10,
+        layout: str = "default",
     ) -> xr.Dataset:
         """
         Integrate the Model over time and write out data as an xarray dataset.
@@ -244,6 +245,12 @@ class Model:
             when blob values fall under given error value the blob gets discarded
         error : float, optional
             Numerical error at x = Lx when the blob gets truncated.
+        layout : str, optional
+            Layout of the returned (and saved) dataset. Possible values:
+            "default": density `n(y, x, t)` with 1D coordinates `x`, `y`, `t`.
+            "imaging": the GPI/APD imaging format `frames(y, x, time)` with
+            2D coordinates `R(y, x)`, `Z(y, x)`, as returned by
+            `to_imaging_dataset`. Requires a two-dimensional geometry.
 
         Returns
         -------
@@ -256,12 +263,16 @@ class Model:
             The resulting blob density, evaluated in the grid, is given by the `DataArray`, `n`, with
             dimension order (y, x, t), i.e. shape (Ny, Nx, Nt). In case that
             the model is one-dimensional, the vertical coordinate `y` will be of length 1.
+            With ``layout="imaging"`` the density is instead the `DataArray`
+            `frames` with dimensions (y, x, time), see `to_imaging_dataset`.
 
 
         Raises
         ------
         ValueError
-            If a sampled blob has an array-valued t_drain whose length does
+            If ``layout`` is not one of the values listed above, if
+            ``layout="imaging"`` is requested for a one-dimensional model, or
+            if a sampled blob has an array-valued t_drain whose length does
             not match the geometry's Nx.
 
         Warns
@@ -275,6 +286,15 @@ class Model:
         -----
         - speed_up is only a good approximation for blob_shape="exp"
         """
+        # Validate the layout before doing any expensive work.
+        if layout not in {"default", "imaging"}:
+            raise ValueError(
+                f'layout must be "default" or "imaging", got layout = "{layout}".'
+            )
+        if layout == "imaging" and self._geometry.Ly == 0:
+            raise ValueError(
+                'layout="imaging" requires a two-dimensional geometry (Ly > 0).'
+            )
 
         # Reset density field
         self._reset_fields()
@@ -314,6 +334,8 @@ class Model:
             self._sum_up_blobs(blob, blob_index, speed_up, error)
 
         dataset = self._create_xr_dataset()
+        if layout == "imaging":
+            dataset = to_imaging_dataset(dataset)
 
         if file_name is not None:
             dataset.to_netcdf(file_name)
@@ -448,3 +470,54 @@ class Model:
             self._labels_field = np.zeros(
                 shape=(self._geometry.Ny, self._geometry.Nx, self._geometry.t.size)
             )
+
+
+def to_imaging_dataset(dataset: xr.Dataset) -> xr.Dataset:
+    """
+    Convert a blobmodel output dataset to the GPI/APD imaging format.
+
+    Downstream analysis tooling for experimental gas-puff-imaging (GPI) and
+    avalanche-photodiode (APD) data standardizes on a dataset with the density
+    stored as ``frames(y, x, time)`` and the grid stored as two-dimensional
+    coordinate arrays ``R(y, x)``, ``Z(y, x)``. This helper converts the
+    default blobmodel output ``n(y, x, t)`` (1D coordinates ``x``, ``y``,
+    ``t``) into that format. It is also available directly from the model via
+    ``make_realization(..., layout="imaging")``.
+
+    Parameters
+    ----------
+    dataset : xr.Dataset
+        Dataset as returned by `Model.make_realization` with the default
+        layout. Must be two-dimensional, i.e. contain a `y` coordinate.
+        A `blob_labels` variable, if present, is carried over.
+
+    Returns
+    -------
+    xr.Dataset
+        Dataset with the density as `frames` with dimension order
+        (y, x, time), coordinates `R` and `Z` of shape (Ny, Nx) holding the
+        meshgrid of the `x` and `y` coordinates, and the coordinate `time`.
+
+    Raises
+    ------
+    ValueError
+        If the dataset has no `y` coordinate (one-dimensional model output).
+    """
+    if "y" not in dataset.coords:
+        raise ValueError(
+            "The imaging layout requires two-dimensional model output "
+            "with a y coordinate."
+        )
+    grid_r, grid_z = np.meshgrid(dataset.x.values, dataset.y.values)
+    data_vars = {"frames": (["y", "x", "time"], dataset.n.values)}
+    if "blob_labels" in dataset:
+        data_vars["blob_labels"] = (["y", "x", "time"], dataset.blob_labels.values)
+    return xr.Dataset(
+        data_vars,
+        coords={
+            "R": (["y", "x"], grid_r),
+            "Z": (["y", "x"], grid_z),
+            "time": (["time"], dataset.t.values),
+        },
+        attrs=dataset.attrs,
+    )
