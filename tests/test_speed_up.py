@@ -233,8 +233,22 @@ def test_speed_up_realization_matches_full_on_offset_domain(x0, blob_kwargs):
     """
     factory = SingleBlobFactory(**blob_kwargs)
     ds_full = _make_model(factory, x0=x0).make_realization(speed_up=False)
-    ds_fast = _make_model(factory, x0=x0).make_realization(speed_up=True, error=ERROR)
+    ds_fast = _make_model(factory, x0=x0).make_realization(truncation_error=ERROR)
     np.testing.assert_allclose(ds_fast.n.values, ds_full.n.values, atol=10 * ERROR)
+
+
+def test_make_realization_defaults_to_speed_up():
+    """
+    speed_up=True with truncation_error=1e-10 is the documented default
+    (every surveyed downstream call passed exactly this); a silent flip back
+    to False would go unnoticed by the other tests, which all pass the flag
+    explicitly.
+    """
+    import inspect
+
+    params = inspect.signature(Model.make_realization).parameters
+    assert params["speed_up"].default is True
+    assert params["truncation_error"].default == 1e-10
 
 
 @pytest.mark.parametrize("speed_up, v_x", [(False, 1.0), (True, 0.0)])

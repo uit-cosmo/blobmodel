@@ -10,7 +10,7 @@ bm = Model(
 )
 
 # create data
-ds = bm.make_realization(speed_up=True, error=1e-2)
+ds = bm.make_realization(truncation_error=1e-2)
 
 import matplotlib.pyplot as plt
 

@@ -26,7 +26,7 @@ def test_imaging_layout_matches_downstream_conversion():
     hand from the default layout: frames(y, x, time) with meshgrid R/Z
     coordinates.
     """
-    ds = make_model().make_realization(speed_up=True, error=1e-10)
+    ds = make_model().make_realization(truncation_error=1e-10)
     grid_r, grid_z = np.meshgrid(ds.x.values, ds.y.values)
     expected = xr.Dataset(
         {"frames": (["y", "x", "time"], ds.n.values)},
@@ -37,9 +37,7 @@ def test_imaging_layout_matches_downstream_conversion():
         },
     )
 
-    ds_imaging = make_model().make_realization(
-        speed_up=True, error=1e-10, layout="imaging"
-    )
+    ds_imaging = make_model().make_realization(truncation_error=1e-10, layout="imaging")
     xr.testing.assert_allclose(ds_imaging, expected)
 
 
@@ -48,10 +46,8 @@ def test_to_imaging_dataset_converter():
     The standalone converter produces the same dataset as the layout
     argument, so already-computed datasets can be converted too.
     """
-    ds = make_model().make_realization(speed_up=True, error=1e-10)
-    ds_imaging = make_model().make_realization(
-        speed_up=True, error=1e-10, layout="imaging"
-    )
+    ds = make_model().make_realization(truncation_error=1e-10)
+    ds_imaging = make_model().make_realization(truncation_error=1e-10, layout="imaging")
     xr.testing.assert_allclose(to_imaging_dataset(ds), ds_imaging)
 
 

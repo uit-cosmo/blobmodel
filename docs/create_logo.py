@@ -65,7 +65,7 @@ tmp = Model(
     blob_factory=bf,
 )
 
-ds = tmp.make_realization(speed_up=True, error=1e-1)
+ds = tmp.make_realization(truncation_error=1e-1)
 
 import matplotlib.pyplot as plt
 

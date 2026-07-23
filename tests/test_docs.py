@@ -64,7 +64,7 @@ def test_one_dim():
         blob_factory=bf,
         one_dimensional=True,
     )
-    bm.make_realization(speed_up=True, error=1e-2)
+    bm.make_realization(truncation_error=1e-2)
     # PLACEHOLDER one_dim_0
 
 
@@ -136,7 +136,7 @@ def test_blob_labels():
         label_border=0.75,
     )
 
-    ds = bm.make_realization(speed_up=True, error=1e-2)
+    ds = bm.make_realization(truncation_error=1e-2)
 
     ds["n"].isel(t=-1).plot()
     ds["blob_labels"].isel(t=-1).plot()
@@ -288,3 +288,30 @@ def test_custom_blob_factory():
 
     ds = tmp.make_realization()
     # PLACEHOLDER custom_blob_factory_1
+
+
+def test_burn_in():
+    # PLACEHOLDER burn_in_0
+    from blobmodel import Blob, CallableBlobFactory, Geometry, Model
+    import numpy as np
+
+    T = 10
+    burn_in = 5  # roughly a few blob transit/drain times
+
+    def blob_getter(rng: np.random.Generator) -> Blob:
+        # Arrivals sampled on [-burn_in, T): blobs born before t = 0 have
+        # already propagated into the domain when the output starts.
+        return Blob(
+            amplitude=rng.exponential(),
+            pos_y0=rng.uniform(0, 10),
+            t_init=rng.uniform(-burn_in, T),
+        )
+
+    bm = Model(
+        geometry=Geometry(Nx=10, Ny=10, Lx=10, Ly=10, dt=0.1, T=T),
+        # scale num_blobs with T + burn_in to keep the arrival rate fixed
+        num_blobs=int(30 * (T + burn_in) / T),
+        blob_factory=CallableBlobFactory(blob_getter, seed=42),
+    )
+    ds = bm.make_realization()
+    # PLACEHOLDER burn_in_1

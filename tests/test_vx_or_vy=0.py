@@ -112,8 +112,8 @@ bm_vx_0 = Model(
 
 
 def test_vy_0():
-    assert bm_vy_0.make_realization(speed_up=True, error=1e-2)
+    assert bm_vy_0.make_realization(truncation_error=1e-2)
 
 
 def test_vx_0():
-    assert bm_vx_0.make_realization(speed_up=True, error=1e-2)
+    assert bm_vx_0.make_realization(truncation_error=1e-2)

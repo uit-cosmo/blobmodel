@@ -39,7 +39,7 @@ bm = Model(
     num_blobs=100,
     blob_factory=bf,
 )
-ds = bm.make_realization(speed_up=True, error=1e-2)
+ds = bm.make_realization(truncation_error=1e-2)
 # show animation and save as gif
 show_model(dataset=ds, interval=100, gif_name="alignment_true.gif", fps=10)
 
@@ -70,6 +70,6 @@ bm = Model(
     num_blobs=100,
     blob_factory=bf,
 )
-ds = bm.make_realization(speed_up=True, error=1e-2)
+ds = bm.make_realization(truncation_error=1e-2)
 # show animation and save as gif
 show_model(dataset=ds, interval=100, gif_name="alignment_false.gif", fps=10)

@@ -7,6 +7,7 @@ from blobmodel import (
     DistributionEnum,
 )
 import numpy as np
+import pytest
 from unittest.mock import MagicMock
 
 
@@ -306,6 +307,19 @@ def test_get_blobs():
     model.make_realization()
     blob_list = model.get_blobs()
     assert len(blob_list) == 3
+
+
+def test_get_blobs_before_realization_raises():
+    """
+    get_blobs() before make_realization() has nothing to return; it must
+    raise instead of silently returning an empty list.
+    """
+    model = Model(
+        geometry=Geometry(Nx=100, Ny=100, Lx=10, Ly=10, dt=1, T=1, periodic_y=False),
+        num_blobs=3,
+    )
+    with pytest.raises(RuntimeError, match="make_realization"):
+        model.get_blobs()
 
 
 def _make_blob(blob_alignment=False, theta=None):
