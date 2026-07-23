@@ -13,7 +13,7 @@ class Blob:
     the function `discretize_blob`. The contribution of a single blob to a grid defined by `x`, `y` and `t` is given by:
 
     .. math::
-        a e^{-(t-t_k)/\\tau_\\shortparallel}\\varphi\\left( \\frac{x-v(t-t_k)}{\ell_x}, \\frac{(y-y_k)-w(t-t_k)}{\ell_y} \\right)
+        a e^{-(t-t_k)/\\tau_\\shortparallel}\\varphi\\left( \\frac{(x-x_k)-v(t-t_k)}{\ell_x}, \\frac{(y-y_k)-w(t-t_k)}{\ell_y} \\right)
 
     Where:
         - :math:`a` is the blob amplitude, `amplitude`.
@@ -21,11 +21,16 @@ class Blob:
         - :math:`\ell_y` is the blob width in the secondary direction, `width_s`.
         - :math:`v` is the horizontal blob velocity.
         - :math:`w` is the vertical blob velocity.
-        - :math:`t_k` is the blob arriving time at the position x=0, `t_init`.
+        - :math:`x_k` and :math:`y_k` are the blob position at time :math:`t_k`,
+          `pos_x0` and `pos_y0`.
+        - :math:`t_k` is the time at which the blob is seeded at
+          :math:`(x_k, y_k)`, `t_init`.
         - :math:`\\tau_\\shortparallel` is the drainage time, `t_drain`.
         - :math:`\\varphi` is the blob pulse shape, `blob_shape`.
 
-    Additionally, a tilt angle can be provided through `theta`.
+    Additionally, a tilt angle can be provided through `theta`, in which case
+    the two arguments of :math:`\\varphi` are rotated by `theta` around the
+    blob center.
     """
 
     def __init__(

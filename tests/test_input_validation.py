@@ -149,6 +149,26 @@ def test_model_rejects_wrong_types():
         Model(blob_factory="default")
 
 
+def test_model_rejects_unknown_labels():
+    """
+    Model raises ValueError for a labels value that is not "off", "same" or
+    "individual"; previously a typo was silently treated as "off".
+    """
+    for bad_labels in ["individal", "Individual", ""]:
+        with pytest.raises(ValueError, match="labels"):
+            Model(labels=bad_labels)
+
+
+def test_geometry_rejects_periodic_y_with_zero_ly():
+    """
+    Geometry raises ValueError for periodic_y=True with Ly=0; previously the
+    combination silently produced an all-NaN density field (floor division by
+    Ly = 0 when wrapping blob positions).
+    """
+    with pytest.raises(ValueError, match="periodic_y"):
+        Geometry(Ly=0, periodic_y=True)
+
+
 def test_factory_rejects_nonpositive_t_drain():
     """
     DefaultBlobFactory raises ValueError for non-positive t_drain values

@@ -94,8 +94,9 @@ class Model:
             AbstractBlobShape instance or blob_factory is not a BlobFactory
             instance.
         ValueError
-            If the model is one-dimensional and the geometry does not have
-            Ny=1 and Ly=0.
+            If ``labels`` is not one of the values listed above, or if the
+            model is one-dimensional and the geometry does not have Ny=1 and
+            Ly=0.
 
         Warns
         -----
@@ -119,6 +120,10 @@ class Model:
         if not isinstance(blob_factory, BlobFactory):
             raise TypeError(
                 f"blob_factory must be a BlobFactory, got {type(blob_factory).__name__}."
+            )
+        if labels not in {"off", "same", "individual"}:
+            raise ValueError(
+                f'labels must be "off", "same" or "individual", got labels = "{labels}".'
             )
         if seed is not None:
             blob_factory.set_rng(np.random.default_rng(seed))

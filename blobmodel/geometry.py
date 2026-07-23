@@ -61,7 +61,18 @@ class Geometry:
             Origin of the domain in the y-direction, analogous to ``x0``. Note
             that `DefaultBlobFactory` samples blob positions ``pos_y0`` in
             ``[0, Ly]`` regardless of ``y0``.
+
+        Raises
+        ------
+        ValueError
+            If ``periodic_y`` is True and ``Ly`` is 0: y-periodicity is
+            meaningless in a zero-width domain, and wrapping blob positions
+            would divide by ``Ly``.
         """
+        if periodic_y and Ly == 0:
+            raise ValueError(
+                "periodic_y=True requires a domain with Ly > 0, got Ly = 0."
+            )
         self.Nx = Nx
         self.Ny = Ny
         self.Lx = Lx

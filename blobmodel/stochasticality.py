@@ -62,7 +62,7 @@ class BlobListFactory(BlobFactory):
 
     Use this (typically through `Model.from_blobs`) when the blobs are
     constructed by hand instead of sampled from distributions. All
-    `sample_blobs` arguments (`num_blobs`, `blob_shape`, `t_drain`, ...) are
+    `sample_blobs` arguments (`Ly`, `T`, `num_blobs`, `blob_shape`) are
     ignored: each `Blob` already carries its own parameters.
     """
 
