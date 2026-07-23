@@ -6,6 +6,7 @@ from .stochasticality import (
     BlobListFactory,
     CallableBlobFactory,
     DefaultBlobFactory,
+    ParameterSampler,
 )
 from .geometry import Geometry
 from .blob_shape import AbstractBlobShape, BlobShapeImpl, BlobShapeEnum

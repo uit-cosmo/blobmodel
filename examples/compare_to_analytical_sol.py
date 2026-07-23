@@ -13,8 +13,10 @@ import numpy as np
 # with analytically derived results. See O. E. Garcia, et al.; Phys. Plasmas 1 May 2016; 23 (5): 052308. https://doi.org/10.1063/1.4951016
 
 # use DefaultBlobFactory to define distribution functions fo random variables
-bf = DefaultBlobFactory(
-    A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros, vy_parameter=10
+bf = (
+    DefaultBlobFactory()
+    .set_sampler("amplitude", DistributionEnum.deg)
+    .set_sampler("vy", DistributionEnum.zeros)
 )
 
 tmp = Model(

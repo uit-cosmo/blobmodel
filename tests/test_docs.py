@@ -49,13 +49,9 @@ def test_one_dim():
         BlobShapeEnum,
     )
 
-    bf = DefaultBlobFactory(
-        A_dist=DistributionEnum.exp,
-        wp_dist=DistributionEnum.deg,
-        vx_dist=DistributionEnum.deg,
-        vy_dist=DistributionEnum.zeros,
-        t_drain=10,
-    )
+    # Amplitudes are exponential and widths/velocities constant by default;
+    # only the y-velocity needs to be set to zero for a 1D model.
+    bf = DefaultBlobFactory(t_drain=10).set_sampler("vy", DistributionEnum.zeros)
 
     bm = Model(
         geometry=Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=0.1, T=10, periodic_y=False),
@@ -85,13 +81,11 @@ def test_blob_shapes():
         blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.lorentz),
     )
     # PLACEHOLDER blob_shapes_1
-    bf = DefaultBlobFactory(
-        A_dist=DistributionEnum.deg,
-        wp_dist=DistributionEnum.deg,
-        spp_dist=DistributionEnum.deg,
-        sps_dist=DistributionEnum.deg,
-        shape_param_p_parameter=0.5,
-        shape_param_s_parameter=0.5,
+    bf = (
+        DefaultBlobFactory()
+        .set_sampler("amplitude", DistributionEnum.deg)
+        .set_sampler("spp", DistributionEnum.deg, 0.5)
+        .set_sampler("sps", DistributionEnum.deg, 0.5)
     )
     bm = Model(
         geometry=Geometry(Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=10),
@@ -110,13 +104,13 @@ def test_blob_tilt():
     vx, vy = 1, 0
     wx, wy = 1, 1
 
-    bf = DefaultBlobFactory(
-        A_dist=DistributionEnum.deg,
-        vy_parameter=vy,
-        vx_parameter=vx,
-        wp_parameter=wx,
-        ws_parameter=wy,
-        blob_alignment=False,
+    bf = (
+        DefaultBlobFactory(blob_alignment=False)
+        .set_sampler("amplitude", DistributionEnum.deg)
+        .set_sampler("vx", DistributionEnum.deg, vx)
+        .set_sampler("vy", DistributionEnum.deg, vy)
+        .set_sampler("wp", DistributionEnum.deg, wx)
+        .set_sampler("ws", DistributionEnum.deg, wy)
     )
     # PLACEHOLDER blob_tilt_1
     theta = np.pi / 2
@@ -147,8 +141,8 @@ def test_blob_factory():
     # PLACEHOLDER blob_factory_0
     from blobmodel import DefaultBlobFactory, DistributionEnum, Geometry, Model
 
-    my_blob_factory = DefaultBlobFactory(
-        A_dist=DistributionEnum.normal, A_parameter=5, t_drain=100
+    my_blob_factory = DefaultBlobFactory(t_drain=100).set_sampler(
+        "amplitude", DistributionEnum.normal, free_parameter=5
     )
 
     bm = Model(
@@ -315,3 +309,24 @@ def test_burn_in():
     )
     ds = bm.make_realization()
     # PLACEHOLDER burn_in_1
+
+
+def test_custom_sampler():
+    # PLACEHOLDER custom_sampler_0
+    from blobmodel import DefaultBlobFactory, Geometry, Model
+
+    # Draw the widths from a log-normal distribution, which is not built in.
+    # The callable receives the factory's random number generator (draw from
+    # it, not from the global np.random state, to stay seedable) and the
+    # number of blobs, and returns one value per blob.
+    bf = DefaultBlobFactory(seed=42).set_sampler(
+        "wp", lambda rng, num_blobs: rng.lognormal(sigma=0.5, size=num_blobs)
+    )
+
+    bm = Model(
+        geometry=Geometry(Nx=10, Ny=10, Lx=10, Ly=10, dt=0.1, T=20),
+        blob_factory=bf,
+        num_blobs=100,
+    )
+    ds = bm.make_realization()
+    # PLACEHOLDER custom_sampler_1

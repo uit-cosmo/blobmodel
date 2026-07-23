@@ -12,8 +12,10 @@ import matplotlib.pyplot as plt
 
 # use DefaultBlobFactory to define distribution functions fo random variables
 t_drain = 2
-bf = DefaultBlobFactory(
-    A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros, t_drain=t_drain
+bf = (
+    DefaultBlobFactory(t_drain=t_drain)
+    .set_sampler("amplitude", DistributionEnum.deg)
+    .set_sampler("vy", DistributionEnum.zeros)
 )
 
 Nx, Lx = 10, 10

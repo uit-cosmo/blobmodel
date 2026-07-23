@@ -10,8 +10,10 @@ from blobmodel import (
 import numpy as np
 
 # use DefaultBlobFactory to define distribution functions fo random variables
-bf = DefaultBlobFactory(
-    A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros, t_drain=2
+bf = (
+    DefaultBlobFactory(t_drain=2)
+    .set_sampler("amplitude", DistributionEnum.deg)
+    .set_sampler("vy", DistributionEnum.zeros)
 )
 
 one_dim_model = Model(

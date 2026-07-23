@@ -20,13 +20,15 @@ vy = 1
 wx = 3
 wy = 1
 
-bf = DefaultBlobFactory(
-    A_dist=DistributionEnum.deg,
-    vy_parameter=vy,
-    vx_parameter=vx,
-    wp_parameter=wx,
-    ws_parameter=wy,
-    blob_alignment=True,  # Blobs will be aligned with their velocities
+bf = (
+    DefaultBlobFactory(
+        blob_alignment=True
+    )  # Blobs will be aligned with their velocities
+    .set_sampler("amplitude", DistributionEnum.deg)
+    .set_sampler("vx", DistributionEnum.deg, vx)
+    .set_sampler("vy", DistributionEnum.deg, vy)
+    .set_sampler("wp", DistributionEnum.deg, wx)
+    .set_sampler("ws", DistributionEnum.deg, wy)
 )
 
 
@@ -46,13 +48,13 @@ show_model(dataset=ds, interval=100, gif_name="alignment_true.gif", fps=10)
 # Now we do tilted blobs
 
 
-bf = DefaultBlobFactory(
-    A_dist=DistributionEnum.deg,
-    vy_parameter=vy,
-    vx_parameter=vx,
-    wp_parameter=wx,
-    ws_parameter=wy,
-    blob_alignment=False,
+bf = (
+    DefaultBlobFactory(blob_alignment=False)
+    .set_sampler("amplitude", DistributionEnum.deg)
+    .set_sampler("vx", DistributionEnum.deg, vx)
+    .set_sampler("vy", DistributionEnum.deg, vy)
+    .set_sampler("wp", DistributionEnum.deg, wx)
+    .set_sampler("ws", DistributionEnum.deg, wy)
 )
 # Blobs will NOT be aligned with their velocities, instead they will be tilted by an angle given by theta.
 

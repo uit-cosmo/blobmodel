@@ -42,8 +42,8 @@ def _random_model(seed=None, blob_factory=None):
 
 def test_factory_same_seed_same_blobs():
     """Two factories constructed with the same seed produce identical blobs."""
-    bf_1 = DefaultBlobFactory(A_dist=DistributionEnum.exp, seed=42)
-    bf_2 = DefaultBlobFactory(A_dist=DistributionEnum.exp, seed=42)
+    bf_1 = DefaultBlobFactory(seed=42)
+    bf_2 = DefaultBlobFactory(seed=42)
     blobs_1 = _sample_default_blobs(bf_1)
     blobs_2 = _sample_default_blobs(bf_2)
     for b1, b2 in zip(blobs_1, blobs_2):
@@ -74,10 +74,10 @@ def test_factory_accepts_generator():
 @pytest.mark.parametrize("dist", list(DistributionEnum))
 def test_all_distributions_reproducible(dist):
     """The rng is threaded through every distribution sampling function."""
-    bf_1 = DefaultBlobFactory(seed=7)
-    bf_2 = DefaultBlobFactory(seed=7)
-    draws_1 = bf_1._draw_random_variables(dist, free_parameter=1, num_blobs=100)
-    draws_2 = bf_2._draw_random_variables(dist, free_parameter=1, num_blobs=100)
+    bf_1 = DefaultBlobFactory(seed=7).set_sampler("amplitude", dist)
+    bf_2 = DefaultBlobFactory(seed=7).set_sampler("amplitude", dist)
+    draws_1 = bf_1._draw_random_variables("amplitude", 100)
+    draws_2 = bf_2._draw_random_variables("amplitude", 100)
     np.testing.assert_array_equal(draws_1, draws_2)
 
 
