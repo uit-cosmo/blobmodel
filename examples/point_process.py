@@ -30,7 +30,7 @@ model = bm.Model(
 )
 ds = model.make_realization(speed_up=True, error=1e-10)
 ds = ds.isel(t=slice(start_index, int(1e50)))
-bm_signal = ds.n.isel(x=0, y=0).values
+bm_signal = ds.n.isel(x=0).values
 
 # Superposedpulses
 waiting_time = T / num_blobs

@@ -33,7 +33,7 @@ def test_convergence_to_analytical_solution():
     analytical derived results. See O. E. Garcia, et al.; Phys. Plasmas 1 May 2016; 23 (5): 052308. https://doi.org/10.1063/1.4951016
     """
     ds = tmp.make_realization(speed_up=True, error=1e-10)
-    model_profile = ds.n.isel(y=0).mean(dim="t")
+    model_profile = ds.n.mean(dim="t")
 
     x = np.arange(0, Lx, Lx / Nx)
     t_p = 1  # vx/ell

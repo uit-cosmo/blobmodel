@@ -4,7 +4,8 @@ One Dimensional
 ===========
 
 The default behaviour of the ``Model`` is to draw two-dimensional realizations. It is possible to draw one-dimensional realizations too.
-This is achieved by setting the flag ``one_dimensional`` to True. Additionally, the vertical velocities should be set to zero:
+This is achieved by setting the flag ``one_dimensional`` to True. Additionally, the vertical velocities should be set to zero.
+The resulting dataset contains the density as ``n(x, t)`` — the ``y`` dimension is dropped entirely, so no ``squeeze()`` is needed:
 
 .. literalinclude:: ../tests/test_docs.py
    :language: python

@@ -90,7 +90,9 @@ def show_model(
         im.set_data(data.isel(t=i).values)
         tx.set_text(f"t = {t_values[i]:.2f}")
 
-    if dataset.y.size == 1:
+    # 1D output (Ly = 0) has no y dimension at all; a 2D dataset with a
+    # single y point is also shown as a line plot.
+    if "y" not in dataset.dims or dataset.y.size == 1:
         line, tx = _setup_1d_plot(dataset=dataset, variable=variable)
         ani = animation.FuncAnimation(
             fig, animate_1d, frames=t_values.size, interval=interval

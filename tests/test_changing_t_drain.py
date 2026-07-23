@@ -28,7 +28,7 @@ def test_decreasing_t_drain():
     Checks that models with variable t_drain run and lead to a results lower than the constant case.
     """
     ds = tmp.make_realization(speed_up=True, error=1e-2)
-    model_profile = ds.n.isel(y=0).mean(dim=("t"))
+    model_profile = ds.n.mean(dim=("t"))
 
     x = np.linspace(0, 10, 10)
     t_p = 1

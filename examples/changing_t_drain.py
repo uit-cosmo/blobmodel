@@ -24,7 +24,7 @@ decreasing_t_drain = Model(
 )
 
 ds_decreasing = decreasing_t_drain.make_realization(speed_up=True, error=1e-2)
-ds_decreasing.n.isel(y=0).mean(dim=("t")).plot(label="decreasing t_drain")
+ds_decreasing.n.mean(dim=("t")).plot(label="decreasing t_drain")
 
 constant_t_drain = Model(
     geometry=Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=1, T=1000, periodic_y=False),
@@ -36,7 +36,7 @@ constant_t_drain = Model(
 )
 
 ds_constant = constant_t_drain.make_realization(speed_up=True, error=1e-2)
-ds_constant.n.isel(y=0).mean(dim=("t")).plot(label="constant t_drain")
+ds_constant.n.mean(dim=("t")).plot(label="constant t_drain")
 
 plt.yscale("log")
 plt.legend()
