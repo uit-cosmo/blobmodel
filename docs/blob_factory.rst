@@ -11,15 +11,26 @@ should implement ``BlobFactory``. An implementation is provided by ``DefaultBlob
 DefaultBlobFactory
 ++++++++++++++++++
 
-We can use ``DefaultBlobFactory`` class in order to change the distribution functions of the following blob parameters:
+We can use the ``DefaultBlobFactory`` class in order to change the distribution functions of the following blob parameters:
 
-* Amplitudes
-* widths in x and y
-* velocities in x and y
-* pulse shape in x and y
-* blob alignment and tilt
+.. list-table::
+   :widths: 10 50
+   :header-rows: 0
 
-The distributions for these parameters are set with the ``*_dist`` arguments. The following distribution functions are implemented:
+   * - "amplitude"
+     - blob amplitude
+
+   * - "wp" / "ws"
+     - widths in the principal and secondary blob direction
+
+   * - "vx" / "vy"
+     - velocities in the x- and y-direction
+
+   * - "spp" / "sps"
+     - pulse shape parameters in the principal and secondary direction
+
+By default, the amplitude is exponentially distributed with mean 1 and all other parameters are constant (widths and velocities 1, shape parameters 0.5).
+Individual parameters are reconfigured with the ``set_sampler`` method, which takes the parameter name and either one of the built-in distributions or a custom sampling callable. The following distribution functions are implemented:
 
 .. list-table:: 
    :widths: 10 50
@@ -47,15 +58,22 @@ The distributions for these parameters are set with the ``*_dist`` arguments. Th
      - array of zeros
 
 As you can see, some of these distributions require an additional ``free_parameter`` to specify the distribution.
-This is done by the ``*_parameter`` arguments.
+This is passed as the third argument of ``set_sampler``. ``set_sampler`` returns the factory itself, so calls can be chained.
 
-Let's take a look at an example. Let's assume we want to sample the blob amplitudes from normal distribution with 5 as the scale parameter. 
-We chose the defualt distributions for all other blob parameters. We would set up the Model as follows:
+Let's take a look at an example. Let's assume we want to sample the blob amplitudes from a normal distribution with 5 as the scale parameter.
+We choose the default distributions for all other blob parameters. We would set up the Model as follows:
 
 .. literalinclude:: ../tests/test_docs.py
    :language: python
    :start-after: # PLACEHOLDER blob_factory_0
    :end-before: # PLACEHOLDER blob_factory_1
+
+If none of the built-in distributions fits, pass a sampling callable to ``set_sampler`` instead of a ``DistributionEnum``:
+
+.. literalinclude:: ../tests/test_docs.py
+   :language: python
+   :start-after: # PLACEHOLDER custom_sampler_0
+   :end-before: # PLACEHOLDER custom_sampler_1
 
 ++++++++++++++++++++++++++++++++++
 Pre-built blobs: Model.from_blobs

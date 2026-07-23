@@ -168,8 +168,8 @@ def test_realization_rejects_wrong_length_t_drain():
     model = Model(
         geometry=Geometry(Nx=5, Ny=1, Lx=5, Ly=0, dt=1, T=2),
         num_blobs=2,
-        blob_factory=DefaultBlobFactory(
-            t_drain=np.ones(3), vy_dist=DistributionEnum.zeros
+        blob_factory=DefaultBlobFactory(t_drain=np.ones(3)).set_sampler(
+            "vy", DistributionEnum.zeros
         ),
         one_dimensional=True,
         verbose=False,

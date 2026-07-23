@@ -3,7 +3,8 @@ from blobmodel import (
     Model,
     BlobFactory,
     Blob,
-    show_model,
+    BlobShapeImpl,
+    BlobShapeEnum,
     AbstractBlobShape,
 )
 import numpy as np
@@ -60,7 +61,7 @@ class CustomBlobFactory(BlobFactory):
 bf = CustomBlobFactory()
 tmp = Model(
     geometry=Geometry(Nx=64, Ny=64, Lx=10, Ly=10, dt=1, T=10, periodic_y=True),
-    blob_shape="gauss",
+    blob_shape=BlobShapeImpl(BlobShapeEnum.gaussian),
     num_blobs=3,
     blob_factory=bf,
 )

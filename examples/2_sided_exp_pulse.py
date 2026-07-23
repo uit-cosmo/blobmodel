@@ -10,11 +10,8 @@ import matplotlib.pyplot as plt
 
 # Example of use of extra blob shape parameters with a double exponential blob shape.
 
-bf = DefaultBlobFactory(
-    shape_param_p_parameter=0.5,
-    shape_param_s_parameter=0.5,
-    blob_alignment=True,
-)
+# The pulse-shape asymmetry parameters ("spp"/"sps") default to 0.5.
+bf = DefaultBlobFactory(blob_alignment=True)
 
 bm = Model(
     geometry=Geometry(Nx=100, Ny=100, Lx=10, Ly=10, dt=0.1, T=10, periodic_y=True),

@@ -22,9 +22,7 @@ model = bm.Model(
     geometry=bm.Geometry(Nx=1, Ny=1, Lx=1, Ly=0, dt=dt, T=T, t_init=0),
     num_blobs=num_blobs,
     blob_shape=bm.BlobShapeImpl(bm.BlobShapeEnum.exp, bm.BlobShapeEnum.gaussian),
-    blob_factory=bm.DefaultBlobFactory(
-        A_dist=bm.DistributionEnum.exp, vy_dist=bm.DistributionEnum.zeros
-    ),
+    blob_factory=bm.DefaultBlobFactory().set_sampler("vy", bm.DistributionEnum.zeros),
     verbose=True,
     one_dimensional=True,  # Checks vy = 0 and sets the y blob shape to 1.
 )

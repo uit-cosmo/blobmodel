@@ -158,29 +158,35 @@ class CallableBlobFactory(BlobFactory):
         return self._one_dimensional
 
 
+ParameterSampler = Callable[[np.random.Generator, int], np.ndarray]
+"""Signature of a custom sampler for `DefaultBlobFactory.set_sampler`: called
+with the factory's random number generator and the number of blobs, returns
+one sampled value per blob."""
+
+
 class DefaultBlobFactory(BlobFactory):
     """Default implementation of BlobFactory.
 
-    Generates blob parameters for different possible random
-    distributions. All random variables are independent from each other
+    Samples each blob parameter independently. Every parameter defaults to a
+    degenerate (constant) distribution except the amplitude, which is
+    exponential with mean 1 (the canonical FPP choice). Individual parameters
+    are reconfigured with `set_sampler`, which accepts either a
+    `DistributionEnum` or an arbitrary sampling callable.
     """
+
+    # Configurable parameter names -> (default distribution, free parameter).
+    _DEFAULT_SAMPLERS = {
+        "amplitude": (DistributionEnum.exp, 1.0),
+        "wp": (DistributionEnum.deg, 1.0),
+        "ws": (DistributionEnum.deg, 1.0),
+        "vx": (DistributionEnum.deg, 1.0),
+        "vy": (DistributionEnum.deg, 1.0),
+        "spp": (DistributionEnum.deg, 0.5),
+        "sps": (DistributionEnum.deg, 0.5),
+    }
 
     def __init__(
         self,
-        A_dist: DistributionEnum = DistributionEnum.exp,
-        wp_dist: DistributionEnum = DistributionEnum.deg,
-        ws_dist: DistributionEnum = DistributionEnum.deg,
-        vx_dist: DistributionEnum = DistributionEnum.deg,
-        vy_dist: DistributionEnum = DistributionEnum.deg,
-        spp_dist: DistributionEnum = DistributionEnum.deg,
-        sps_dist: DistributionEnum = DistributionEnum.deg,
-        A_parameter: float = 1.0,
-        wp_parameter: float = 1.0,
-        ws_parameter: float = 1.0,
-        vx_parameter: float = 1.0,
-        vy_parameter: float = 1.0,
-        shape_param_p_parameter: float = 0.5,
-        shape_param_s_parameter: float = 0.5,
         t_drain: Union[float, NDArray, int] = np.inf,
         blob_alignment: bool = False,
         seed: Union[int, np.random.Generator, None] = None,
@@ -188,39 +194,13 @@ class DefaultBlobFactory(BlobFactory):
         """
         Default implementation of BlobFactory.
 
-        Generates blob parameters for different possible random distributions.
-        All random variables are independent from each other.
+        Blob parameter distributions are configured with `set_sampler`; the
+        defaults are an exponential amplitude with mean 1 and degenerate
+        (constant) distributions for everything else: widths and velocities 1,
+        shape parameters 0.5.
 
         Parameters
         ----------
-        A_dist : Distribution, optional
-            Distribution type for amplitude, by default "Distribution.exp"
-        wp_dist : Distribution, optional
-            Distribution type for width in the principal blob direction, by default "Distribution.deg"
-        ws_dist : Distribution, optional
-            Distribution type for width in the secondary blob direction, by default "Distribution.deg"
-        vx_dist : Distribution, optional
-            Distribution type for velocity in the x-direction, by default "Distribution.deg"
-        vy_dist : Distribution, optional
-            Distribution type for velocity in the y-direction, by default "Distribution.deg"
-        spp_dist : Distribution, optional
-            Distribution type for shape parameter in the principal blob direction, by default "Distribution.deg"
-        sps_dist : Distribution, optional
-            Distribution type for shape parameter in the secondary blob direction, by default "Distribution.deg"
-        A_parameter : float, optional
-            Free parameter for the amplitude distribution, by default 1.0
-        wp_parameter : float, optional
-            Free parameter for the width distribution in the principal direction, by default 1.0
-        ws_parameter : float, optional
-            Free parameter for the width distribution in the secondary direction, by default 1.0
-        vx_parameter : float, optional
-            Free parameter for the velocity distribution in the x-direction, by default 1.0
-        vy_parameter : float, optional
-            Free parameter for the velocity distribution in the y-direction, by default 1.0
-        shape_param_p_parameter : float, optional
-            Free parameter for the shape parameter distribution in the principal direction, by default 0.5
-        shape_param_s_parameter : float, optional
-            Free parameter for the shape parameter distribution in the secondary direction, by default 0.5
         t_drain : float or array-like, optional
             Drain time scale of the blobs (exponential decay), applied to every
             sampled blob. Can be a single value or an array-like of length Nx
@@ -239,10 +219,67 @@ class DefaultBlobFactory(BlobFactory):
             Note that a seed passed to `Model` takes precedence: it replaces
             this factory's generator via `set_rng`.
 
+        Raises
+        ------
+        ValueError
+            If `t_drain` is not positive.
+        """
+        if np.any(np.asarray(t_drain) <= 0):
+            raise ValueError(f"t_drain must be positive, got t_drain = {t_drain}.")
+
+        # Per-parameter distribution (None for custom callables) and sampler.
+        self._dists: dict = {}
+        self._free_parameters: dict = {}
+        self._samplers: dict = {}
+        for parameter, (dist, free_parameter) in self._DEFAULT_SAMPLERS.items():
+            self.set_sampler(parameter, dist, free_parameter)
+
+        self.t_drain = t_drain
+        self.blob_alignment = blob_alignment
+        self.theta_setter: Union[Callable[[], float], None] = None
+        self.rng = np.random.default_rng(seed)
+
+    def set_sampler(
+        self,
+        parameter: str,
+        sampler: Union[DistributionEnum, ParameterSampler],
+        free_parameter: Union[float, None] = None,
+    ) -> "DefaultBlobFactory":
+        """
+        Configure how one blob parameter is sampled.
+
+        Parameters
+        ----------
+        parameter : str
+            Which blob parameter to configure. One of:
+            - "amplitude": blob amplitude
+            - "wp": width in the principal (propagation) blob direction
+            - "ws": width in the secondary (perpendicular) blob direction
+            - "vx": velocity in the x-direction
+            - "vy": velocity in the y-direction
+            - "spp": pulse shape parameter in the principal direction
+            - "sps": pulse shape parameter in the secondary direction
+        sampler : DistributionEnum or Callable[[np.random.Generator, int], np.ndarray]
+            Either one of the built-in distributions (see Notes), or a callable
+            drawing the values itself: it is called with the factory's random
+            number generator and the number of blobs and must return one value
+            per blob. Draw from the generator you are given (not the global
+            `np.random` state) so realizations stay reproducible through
+            `DefaultBlobFactory(seed=...)` or `Model(seed=...)`.
+        free_parameter : float, optional
+            Free parameter of the built-in distribution (see Notes), by
+            default 1.0. Only valid together with a `DistributionEnum`.
+
+        Returns
+        -------
+        DefaultBlobFactory
+            The factory itself, so calls can be chained:
+            ``DefaultBlobFactory().set_sampler("vy", DistributionEnum.zeros)``.
+
         Notes
         -----
         - The following distributions are implemented:
-            - exp: exponential distribution with mean 1
+            - exp: exponential distribution with mean `free_parameter`
             - gamma: gamma distribution with `free_parameter` as shape parameter and mean 1
             - normal: normal distribution with zero mean and `free_parameter` as scale parameter
             - uniform: uniform distribution with mean 1 and `free_parameter` as width,
@@ -257,65 +294,64 @@ class DefaultBlobFactory(BlobFactory):
         Raises
         ------
         TypeError
-            If a distribution argument is not a DistributionEnum member.
+            If `sampler` is neither a DistributionEnum member nor a callable.
         ValueError
-            If a width distribution (`wp_dist` or `ws_dist`) is uniform with
-            `free_parameter` > 2, which would produce negative blob widths,
-            or if `t_drain` is not positive.
-
+            If `parameter` is not one of the names listed above, if a width
+            (`wp` or `ws`) is uniform with `free_parameter` > 2 (which would
+            produce negative blob widths), or if `free_parameter` is combined
+            with a callable sampler.
         """
-        for name, dist in (
-            ("A_dist", A_dist),
-            ("wp_dist", wp_dist),
-            ("ws_dist", ws_dist),
-            ("vx_dist", vx_dist),
-            ("vy_dist", vy_dist),
-            ("spp_dist", spp_dist),
-            ("sps_dist", sps_dist),
-        ):
-            if not isinstance(dist, DistributionEnum):
-                raise TypeError(
-                    f"{name} must be a DistributionEnum, got {type(dist).__name__}."
-                )
-
-        for name, dist, parameter in (
-            ("wp", wp_dist, wp_parameter),
-            ("ws", ws_dist, ws_parameter),
-        ):
-            if dist == DistributionEnum.uniform and parameter > 2:
+        if parameter not in self._DEFAULT_SAMPLERS:
+            raise ValueError(
+                f"Unknown parameter '{parameter}', "
+                f"must be one of {sorted(self._DEFAULT_SAMPLERS)}."
+            )
+        if isinstance(sampler, DistributionEnum):
+            if free_parameter is None:
+                free_parameter = 1.0
+            if (
+                parameter in ("wp", "ws")
+                and sampler == DistributionEnum.uniform
+                and free_parameter > 2
+            ):
                 raise ValueError(
-                    f"{name}_parameter = {parameter} with {name}_dist = uniform would produce "
-                    f"negative blob widths: the uniform distribution has support "
-                    f"[1 - {name}_parameter / 2, 1 + {name}_parameter / 2], so {name}_parameter must be <= 2."
+                    f"free_parameter = {free_parameter} with a uniform {parameter} distribution "
+                    f"would produce negative blob widths: the uniform distribution has support "
+                    f"[1 - free_parameter / 2, 1 + free_parameter / 2], so free_parameter must be <= 2."
                 )
+            dist_function = DISTRIBUTIONS[sampler]
+            self._dists[parameter] = sampler
+            self._free_parameters[parameter] = free_parameter
+            self._samplers[parameter] = (
+                lambda rng, num_blobs, _dist_function=dist_function, _free_parameter=free_parameter: _dist_function(
+                    num_blobs, rng, free_param=_free_parameter
+                )
+            )
+        elif callable(sampler):
+            if free_parameter is not None:
+                raise ValueError(
+                    "free_parameter only applies to DistributionEnum samplers; "
+                    "a callable sampler takes no free parameter."
+                )
+            self._dists[parameter] = None
+            self._free_parameters[parameter] = None
+            self._samplers[parameter] = sampler
+        else:
+            raise TypeError(
+                f"sampler for '{parameter}' must be a DistributionEnum or a callable, "
+                f"got {type(sampler).__name__}."
+            )
+        return self
 
-        self.amplitude_dist = A_dist
-        self.width_p_dist = wp_dist
-        self.width_s_dist = ws_dist
-        self.velocity_x_dist = vx_dist
-        self.velocity_y_dist = vy_dist
-        self.shape_param_p_dist = spp_dist
-        self.shape_param_s_dist = sps_dist
-        self.amplitude_parameter = A_parameter
-        self.width_p_parameter = wp_parameter
-        self.width_s_parameter = ws_parameter
-        self.velocity_x_parameter = vx_parameter
-        self.velocity_y_parameter = vy_parameter
-        if np.any(np.asarray(t_drain) <= 0):
-            raise ValueError(f"t_drain must be positive, got t_drain = {t_drain}.")
-
-        self.shape_param_p_parameter = shape_param_p_parameter
-        self.shape_param_s_parameter = shape_param_s_parameter
-        self.t_drain = t_drain
-        self.blob_alignment = blob_alignment
-        self.theta_setter: Union[Callable[[], float], None] = None
-        self.rng = np.random.default_rng(seed)
-
-    def _draw_random_variables(
-        self, dist: DistributionEnum, free_parameter: float, num_blobs: int
-    ) -> np.ndarray:
-        """Draws random variables from a specified distribution."""
-        return DISTRIBUTIONS[dist](num_blobs, self.rng, free_param=free_parameter)
+    def _draw_random_variables(self, parameter: str, num_blobs: int) -> np.ndarray:
+        """Draw `num_blobs` values for one parameter from its sampler."""
+        values = np.asarray(self._samplers[parameter](self.rng, num_blobs))
+        if values.shape != (num_blobs,):
+            raise ValueError(
+                f"The sampler for '{parameter}' returned shape {values.shape}, "
+                f"expected ({num_blobs},)."
+            )
+        return values
 
     def sample_blobs(
         self,
@@ -357,29 +393,13 @@ class DefaultBlobFactory(BlobFactory):
                 f"blob_shape must be an AbstractBlobShape, got {type(blob_shape).__name__}."
             )
 
-        amps = self._draw_random_variables(
-            self.amplitude_dist,
-            self.amplitude_parameter,
-            num_blobs,
-        )
-        wxs = self._draw_random_variables(
-            self.width_p_dist, self.width_p_parameter, num_blobs
-        )
-        wys = self._draw_random_variables(
-            self.width_s_dist, self.width_s_parameter, num_blobs
-        )
-        vxs = self._draw_random_variables(
-            self.velocity_x_dist, self.velocity_x_parameter, num_blobs
-        )
-        vys = self._draw_random_variables(
-            self.velocity_y_dist, self.velocity_y_parameter, num_blobs
-        )
-        spxs = self._draw_random_variables(
-            self.shape_param_p_dist, self.shape_param_p_parameter, num_blobs
-        )
-        spys = self._draw_random_variables(
-            self.shape_param_s_dist, self.shape_param_s_parameter, num_blobs
-        )
+        amps = self._draw_random_variables("amplitude", num_blobs)
+        wxs = self._draw_random_variables("wp", num_blobs)
+        wys = self._draw_random_variables("ws", num_blobs)
+        vxs = self._draw_random_variables("vx", num_blobs)
+        vys = self._draw_random_variables("vy", num_blobs)
+        spxs = self._draw_random_variables("spp", num_blobs)
+        spys = self._draw_random_variables("sps", num_blobs)
         # For now, only a lambda parameter is implemented
         spxs_dict = [{"lam": s} for s in spxs]
         spys_dict = [{"lam": s} for s in spys]
@@ -432,6 +452,9 @@ class DefaultBlobFactory(BlobFactory):
         Notes
         -----
         - Perpendicular width parameters are irrelevant since perp shape should be ignored by the Bolb class.
+        - Only the built-in `DistributionEnum.zeros` distribution for "vy" is
+          recognized as one-dimensional; a custom callable sampler is assumed
+          two-dimensional even if it always returns zeros.
 
         """
-        return self.velocity_y_dist == DistributionEnum.zeros
+        return self._dists["vy"] == DistributionEnum.zeros

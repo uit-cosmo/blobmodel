@@ -15,27 +15,23 @@ tmp = Model(
     geometry=Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=1, T=1000, periodic_y=False),
     blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
     num_blobs=10000,
-    blob_factory=DefaultBlobFactory(
-        A_dist=DistributionEnum.deg,
-        vy_dist=DistributionEnum.zeros,
-        t_drain=t_drain,
-    ),
+    blob_factory=DefaultBlobFactory(t_drain=t_drain)
+    .set_sampler("amplitude", DistributionEnum.deg)
+    .set_sampler("vy", DistributionEnum.zeros),
 )
 
-ds_changing_t_drain = tmp.make_realization(speed_up=False)
+ds_changing_t_drain = tmp.make_realization()
 
 tmp = Model(
     geometry=Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=1, T=1000, periodic_y=False),
     blob_shape=BlobShapeImpl(BlobShapeEnum.exp),
     num_blobs=10000,
-    blob_factory=DefaultBlobFactory(
-        A_dist=DistributionEnum.deg,
-        vy_dist=DistributionEnum.zeros,
-        t_drain=2,
-    ),
+    blob_factory=DefaultBlobFactory(t_drain=2)
+    .set_sampler("amplitude", DistributionEnum.deg)
+    .set_sampler("vy", DistributionEnum.zeros),
 )
 
-ds_constant_drain = tmp.make_realization(speed_up=False)
+ds_constant_drain = tmp.make_realization()
 
 
 def plot_cahnging_t_drain(changing, constant):

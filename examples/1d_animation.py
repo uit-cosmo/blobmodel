@@ -10,7 +10,7 @@ from blobmodel import (
 
 # Example of a one-dimensional realization and animation.
 
-bf = DefaultBlobFactory(vy_dist=DistributionEnum.zeros, t_drain=10)
+bf = DefaultBlobFactory(t_drain=10).set_sampler("vy", DistributionEnum.zeros)
 
 bm = Model(
     geometry=Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=0.1, T=10, periodic_y=False),

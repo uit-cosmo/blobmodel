@@ -11,8 +11,10 @@ import numpy as np
 # use DefaultBlobFactory to define distribution functions fo random variables
 t_drain = np.linspace(2, 1, 10)
 
-bf = DefaultBlobFactory(
-    A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros, t_drain=t_drain
+bf = (
+    DefaultBlobFactory(t_drain=t_drain)
+    .set_sampler("amplitude", DistributionEnum.deg)
+    .set_sampler("vy", DistributionEnum.zeros)
 )
 
 tmp = Model(
