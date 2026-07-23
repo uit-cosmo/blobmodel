@@ -358,6 +358,42 @@ def test_no_tilt_when_theta_none_and_no_alignment():
     assert blob._theta == 0
 
 
+def test_theta_property_exposes_resolved_angle():
+    """The read-only theta property returns the angle actually used for
+    discretization: the explicit theta if given, else the alignment result."""
+    assert _make_blob(theta=1.0).theta == 1.0
+    assert np.isclose(_make_blob(blob_alignment=True).theta, np.pi / 4)
+    assert _make_blob().theta == 0
+    with pytest.raises(AttributeError):
+        _make_blob().theta = 2.0
+
+
+@pytest.mark.parametrize(
+    "t_drain", [[2.0, 4.0, 8.0, 16.0], np.int64(10), np.float64(10.0)]
+)
+def test_t_drain_is_normalized(t_drain):
+    """
+    t_drain given as a plain list or a numpy scalar must work end to end:
+    Blob normalizes it to a float scalar or float array at construction
+    (lists and numpy integers used to fail deep inside the drain factor).
+    """
+    blob = Blob(t_drain=t_drain)
+    if np.ndim(t_drain) == 0:
+        assert isinstance(blob.t_drain, float)
+    else:
+        assert isinstance(blob.t_drain, np.ndarray)
+        assert blob.t_drain.dtype == np.float64
+    geometry = Geometry(
+        Nx=np.size(t_drain) if np.ndim(t_drain) else 4, Ny=2, Lx=4, Ly=2, dt=0.5, T=2
+    )
+    ds = Model.from_blobs([blob], geometry=geometry, verbose=False).make_realization()
+    reference_blob = Blob(t_drain=np.asarray(t_drain, dtype=np.float64))
+    ds_ref = Model.from_blobs(
+        [reference_blob], geometry=geometry, verbose=False
+    ).make_realization()
+    np.testing.assert_array_equal(ds.n.values, ds_ref.n.values)
+
+
 def test_theta_setter_overrides_factory_alignment():
     """A registered theta_setter wins over the factory's blob_alignment flag."""
     bf = DefaultBlobFactory(blob_alignment=True).set_sampler(

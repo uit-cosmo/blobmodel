@@ -123,7 +123,8 @@ class Geometry:
         Raises
         ------
         ValueError
-            If any array is not 1D, is empty, or is not uniformly spaced.
+            If any array is not 1D, is empty, is not uniformly spaced, or is
+            not strictly increasing.
         """
         x, y, t = np.asarray(x), np.asarray(y), np.asarray(t)
         for name, arr in (("x", x), ("y", y), ("t", t)):
@@ -134,6 +135,11 @@ class Geometry:
                 spacings, spacings[0], rtol=1e-8, atol=0
             ):
                 raise ValueError(f"{name} must be uniformly spaced.")
+            # A descending array passes the uniform-spacing check but yields
+            # a negative domain length, silently breaking the speed_up
+            # truncation windows.
+            if arr.size > 1 and spacings[0] <= 0:
+                raise ValueError(f"{name} must be strictly increasing.")
 
         dx = x[1] - x[0] if x.size > 1 else 1.0
         dy = y[1] - y[0] if y.size > 1 else 0.0

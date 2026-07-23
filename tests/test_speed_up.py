@@ -237,6 +237,36 @@ def test_speed_up_realization_matches_full_on_offset_domain(x0, blob_kwargs):
     np.testing.assert_allclose(ds_fast.n.values, ds_full.n.values, atol=10 * ERROR)
 
 
+# (blob_kwargs). Tilted blobs whose extent along x is governed by width_s:
+# the truncation margin must use the widths projected through theta, not
+# width_p alone (which truncated most of the blob for these cases).
+TILTED_CONFIGS = [
+    dict(width_p=0.1, width_s=5.0, v_x=1.0, theta=np.pi / 2),  # x-extent = width_s
+    dict(width_p=0.1, width_s=5.0, v_x=1.0, theta=2.0),  # oblique tilt
+    dict(width_p=0.1, width_s=5.0, v_x=0.5, v_y=5.0, blob_alignment=True),
+]
+
+
+@pytest.mark.parametrize("blob_kwargs", TILTED_CONFIGS)
+def test_speed_up_realization_matches_full_for_tilted_blob(blob_kwargs):
+    """
+    End-to-end guard for tilted blobs (explicit theta or blob_alignment):
+    with speed_up the realization must match the untruncated one to within
+    the truncation error. The long time axis makes the window actually
+    truncate, so a margin based on width_p alone fails by O(field max).
+    """
+    geometry_kwargs = dict(Nx=32, Ny=32, Lx=10, Ly=10, dt=0.1, T=60)
+    blob = Blob(pos_y0=5.0, t_init=20.0, **blob_kwargs)
+    ds_full = Model.from_blobs(
+        [blob], geometry=Geometry(**geometry_kwargs), verbose=False
+    ).make_realization(speed_up=False)
+    ds_fast = Model.from_blobs(
+        [blob], geometry=Geometry(**geometry_kwargs), verbose=False
+    ).make_realization(truncation_error=ERROR)
+    assert ds_full.n.values.max() > 0.1  # guard: the blob really contributes
+    np.testing.assert_allclose(ds_fast.n.values, ds_full.n.values, atol=10 * ERROR)
+
+
 def test_make_realization_defaults_to_speed_up():
     """
     speed_up=True with truncation_error=1e-10 is the documented default

@@ -192,6 +192,12 @@ def test_from_arrays_rejects_bad_input():
         Geometry.from_arrays(np.zeros((2, 2)), x, t)
     with pytest.raises(ValueError, match="1D"):
         Geometry.from_arrays(x, x, np.array([]))
+    # descending arrays are uniformly spaced but would give negative domain
+    # lengths, breaking the speed_up truncation windows
+    with pytest.raises(ValueError, match="strictly increasing"):
+        Geometry.from_arrays(x[::-1], np.array([0.0]), t)
+    with pytest.raises(ValueError, match="strictly increasing"):
+        Geometry.from_arrays(x, x, t[::-1])
 
 
 def test_model_accepts_geometry_and_exposes_it():

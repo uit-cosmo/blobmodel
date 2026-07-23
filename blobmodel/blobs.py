@@ -75,8 +75,10 @@ class Blob:
         t_init : float, optional
             Initial time of the blob. Default 0.
         t_drain : Union[float, NDArray], optional
-            Time scale for the blob to drain. Default ``np.inf`` = no
-            draining.
+            Time scale for the blob to drain. Either a scalar or a 1D
+            array-like of length Nx (one value per grid point in the
+            x-direction); array-likes are stored as float numpy arrays.
+            Default ``np.inf`` = no draining.
         shape_parameters_p : dict
             Additional shape parameters for the propagation direction.
         shape_parameters_s : dict
@@ -123,7 +125,14 @@ class Blob:
         self.pos_x0 = pos_x0
         self.pos_y0 = pos_y0
         self.t_init = t_init
-        self.t_drain = t_drain
+        # Normalize to float scalar or float array so downstream code can
+        # rely on np.ndim and numpy indexing (lists and numpy integer
+        # scalars would otherwise fail deep inside _drain).
+        self.t_drain: Union[float, np.ndarray] = (
+            float(t_drain)
+            if np.ndim(t_drain) == 0
+            else np.asarray(t_drain, dtype=np.float64)
+        )
         self.shape_parameters_p = (
             {} if shape_parameters_p is None else shape_parameters_p
         )
@@ -137,6 +146,13 @@ class Blob:
             self._theta = cmath.phase(self.v_x + self.v_y * 1j)
         else:
             self._theta = 0
+
+    @property
+    def theta(self) -> float:
+        """float: Tilt angle used when discretizing the blob, measured from
+        the x-axis (read-only). Resolved at construction from the explicit
+        ``theta`` argument or, when that is None, from ``blob_alignment``."""
+        return self._theta
 
     def discretize_blob(
         self,
@@ -315,9 +331,9 @@ class Blob:
             Drain factor.
 
         """
-        if isinstance(self.t_drain, (int, float)):
-            return np.exp(-(t - self.t_init) / float(self.t_drain))
-        return np.exp(-(t - self.t_init) / self.t_drain[np.newaxis, :, np.newaxis])
+        if isinstance(self.t_drain, np.ndarray):
+            return np.exp(-(t - self.t_init) / self.t_drain[np.newaxis, :, np.newaxis])
+        return np.exp(-(t - self.t_init) / self.t_drain)
 
     def _blob_trajectory_x(self, t: Union[int, NDArray]) -> Any:
         """

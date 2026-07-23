@@ -41,6 +41,13 @@ def show_model(
         The animation object. Keep a reference to it as long as the animation
         should stay alive.
 
+    Raises
+    ------
+    ValueError
+        If the dataset has no `t` coordinate, e.g. because it was produced
+        with ``layout="imaging"`` (`frames`/`time`); only the default layout
+        is supported for plotting.
+
     Notes
     -----
     - This function chooses between a 1D and 2D visualizations based on the dimensionality of the dataset.
@@ -48,6 +55,14 @@ def show_model(
       over the whole dataset.
 
     """
+    if "t" not in dataset.coords:
+        raise ValueError(
+            "show_model expects a dataset in the default layout (with a `t` "
+            "coordinate); imaging-layout datasets (`frames`/`time`) are not "
+            'supported. Make the realization with layout="default" for '
+            "plotting."
+        )
+
     import matplotlib.pyplot as plt
     from matplotlib import animation
 
@@ -131,7 +146,13 @@ def _setup_1d_plot(dataset, variable):
     """
     import matplotlib.pyplot as plt
 
-    ax = plt.axes(xlim=(0, dataset.x[-1]), ylim=(0, dataset[variable].max()))
+    data = dataset[variable]
+    # x starts at the domain origin (x0 may be nonzero); the y-range must
+    # include negative values, which dipole-shaped blobs produce.
+    ax = plt.axes(
+        xlim=(float(dataset.x[0]), float(dataset.x[-1])),
+        ylim=(float(data.min()), float(data.max())),
+    )
     tx = ax.set_title(r"$t = 0$")
     (line,) = ax.plot([], [], lw=2)
     ax.set_xlabel(r"$x$")
