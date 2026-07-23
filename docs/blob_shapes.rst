@@ -38,7 +38,7 @@ direction, respectively. These arguments are ``BlobShapeEnum`` typed, and can ta
      - Rectangular
    * - :math:`e^\theta \Theta(-\theta)`
      - :math:`\frac{1}{\pi(1+\theta^2)}`
-     - :math:`e^{\theta/\lambda} \Theta(-\theta) + e^{\theta/(1-\lambda)} \Theta(\theta)`
+     - :math:`e^{\theta/(1-\lambda)} \Theta(-\theta) + e^{-\theta/\lambda} \Theta(\theta)`
      - :math:`\frac{e^{-\theta^2/2}}{\sqrt{\pi}}`
      - :math:`\frac{2}{\pi (e^\theta + e^{-\theta})}`
      - :math:`\frac{-2 \theta e^{-\theta^2}}{\sqrt{\pi}}`
@@ -61,12 +61,21 @@ Two-sided exponential blob shape
 ++++++++++++++++++++++++++++++++
 
 The last blob shape we discuss is the two-sided exponential blob shape. In contrast to the shapes above, it requires an asymmetry parameter ``lam`` to specify the exact shape.
-The shape is implemented as follows:
+The shape is implemented as follows (``theta`` is the spatial coordinate in the blob frame):
 
 .. code-block:: python
 
-  shape[t < 0] = np.exp(t[t < 0] / lam)
-  shape[t >= 0] = np.exp(-t[t >= 0] / (1 - lam))
+  shape[theta < 0] = np.exp(theta[theta < 0] / (1 - lam))
+  shape[theta >= 0] = np.exp(-theta[theta >= 0] / lam)
+
+``lam`` weights the leading (``theta >= 0``) side of the pulse. For a blob propagating with
+``v_x > 0`` recorded at a fixed position, ``lam`` is the temporal *rise* fraction of the
+measured pulse — the standard asymmetry-parameter convention of the FPP literature.
+
+.. note::
+   The convention was flipped in blobmodel 2.0.0: previously ``lam`` weighted the
+   trailing (``theta < 0``) side, i.e. the temporal fall. Code written against older
+   versions that passed ``1 - lam`` to compensate should now pass ``lam`` directly.
 
 .. image:: 2-sided_pulse_shape.png
    :scale: 80%

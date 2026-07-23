@@ -121,20 +121,22 @@ def test_double_exp_lam_outside_unit_interval_raises():
 def test_double_exp_lam_limits_are_one_sided():
     """
     lam = 0 and lam = 1 are valid one-sided limits of the double-exponential
-    shape: a pure decay and a pure rise, respectively.
+    shape: nonzero only on the trailing (theta < 0) and leading (theta >= 0)
+    side, respectively (a pure temporal decay and a pure temporal rise for a
+    blob with v_x > 0).
     """
     ps = BlobShapeImpl(BlobShapeEnum.double_exp, BlobShapeEnum.double_exp)
     theta = np.linspace(-5, 5, 100)
 
-    pure_decay = ps.get_blob_shape_p(theta, lam=0)
-    expected_decay = np.zeros_like(theta)
-    expected_decay[theta >= 0] = np.exp(-theta[theta >= 0])
-    np.testing.assert_allclose(pure_decay, expected_decay)
+    pure_trailing = ps.get_blob_shape_p(theta, lam=0)
+    expected_trailing = np.zeros_like(theta)
+    expected_trailing[theta < 0] = np.exp(theta[theta < 0])
+    np.testing.assert_allclose(pure_trailing, expected_trailing)
 
-    pure_rise = ps.get_blob_shape_p(theta, lam=1)
-    expected_rise = np.zeros_like(theta)
-    expected_rise[theta < 0] = np.exp(theta[theta < 0])
-    np.testing.assert_allclose(pure_rise, expected_rise)
+    pure_leading = ps.get_blob_shape_p(theta, lam=1)
+    expected_leading = np.zeros_like(theta)
+    expected_leading[theta >= 0] = np.exp(-theta[theta >= 0])
+    np.testing.assert_allclose(pure_leading, expected_leading)
 
 
 def test_model_rejects_wrong_types():
