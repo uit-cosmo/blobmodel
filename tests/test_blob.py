@@ -10,6 +10,26 @@ import numpy as np
 from unittest.mock import MagicMock
 
 
+def test_blob_defaults():
+    """
+    Tests that a Blob is constructible without arguments, with the documented
+    defaults: a unit-amplitude, unit-width Gaussian blob moving with v_x = 1
+    from the origin, without draining.
+    """
+    blob = Blob()
+    assert blob.blob_id == 0
+    assert isinstance(blob.blob_shape, BlobShapeImpl)
+    assert blob.amplitude == 1
+    assert blob.width_p == 1
+    assert blob.width_s == 1
+    assert blob.v_x == 1
+    assert blob.v_y == 0
+    assert blob.pos_x0 == 0
+    assert blob.pos_y0 == 0
+    assert blob.t_init == 0
+    assert blob.t_drain == np.inf
+
+
 def test_gaussian_blob():
     """
     Tests Gaussian blob discretization on a meshgrid.

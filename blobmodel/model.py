@@ -57,7 +57,8 @@ class Model:
             Blob label setting. Possible values: "off", "same", "individual".
             "off": no blob labels returned
             "same": regions where blobs are present are set to label 1
-            "individual": different blobs return individual labels
+            "individual": each blob gets its own label, 1..num_blobs in the
+            order the factory returns the blobs
             Used for creating training data for supervised machine learning algorithms
         label_border : float, optional
             Defines region of blob as region where density >= label_border * amplitude of Blob
@@ -309,8 +310,8 @@ class Model:
         iterable = (
             tqdm(self._blobs, desc="Summing up Blobs") if self._verbose else self._blobs
         )
-        for blob in iterable:
-            self._sum_up_blobs(blob, speed_up, error)
+        for blob_index, blob in enumerate(iterable):
+            self._sum_up_blobs(blob, blob_index, speed_up, error)
 
         dataset = self._create_xr_dataset()
 
@@ -359,6 +360,7 @@ class Model:
     def _sum_up_blobs(
         self,
         blob: Blob,
+        blob_index: int,
         speed_up: bool,
         error: float,
     ):
@@ -369,6 +371,9 @@ class Model:
         ----------
         blob : Blob
             Blob object.
+        blob_index : int
+            Position of the blob in the factory output; used to assign the
+            blob label when ``labels="individual"``.
         speed_up : bool
             Flag for speeding up the code by discretizing each single blob at a smaller time window.
         error : float
@@ -400,7 +405,7 @@ class Model:
             __max_amplitudes[__max_amplitudes == 0] = np.inf
             self._labels_field[:, :, _start:_stop][
                 _single_blob >= __max_amplitudes * self._label_border
-            ] = (blob.blob_id + 1)
+            ] = (blob_index + 1)
 
     def _compute_start_stop(self, blob: Blob, speed_up: bool, error: float):
         """

@@ -78,6 +78,19 @@ def _get_lorentz_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
 def _get_double_exponential_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
     """Compute the double-exponential pulse shape.
 
+    The shape is ``exp(-theta / lam)`` for ``theta >= 0`` and
+    ``exp(theta / (1 - lam))`` for ``theta < 0``, i.e. ``lam`` is the
+    e-folding fraction of the leading (``theta >= 0``) side of the pulse.
+    For a blob propagating with ``v_x > 0`` observed at a fixed position,
+    ``lam`` is therefore the temporal *rise* fraction of the measured pulse,
+    matching the asymmetry-parameter convention of the FPP literature.
+
+    .. versionchanged:: 2.0.0
+        The convention was flipped: ``lam`` previously weighted the trailing
+        (``theta < 0``) side, so ``lam`` was the temporal *fall* fraction.
+        Code written against older versions that passed ``1 - lam`` to
+        compensate should now pass ``lam`` directly.
+
     Parameters
     ----------
     theta : np.ndarray
@@ -86,9 +99,9 @@ def _get_double_exponential_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
         Additional keyword arguments.
         lam : float
             Asymmetry parameter controlling the shape, in the interval [0, 1].
-            The limits are the one-sided shapes: lam = 0 is a pure decay
-            (nonzero only for theta >= 0), lam = 1 a pure rise (nonzero only
-            for theta < 0).
+            The limits are the one-sided shapes: lam = 0 is nonzero only for
+            theta < 0 (a pure temporal decay for v_x > 0), lam = 1 is nonzero
+            only for theta >= 0 (a pure temporal rise for v_x > 0).
 
     Returns
     -------
@@ -104,10 +117,10 @@ def _get_double_exponential_shape(theta: np.ndarray, **kwargs) -> np.ndarray:
     if not 0.0 <= lam <= 1.0:
         raise ValueError(f"lam must be in the interval [0, 1], got lam = {lam}.")
     kern = np.zeros(shape=np.shape(theta))
-    if lam > 0.0:
-        kern[theta < 0] = np.exp(theta[theta < 0] / lam)
     if lam < 1.0:
-        kern[theta >= 0] = np.exp(-theta[theta >= 0] / (1 - lam))
+        kern[theta < 0] = np.exp(theta[theta < 0] / (1 - lam))
+    if lam > 0.0:
+        kern[theta >= 0] = np.exp(-theta[theta >= 0] / lam)
     return kern
 
 

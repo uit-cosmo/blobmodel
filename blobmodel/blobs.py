@@ -3,7 +3,7 @@
 from typing import Union, Any, Optional
 from nptyping import NDArray
 import numpy as np
-from .blob_shape import AbstractBlobShape
+from .blob_shape import AbstractBlobShape, BlobShapeImpl
 import cmath
 
 
@@ -30,17 +30,17 @@ class Blob:
 
     def __init__(
         self,
-        blob_id: int,
-        blob_shape: AbstractBlobShape,
-        amplitude: float,
-        width_p: float,
-        width_s: float,
-        v_x: float,
-        v_y: float,
-        pos_x0: float,
-        pos_y0: float,
-        t_init: float,
-        t_drain: Union[float, NDArray],
+        blob_id: int = 0,
+        blob_shape: Optional[AbstractBlobShape] = None,
+        amplitude: float = 1.0,
+        width_p: float = 1.0,
+        width_s: float = 1.0,
+        v_x: float = 1.0,
+        v_y: float = 0.0,
+        pos_x0: float = 0.0,
+        pos_y0: float = 0.0,
+        t_init: float = 0.0,
+        t_drain: Union[float, NDArray] = np.inf,
         shape_parameters_p: Union[dict, None] = None,
         shape_parameters_s: Union[dict, None] = None,
         blob_alignment: bool = False,
@@ -51,28 +51,32 @@ class Blob:
 
         Parameters
         ----------
-        blob_id : int
-            Identifier for the blob.
-        blob_shape : AbstractBlobShape
-            Shape of the blob.
-        amplitude : float
-            Amplitude of the blob.
-        width_p : float
-            Width of the blob in the propagation direction.
-        width_s : float
-            Width of the blob in the perpendicular direction.
-        v_x : float
-            Velocity of the blob in the x-direction.
-        v_y : float
-            Velocity of the blob in the y-direction.
-        pos_x0 : float
-            Initial position of the blob in the x-direction.
-        pos_y0 : float
-            Initial position of the blob in the y-direction.
-        t_init : float
-            Initial time of the blob.
-        t_drain : Union[float, NDArray]
-            Time scale for the blob to drain. Use ``np.inf`` for no draining.
+        blob_id : int, optional
+            Identifier for the blob (default 0). Purely metadata: blob labels
+            in ``Model`` (``labels="individual"``) are assigned from each
+            blob's position in the factory output, not from ``blob_id``.
+        blob_shape : AbstractBlobShape, optional
+            Shape of the blob. Default None, which means a Gaussian shape in
+            both directions, ``BlobShapeImpl()``.
+        amplitude : float, optional
+            Amplitude of the blob. Default 1.
+        width_p : float, optional
+            Width of the blob in the propagation direction. Default 1.
+        width_s : float, optional
+            Width of the blob in the perpendicular direction. Default 1.
+        v_x : float, optional
+            Velocity of the blob in the x-direction. Default 1.
+        v_y : float, optional
+            Velocity of the blob in the y-direction. Default 0.
+        pos_x0 : float, optional
+            Initial position of the blob in the x-direction. Default 0.
+        pos_y0 : float, optional
+            Initial position of the blob in the y-direction. Default 0.
+        t_init : float, optional
+            Initial time of the blob. Default 0.
+        t_drain : Union[float, NDArray], optional
+            Time scale for the blob to drain. Default ``np.inf`` = no
+            draining.
         shape_parameters_p : dict
             Additional shape parameters for the propagation direction.
         shape_parameters_s : dict
@@ -96,6 +100,8 @@ class Blob:
             is not positive (every element, when it is an array).
 
         """
+        if blob_shape is None:
+            blob_shape = BlobShapeImpl()
         if not isinstance(blob_shape, AbstractBlobShape):
             raise TypeError(
                 f"blob_shape must be an AbstractBlobShape, got {type(blob_shape).__name__}."

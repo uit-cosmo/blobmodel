@@ -22,8 +22,8 @@ plt.show()
 
 for lam in [0.2, 0.5, 0.8]:
     shape = np.zeros(1000)
-    shape[t < 0] = np.exp(t[t < 0] / lam)
-    shape[t >= 0] = np.exp(-t[t >= 0] / (1 - lam))
+    shape[t < 0] = np.exp(t[t < 0] / (1 - lam))
+    shape[t >= 0] = np.exp(-t[t >= 0] / lam)
     plt.plot(t, shape, label=f"lam = {lam}")
 
 plt.xlabel("t")
