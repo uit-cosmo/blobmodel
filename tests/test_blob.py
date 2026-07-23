@@ -280,7 +280,6 @@ def test_get_blobs():
     bf = DefaultBlobFactory(A_dist=DistributionEnum.deg)
     model = Model(
         geometry=Geometry(Nx=100, Ny=100, Lx=10, Ly=10, dt=1, T=1, periodic_y=False),
-        t_drain=1e10,
         num_blobs=3,
         blob_factory=bf,
     )
@@ -329,25 +328,19 @@ def test_theta_setter_overrides_factory_alignment():
     """A registered theta_setter wins over the factory's blob_alignment flag."""
     bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, blob_alignment=True)
     bf.set_theta_setter(lambda: 0.5)
-    blobs = bf.sample_blobs(
-        Ly=10, T=1, num_blobs=3, blob_shape=BlobShapeImpl(), t_drain=1e10
-    )
+    blobs = bf.sample_blobs(Ly=10, T=1, num_blobs=3, blob_shape=BlobShapeImpl())
     assert all(b._theta == 0.5 for b in blobs)
 
 
 def test_factory_alignment_used_without_theta_setter():
     """Without a theta_setter, the factory falls back to blob_alignment (velocity phase)."""
     bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, blob_alignment=True)
-    blobs = bf.sample_blobs(
-        Ly=10, T=1, num_blobs=3, blob_shape=BlobShapeImpl(), t_drain=1e10
-    )
+    blobs = bf.sample_blobs(Ly=10, T=1, num_blobs=3, blob_shape=BlobShapeImpl())
     assert all(np.isclose(b._theta, np.arctan2(b.v_y, b.v_x)) for b in blobs)
 
 
 def test_factory_default_is_axis_aligned():
     """With all-default arguments the factory produces untilted blobs (blob_alignment=False)."""
     bf = DefaultBlobFactory(A_dist=DistributionEnum.deg)
-    blobs = bf.sample_blobs(
-        Ly=10, T=1, num_blobs=3, blob_shape=BlobShapeImpl(), t_drain=1e10
-    )
+    blobs = bf.sample_blobs(Ly=10, T=1, num_blobs=3, blob_shape=BlobShapeImpl())
     assert all(b._theta == 0 for b in blobs)

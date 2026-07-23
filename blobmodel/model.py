@@ -5,9 +5,8 @@ import xarray as xr
 from tqdm import tqdm
 from typing import List, Union
 from .blobs import Blob
-from .stochasticality import BlobFactory, DefaultBlobFactory
+from .stochasticality import BlobFactory, BlobListFactory, DefaultBlobFactory
 from .geometry import Geometry
-from nptyping import NDArray
 import warnings
 from .blob_shape import AbstractBlobShape, BlobShapeImpl
 
@@ -26,7 +25,6 @@ class Model:
         geometry: Union[Geometry, None] = None,
         blob_shape: Union[AbstractBlobShape, None] = None,
         num_blobs: int = 1000,
-        t_drain: Union[float, NDArray, int] = 10,
         blob_factory: Union[BlobFactory, None] = None,
         labels: str = "off",
         label_border: float = 0.75,
@@ -50,12 +48,11 @@ class Model:
             By default None, in which case a gaussian `BlobShapeImpl` is created.
         num_blobs : int, optional
             Number of blobs.
-        t_drain : float or array-like, optional
-            Drain time scale of the blobs (exponential decay). Can be a single
-            float value or an array-like of length Nx.
         blob_factory : BlobFactory, optional
             BlobFactory instance for setting blob parameter distributions.
-            By default None, in which case a `DefaultBlobFactory` is created.
+            By default None, in which case a `DefaultBlobFactory` is created
+            (whose default is non-draining blobs, `t_drain=np.inf` — blob
+            draining is owned by the factory, not the model).
         labels : str, optional
             Blob label setting. Possible values: "off", "same", "individual".
             "off": no blob labels returned
@@ -82,6 +79,13 @@ class Model:
             `self.rng`. By default None, i.e. the factory's own generator is
             kept (non-reproducible unless the factory was seeded).
 
+        Notes
+        -----
+        - `num_blobs` and `blob_shape` are only forwarded to the blob
+          factory's `sample_blobs`; a custom factory may ignore either of
+          them (`BlobListFactory` ignores both). For pre-built blob lists
+          prefer `Model.from_blobs`, which hides these parameters.
+
         Raises
         ------
         TypeError
@@ -89,9 +93,8 @@ class Model:
             AbstractBlobShape instance or blob_factory is not a BlobFactory
             instance.
         ValueError
-            If t_drain is neither a single value nor an array-like of length Nx,
-            or if t_drain is not positive, or if the model is one-dimensional
-            and the geometry does not have Ny=1 and Ly=0.
+            If the model is one-dimensional and the geometry does not have
+            Ny=1 and Ly=0.
 
         Warns
         -----
@@ -116,13 +119,6 @@ class Model:
             raise TypeError(
                 f"blob_factory must be a BlobFactory, got {type(blob_factory).__name__}."
             )
-        if not isinstance(t_drain, (int, float)) and len(t_drain) != geometry.Nx:
-            raise ValueError(
-                f"t_drain must be a scalar or of length Nx = {geometry.Nx}, "
-                f"got length {len(t_drain)}."
-            )
-        if np.any(np.asarray(t_drain) <= 0):
-            raise ValueError(f"t_drain must be positive, got t_drain = {t_drain}.")
         if seed is not None:
             blob_factory.set_rng(np.random.default_rng(seed))
         self._one_dimensional = one_dimensional
@@ -140,7 +136,6 @@ class Model:
         self._geometry: Geometry = geometry
         self.blob_shape = blob_shape
         self.num_blobs: int = num_blobs
-        self.t_drain: Union[float, NDArray] = t_drain
 
         self._blobs: List[Blob] = []
         self._blob_factory = blob_factory
@@ -158,9 +153,55 @@ class Model:
         str
             String representation of the Model.
         """
-        return (
-            f"2d Blob Model with"
-            + f" num_blobs:{self.num_blobs} and t_drain:{self.t_drain}"
+        return f"2d Blob Model with num_blobs:{self.num_blobs}"
+
+    @classmethod
+    def from_blobs(
+        cls,
+        blobs: List[Blob],
+        geometry: Union[Geometry, None] = None,
+        labels: str = "off",
+        label_border: float = 0.75,
+        one_dimensional: bool = False,
+        verbose: bool = True,
+    ) -> "Model":
+        """
+        Create a Model that realizes a pre-built list of blobs.
+
+        Shortcut for the hand-built-blobs workflow: wraps `blobs` in a
+        `BlobListFactory`, so the sampling parameters of `Model.__init__`
+        (`num_blobs`, `blob_shape`) need not be supplied — each `Blob`
+        already carries its own parameters.
+
+        Parameters
+        ----------
+        blobs : List[Blob]
+            Blobs to sum in `make_realization`.
+        geometry : Geometry, optional
+            Grid on which the blobs are discretized, as in `Model.__init__`.
+        labels : str, optional
+            Blob label setting, as in `Model.__init__`.
+        label_border : float, optional
+            Defines region of blob, as in `Model.__init__`.
+        one_dimensional : bool, optional
+            If True, the perpendicular shape of the blobs is discarded, as in
+            `Model.__init__`.
+        verbose : bool, optional
+            If True, print a loading bar.
+
+        Returns
+        -------
+        Model
+            Model whose realizations sum exactly the given blobs.
+        """
+        return cls(
+            geometry=geometry,
+            num_blobs=len(blobs),
+            blob_factory=BlobListFactory(blobs),
+            labels=labels,
+            label_border=label_border,
+            one_dimensional=one_dimensional,
+            verbose=verbose,
         )
 
     @property
@@ -216,6 +257,12 @@ class Model:
             the model is one-dimensional, the vertical coordinate `y` will be of length 1.
 
 
+        Raises
+        ------
+        ValueError
+            If a sampled blob has an array-valued t_drain whose length does
+            not match the geometry's Nx.
+
         Warns
         -----
         UserWarning
@@ -236,8 +283,20 @@ class Model:
             T=self._geometry.T,
             num_blobs=self.num_blobs,
             blob_shape=self.blob_shape,
-            t_drain=self.t_drain,
         )
+
+        # Array-valued t_drain (drain time varying along x) must match the
+        # grid; only the model knows Nx, so this cannot be checked by the
+        # factory or the blob itself.
+        for blob in self._blobs:
+            if (
+                not isinstance(blob.t_drain, (int, float))
+                and len(blob.t_drain) != self._geometry.Nx
+            ):
+                raise ValueError(
+                    f"t_drain must be a scalar or of length Nx = {self._geometry.Nx}, "
+                    f"got length {len(blob.t_drain)}."
+                )
 
         if self._geometry.periodic_y and not self._one_dimensional and self._blobs:
             max_width = max(max(blob.width_p, blob.width_s) for blob in self._blobs)

@@ -10,12 +10,13 @@ from blobmodel import (
 import numpy as np
 
 # use DefaultBlobFactory to define distribution functions fo random variables
-bf = DefaultBlobFactory(A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros)
+bf = DefaultBlobFactory(
+    A_dist=DistributionEnum.deg, vy_dist=DistributionEnum.zeros, t_drain=2
+)
 
 one_dim_model = Model(
     geometry=Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=1, T=1000, periodic_y=False),
     blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
-    t_drain=2,
     num_blobs=10000,
     blob_factory=bf,
     one_dimensional=True,
@@ -56,7 +57,6 @@ def test_1d_geometry_mismatch_raises():
                 Nx=100, Ny=100, Lx=10, Ly=10, dt=1, T=1000, periodic_y=False
             ),
             blob_shape=BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.gaussian),
-            t_drain=2,
             num_blobs=1,
             blob_factory=bf,
             one_dimensional=True,

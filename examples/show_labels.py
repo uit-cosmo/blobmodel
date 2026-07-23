@@ -6,7 +6,6 @@ from blobmodel import Geometry, Model
 bm = Model(
     geometry=Geometry(Nx=100, Ny=100, Lx=20, Ly=20, dt=0.1, T=20, periodic_y=True),
     num_blobs=10,
-    t_drain=1e10,
     labels="individual",
 )
 

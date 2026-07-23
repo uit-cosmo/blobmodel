@@ -22,10 +22,15 @@ class BlobFactory(ABC):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: Union[float, NDArray],
     ) -> List[Blob]:
         """
         Creates a list of Blobs used in Model.
+
+        Notes
+        -----
+        - Blob draining is owned by the factory, not the `Model`: each `Blob`
+          carries its own `t_drain` (`DefaultBlobFactory` takes it as a
+          constructor argument, `np.inf` — no draining — by default).
         """
         raise NotImplementedError
 
@@ -52,6 +57,107 @@ class BlobFactory(ABC):
         self.rng = rng
 
 
+class BlobListFactory(BlobFactory):
+    """BlobFactory that returns a pre-built list of blobs.
+
+    Use this (typically through `Model.from_blobs`) when the blobs are
+    constructed by hand instead of sampled from distributions. All
+    `sample_blobs` arguments (`num_blobs`, `blob_shape`, `t_drain`, ...) are
+    ignored: each `Blob` already carries its own parameters.
+    """
+
+    def __init__(self, blobs: List[Blob]) -> None:
+        """
+        Initialize the factory with the list of blobs to realize.
+
+        Parameters
+        ----------
+        blobs : List[Blob]
+            Blobs returned by every `sample_blobs` call.
+        """
+        self._blobs = list(blobs)
+
+    def sample_blobs(
+        self,
+        Ly: float,
+        T: float,
+        num_blobs: int,
+        blob_shape: AbstractBlobShape,
+    ) -> List[Blob]:
+        """Return the stored blob list. All arguments are ignored."""
+        return list(self._blobs)
+
+    def is_one_dimensional(self) -> bool:
+        """
+        Returns True if all stored blobs have zero perpendicular velocity.
+
+        Returns
+        -------
+        bool
+            True if `v_y == 0` for every blob, False otherwise.
+        """
+        return all(blob.v_y == 0 for blob in self._blobs)
+
+
+class CallableBlobFactory(BlobFactory):
+    """BlobFactory that builds each blob by calling a user-provided getter.
+
+    The getter receives the factory's random number generator, so blobs
+    sampled through this factory are reproducible via
+    `CallableBlobFactory(seed=...)` or `Model(seed=...)` — provided the getter
+    draws its random numbers from the generator it is given instead of the
+    global `np.random` state.
+    """
+
+    def __init__(
+        self,
+        blob_getter: Callable[[np.random.Generator], Blob],
+        one_dimensional: bool = False,
+        seed: Union[int, np.random.Generator, None] = None,
+    ) -> None:
+        """
+        Initialize the factory with a blob getter.
+
+        Parameters
+        ----------
+        blob_getter : Callable[[np.random.Generator], Blob]
+            Function called once per blob with the factory's random number
+            generator; must return a `Blob`.
+        one_dimensional : bool, optional
+            Whether the blobs produced by the getter are compatible with a
+            one-dimensional model (i.e. have `v_y == 0`). Cannot be inferred
+            from the getter, so it must be declared. By default False.
+        seed : int, np.random.Generator or None, optional
+            Seed (or an already constructed `numpy.random.Generator`) for the
+            generator passed to `blob_getter`. A seed passed to `Model` takes
+            precedence: it replaces this factory's generator via `set_rng`.
+            By default None, i.e. a freshly seeded generator
+            (non-reproducible).
+        """
+        self._blob_getter = blob_getter
+        self._one_dimensional = one_dimensional
+        self.rng = np.random.default_rng(seed)
+
+    def sample_blobs(
+        self,
+        Ly: float,
+        T: float,
+        num_blobs: int,
+        blob_shape: AbstractBlobShape,
+    ) -> List[Blob]:
+        """
+        Create `num_blobs` blobs by calling the getter with `self.rng`.
+
+        `Ly`, `T` and `blob_shape` are ignored: the getter is expected to
+        fully specify each blob.
+        """
+        return [self._blob_getter(self.rng) for _ in range(num_blobs)]
+
+    def is_one_dimensional(self) -> bool:
+        """Return the `one_dimensional` flag declared at construction."""
+        return self._one_dimensional
+
+
 class DefaultBlobFactory(BlobFactory):
     """Default implementation of BlobFactory.
 
@@ -75,6 +181,7 @@ class DefaultBlobFactory(BlobFactory):
         vy_parameter: float = 1.0,
         shape_param_p_parameter: float = 0.5,
         shape_param_s_parameter: float = 0.5,
+        t_drain: Union[float, NDArray, int] = np.inf,
         blob_alignment: bool = False,
         seed: Union[int, np.random.Generator, None] = None,
     ) -> None:
@@ -114,6 +221,11 @@ class DefaultBlobFactory(BlobFactory):
             Free parameter for the shape parameter distribution in the principal direction, by default 0.5
         shape_param_s_parameter : float, optional
             Free parameter for the shape parameter distribution in the secondary direction, by default 0.5
+        t_drain : float or array-like, optional
+            Drain time scale of the blobs (exponential decay), applied to every
+            sampled blob. Can be a single value or an array-like of length Nx
+            (the number of grid points of the model's geometry in the
+            x-direction). By default `np.inf`, i.e. no draining.
         blob_alignment : bool, optional
             If blob_alignment == True, the blob shapes are rotated in the propagation direction of the blob.
             If blob_alignment == False, the blob shapes are independent of the propagation direction.
@@ -148,7 +260,8 @@ class DefaultBlobFactory(BlobFactory):
             If a distribution argument is not a DistributionEnum member.
         ValueError
             If a width distribution (`wp_dist` or `ws_dist`) is uniform with
-            `free_parameter` > 2, which would produce negative blob widths.
+            `free_parameter` > 2, which would produce negative blob widths,
+            or if `t_drain` is not positive.
 
         """
         for name, dist in (
@@ -188,8 +301,12 @@ class DefaultBlobFactory(BlobFactory):
         self.width_s_parameter = ws_parameter
         self.velocity_x_parameter = vx_parameter
         self.velocity_y_parameter = vy_parameter
+        if np.any(np.asarray(t_drain) <= 0):
+            raise ValueError(f"t_drain must be positive, got t_drain = {t_drain}.")
+
         self.shape_param_p_parameter = shape_param_p_parameter
         self.shape_param_s_parameter = shape_param_s_parameter
+        self.t_drain = t_drain
         self.blob_alignment = blob_alignment
         self.theta_setter: Union[Callable[[], float], None] = None
         self.rng = np.random.default_rng(seed)
@@ -206,10 +323,12 @@ class DefaultBlobFactory(BlobFactory):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: Union[float, NDArray],
     ) -> List[Blob]:
         """
         Creates a list of Blobs used in the Model.
+
+        Every blob is given the factory's `t_drain` (a constructor argument,
+        `np.inf` — no draining — by default).
 
         Parameters
         ----------
@@ -222,9 +341,6 @@ class DefaultBlobFactory(BlobFactory):
             Number of blobs to generate.
         blob_shape : AbstractBlobShape
             Object representing the shape of the blobs.
-        t_drain : float or NDArray
-            Drain time scale of the blobs (exponential decay). Either a
-            scalar or an array of length Nx.
 
         Returns
         -------
@@ -283,7 +399,7 @@ class DefaultBlobFactory(BlobFactory):
                 pos_x0=posxs[i],
                 pos_y0=posys[i],
                 t_init=t_inits[i],
-                t_drain=t_drain,
+                t_drain=self.t_drain,
                 shape_parameters_p=spxs_dict[i],
                 shape_parameters_s=spys_dict[i],
                 blob_alignment=self.blob_alignment,

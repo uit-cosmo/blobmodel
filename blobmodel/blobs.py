@@ -72,7 +72,7 @@ class Blob:
         t_init : float
             Initial time of the blob.
         t_drain : Union[float, NDArray]
-            Time scale for the blob to drain.
+            Time scale for the blob to drain. Use ``np.inf`` for no draining.
         shape_parameters_p : dict
             Additional shape parameters for the propagation direction.
         shape_parameters_s : dict

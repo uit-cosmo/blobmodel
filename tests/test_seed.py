@@ -26,7 +26,7 @@ def _blob_attributes(blob):
 
 def _sample_default_blobs(factory, num_blobs=10):
     return factory.sample_blobs(
-        Ly=10, T=10, num_blobs=num_blobs, blob_shape=BlobShapeImpl(), t_drain=10
+        Ly=10, T=10, num_blobs=num_blobs, blob_shape=BlobShapeImpl()
     )
 
 

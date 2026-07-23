@@ -9,14 +9,22 @@ from blobmodel import (
 import numpy as np
 
 # Example of implementing a BlobFactory, which allows to set blob parameters in any desirable way.
+# For simpler cases you may not need a subclass at all:
+# - Model.from_blobs(blobs) realizes a pre-built list of Blob objects,
+# - CallableBlobFactory(blob_getter) builds each blob by calling
+#   blob_getter(rng), which keeps realizations seedable if the getter draws
+#   its random numbers from the rng it is given.
 
 
 # create custom class that inherits from BlobFactory
 # here you can define your custom parameter distributions
 class CustomBlobFactory(BlobFactory):
-    def __init__(self, seed=None) -> None:
-        # Draw random numbers from self.rng: a seed passed to Model replaces it
-        # (via BlobFactory.set_rng), making realizations reproducible.
+    def __init__(self, t_drain: float = np.inf, seed=None) -> None:
+        # Blob draining is owned by the factory: each sampled Blob gets this
+        # t_drain. Draw random numbers from self.rng: a seed passed to Model
+        # replaces it (via BlobFactory.set_rng), making realizations
+        # reproducible.
+        self.t_drain = t_drain
         self.rng = np.random.default_rng(seed)
 
     def sample_blobs(
@@ -25,7 +33,6 @@ class CustomBlobFactory(BlobFactory):
         T: float,
         num_blobs: int,
         blob_shape: AbstractBlobShape,
-        t_drain: float,
     ) -> list[Blob]:
         # set custom parameter distributions
         amp = np.linspace(0.01, 1, num=num_blobs)
@@ -52,7 +59,7 @@ class CustomBlobFactory(BlobFactory):
                 pos_x0=posx[i],
                 pos_y0=posy[i],
                 t_init=t_init[i],
-                t_drain=t_drain,
+                t_drain=self.t_drain,
             )
             for i in range(num_blobs)
         ]
@@ -61,10 +68,9 @@ class CustomBlobFactory(BlobFactory):
         return False
 
 
-bf = CustomBlobFactory()
+bf = CustomBlobFactory(t_drain=2)
 tmp = Model(
     geometry=Geometry(Nx=32, Ny=32, Lx=10, Ly=10, dt=0.1, T=10, periodic_y=True),
-    t_drain=2,
     num_blobs=100,
     blob_factory=bf,
 )
