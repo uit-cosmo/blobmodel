@@ -14,11 +14,22 @@ All source lives in `blobmodel/` (flat, one class-cluster per file):
 
 - `model.py` — `Model`: owns the grid, sums discretized blobs into the density
   field (`make_realization`), handles `speed_up`/truncation and blob labels.
+  Also `to_imaging_dataset` (module-level): converts the output dataset to
+  the GPI/APD `frames(y, x, time)` + `R`/`Z` format, also reachable via
+  `make_realization(layout="imaging")`.
 - `blobs.py` — `Blob`: one blob's parameters + `discretize_blob` (analytic
   shape evaluated on the mesh, with periodic-y ghost copies and tilt `theta`).
 - `stochasticality.py` — `BlobFactory` (ABC) / `DefaultBlobFactory`: samples
-  blob parameters from distributions. The advertised extension point is
-  subclassing `BlobFactory` (see `examples/custom_blobfactory.py`).
+  blob parameters independently; configured via the chainable
+  `set_sampler(parameter, sampler, free_parameter=None)` with parameter keys
+  "amplitude"/"wp"/"ws"/"vx"/"vy"/"spp"/"sps" and `sampler` either a
+  `DistributionEnum` or a `ParameterSampler` callable
+  (`(rng, num_blobs) -> np.ndarray`); ctor takes only `t_drain`,
+  `blob_alignment`, `seed`. Also `BlobListFactory` (pre-built blob
+  list; used by `Model.from_blobs`) and `CallableBlobFactory`
+  (`blob_getter(rng) -> Blob`, the seedable path for hand-rolled sampling).
+  Subclassing `BlobFactory` remains the general extension point (see
+  `examples/custom_blobfactory.py`).
 - `distributions.py` — `DistributionEnum` → sampling functions (`DISTRIBUTIONS`
   dict of plain functions).
 - `blob_shape.py` — `AbstractBlobShape` / `BlobShapeImpl` / `BlobShapeEnum`:
@@ -65,18 +76,50 @@ GPI/APD `frames(y, x, time)` + `R`/`Z` format.
 
 - Same working convention as feedback.txt: one branch/PR per item, tests for
   behavior changes.
-- Four open GitHub issues map onto items and should be closed by the
-  implementing PRs: #140 Geometry flexibility (→ item 1, the P0 — downstream
-  pokes `model._geometry` and that hack is half-broken since meshgrids were
-  dropped), #93 t_drain belongs in stochasticality (→ item 3), #132 dataset in
-  cmod_functions format (→ item 6), #101 rework DefaultBlobFactory config
-  (→ item 10, low priority).
-- Suggested order is at the bottom of feedback.md: 1) Geometry (x0/y0 offsets,
-  accept a user-built `Geometry` in `Model`, expose `model.geometry`);
-  2) `BlobListFactory`/`CallableBlobFactory` + `Model.from_blobs`;
-  3) Blob defaults, `t_drain=inf`, `lam` convention docs; 4) output-layout
-  helper, speed_up default.
-- No items have been started yet.
+- Open GitHub issues mapping onto items, to be closed by the implementing
+  PRs: #132 dataset in cmod_functions format (→ item 6), #101 rework
+  DefaultBlobFactory config (→ item 10, low priority).
+- Suggested order is at the bottom of feedback.md:
+  1) Blob defaults, `lam` convention docs; 2) output-layout helper,
+  speed_up default; 3) docs-script fixes.
+- Item 1 (Geometry flexibility, #140) merged in PR #152 (2026-07-22): grid
+  params moved from `Model` to `Geometry` (breaking — 2.0.0), `x0`/`y0`
+  offsets, `Geometry.from_arrays`, read-only `model.geometry`.
+- Items 2, 3, 8 merged in PR #153 (2026-07-23, closed #93): added
+  `BlobListFactory`/`CallableBlobFactory`/`Model.from_blobs`; breaking —
+  `t_drain` removed from `Model` and from the `BlobFactory.sample_blobs`
+  signature (now a `DefaultBlobFactory` constructor arg, default `np.inf` =
+  no draining, so a bare `Model()` no longer drains; previously
+  `t_drain=10`). Downstream repos not yet migrated.
+- Items 4 and 5 implemented 2026-07-23 on branch `blob_defaults_lam`: all
+  `Blob.__init__` parameters now have defaults (order unchanged;
+  `Blob()` = unit Gaussian blob, `v_x=1`, no draining) and
+  `labels="individual"` labels blobs by factory-output position
+  (`blob_id` is pure metadata now). Breaking: `double_exp` `lam` flipped
+  to the FPP convention (see gotcha below) — downstream `1 - lam`
+  workarounds must be removed on migration.
+- Item 6 implemented 2026-07-23: PR #155 (closed #132) added
+  `make_realization(layout="imaging")` / `to_imaging_dataset` (non-breaking);
+  branch `one_dim_squeeze` then made Ly=0 output squeezed — `n(x, t)`, no
+  `y` dimension (breaking: downstream `isel(y=0)` on 1D output must go).
+- Items 7 and 9 implemented 2026-07-23 on branch `misc_api_cleanup`
+  (PR #157): `make_realization` defaults to `speed_up=True`,
+  `truncation_error=1e-10` (breaking: `error` renamed to
+  `truncation_error` — downstream `speed_up=True, error=1e-10`
+  boilerplate can just be dropped); `get_blobs()` before
+  `make_realization()` raises RuntimeError; burn-in documented
+  ("Stationarity and burn-in" in `blob_factory.rst`: negative blob
+  `t_init` via `CallableBlobFactory`; a real `burn_in=` option was
+  deliberately deferred).
+- Items 10 and 11 implemented 2026-07-23 on branch `docs_factory_cleanup`
+  (closes #101). Breaking: `DefaultBlobFactory` lost its fourteen
+  `*_dist`/`*_parameter` ctor args in favor of `set_sampler` (see
+  Architecture above); defaults unchanged (exp amplitude, rest
+  degenerate). Item 11: `docs/create_logo.py` repaired; docs plot
+  scripts now covered by headless smoke tests
+  (`tests/test_docs_scripts.py`). All feedback.md items done.
+- The 2.0.0 version bump is now unblocked from the feedback.md side
+  (all breaking items have landed); it has not been done yet.
 
 ## Commands
 
@@ -109,13 +152,23 @@ CI is `.github/workflows/workflow.yml` (currently duplicated jobs on Python
 - **Randomness**: seeding exists — `Model(seed=...)` and
   `DefaultBlobFactory(seed=...)` thread a `numpy.random.Generator` through
   (`BlobFactory.set_rng` / `self.rng`); a seed passed to `Model` overrides the
-  factory's. Custom factories are only seedable if they draw from `self.rng`
-  — downstream ones currently don't (see feedback.md item 8). Don't introduce
-  global-state `np.random.*` randomness.
+  factory's. Custom factories are only seedable if they draw from `self.rng`;
+  `CallableBlobFactory` passes its rng to the `blob_getter` for the same
+  reason — downstream `blob_getter` functions still use global `np.random`
+  until they migrate. Don't introduce global-state `np.random.*` randomness.
 - **Angles** (`theta`) are measured from the x-axis, not from the velocity
   vector.
+- **`lam` (double_exp asymmetry)**: since 2.0.0 `lam` weighs the *leading*
+  (`theta >= 0`) side of the spatial pulse — i.e. the temporal *rise*
+  fraction at a fixed probe for `v_x > 0`, matching the FPP-literature
+  convention. Pre-2.0 it weighted the trailing side (temporal fall), which
+  is why old downstream code passes `1 - lam`.
 - `t_drain` is a drain *time scale* (exponential decay), not a start time; it
-  may be a scalar or an array of length Nx.
+  may be a scalar or an array of length Nx (length checked in
+  `make_realization`). It lives on `Blob`/the factory
+  (`DefaultBlobFactory(t_drain=...)`), not on `Model`, and defaults to
+  `np.inf` = no draining (the documented replacement for the old `1e10`
+  folk convention).
 - Version is the static `version` in pyproject.toml (bumped manually per
   release, see recent "Up version number" commits); setuptools-scm in
   build-system is vestigial (item 14).
