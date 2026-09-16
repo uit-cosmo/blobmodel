@@ -13,7 +13,7 @@ class Blob:
     the function `discretize_blob`. The contribution of a single blob to a grid defined by `x`, `y` and `t` is given by:
 
     .. math::
-        a e^{-(t-t_k)/\\tau_\\shortparallel}\\varphi\\left( \\frac{(x-x_k)-v(t-t_k)}{\ell_x}, \\frac{(y-y_k)-w(t-t_k)}{\ell_y} \\right)
+        a e^{-(t-t_k)/\\tau_\\shortparallel} e^{-\\left((t-t_k)/\\tau_\\mathrm{d}\\right)^2}\\varphi\\left( \\frac{(x-x_k)-v(t-t_k)}{\ell_x}, \\frac{(y-y_k)-w(t-t_k)}{\ell_y} \\right)
 
     Where:
         - :math:`a` is the blob amplitude, `amplitude`.
@@ -26,11 +26,23 @@ class Blob:
         - :math:`t_k` is the time at which the blob is seeded at
           :math:`(x_k, y_k)`, `t_init`.
         - :math:`\\tau_\\shortparallel` is the drainage time, `t_drain`.
+        - :math:`\\tau_\\mathrm{d}` is the pulse lifetime, `t_lifetime`. The
+          corresponding factor is absent (equal to 1) when `t_lifetime` is
+          None, which is the default.
         - :math:`\\varphi` is the blob pulse shape, `blob_shape`.
+
+    The two temporal factors are different: `t_drain` is a one-sided
+    exponential decay *from* :math:`t_k`, growing without bound backwards in
+    time, while `t_lifetime` is a Gaussian envelope *symmetric about*
+    :math:`t_k`. They are independent and multiply. When a lifetime is set and
+    `t_drain` is infinite, :math:`t_k` is the time of maximum amplitude.
 
     Additionally, a tilt angle can be provided through `theta`, in which case
     the two arguments of :math:`\\varphi` are rotated by `theta` around the
     blob center.
+
+    .. versionadded:: 2.1.0
+        The `t_lifetime` envelope.
     """
 
     def __init__(
@@ -50,6 +62,7 @@ class Blob:
         shape_parameters_s: Union[dict, None] = None,
         blob_alignment: bool = False,
         theta: Optional[float] = None,
+        t_lifetime: Optional[float] = None,
     ) -> None:
         """
         Initialize a single blob.
@@ -97,14 +110,24 @@ class Blob:
             vector). If not None, this angle is used directly and ``blob_alignment``
             is ignored. If None (the default), the angle is determined by
             ``blob_alignment``: the velocity phase when it is True, or 0 when False.
+        t_lifetime : float, optional
+            Pulse lifetime: the blob is multiplied by the Gaussian envelope
+            ``exp(-((t - t_init) / t_lifetime)**2)``, symmetric about
+            ``t_init``. Scalar only — unlike ``t_drain`` there is no per-x
+            array form. Default None = no envelope; ``np.inf`` is accepted and
+            is equivalent to None. Keyword-only in practice: it is last in the
+            signature so that positional callers are unaffected.
+
+            .. versionadded:: 2.1.0
 
         Raises
         ------
         TypeError
             If ``blob_shape`` is not an ``AbstractBlobShape`` instance.
         ValueError
-            If ``width_p`` or ``width_s`` is not positive, or if ``t_drain``
-            is not positive (every element, when it is an array).
+            If ``width_p`` or ``width_s`` is not positive, if ``t_drain``
+            is not positive (every element, when it is an array), or if
+            ``t_lifetime`` is given and is not positive.
 
         """
         if blob_shape is None:
@@ -119,6 +142,10 @@ class Blob:
             )
         if np.any(np.asarray(t_drain) <= 0):
             raise ValueError(f"t_drain must be positive, got t_drain = {t_drain}.")
+        if t_lifetime is not None and not t_lifetime > 0:
+            raise ValueError(
+                f"t_lifetime must be positive, got t_lifetime = {t_lifetime}."
+            )
 
         self.blob_id = blob_id
         self.blob_shape = blob_shape
@@ -137,6 +164,9 @@ class Blob:
             float(t_drain)
             if np.ndim(t_drain) == 0
             else np.asarray(t_drain, dtype=np.float64)
+        )
+        self.t_lifetime: Optional[float] = (
+            None if t_lifetime is None else float(t_lifetime)
         )
         self.shape_parameters_p = (
             {} if shape_parameters_p is None else shape_parameters_p
@@ -318,7 +348,11 @@ class Blob:
         )
 
         return (
-            self.amplitude * self._drain(t) * primary_axis_shape * secondary_axis_shape
+            self.amplitude
+            * self._drain(t)
+            * self._envelope(t)
+            * primary_axis_shape
+            * secondary_axis_shape
         )
 
     def _drain(self, t: Union[int, NDArray]) -> NDArray:
@@ -339,6 +373,27 @@ class Blob:
         if isinstance(self.t_drain, np.ndarray):
             return np.exp(-(t - self.t_init) / self.t_drain[np.newaxis, :, np.newaxis])
         return np.exp(-(t - self.t_init) / self.t_drain)
+
+    def _envelope(self, t: Union[int, NDArray]) -> Any:
+        """
+        Gaussian pulse-lifetime envelope, symmetric about `t_init`.
+
+        Parameters
+        ----------
+        t : NDArray
+            Time coordinates.
+
+        Returns
+        -------
+        envelope_factor : float or NDArray
+            ``exp(-((t - t_init) / t_lifetime)**2)``, or the float 1.0 when
+            `t_lifetime` is None. Multiplying by 1.0 is exact in IEEE754, so
+            a blob without a lifetime is bit-for-bit unaffected.
+
+        """
+        if self.t_lifetime is None:
+            return 1.0
+        return np.exp(-(((t - self.t_init) / self.t_lifetime) ** 2))
 
     def _blob_trajectory_x(self, t: Union[int, NDArray]) -> Any:
         """

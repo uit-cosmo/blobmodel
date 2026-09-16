@@ -38,6 +38,30 @@ def test_drainage_time():
     # PLACEHOLDER drainage_time_1
 
 
+def test_pulse_lifetime():
+    # PLACEHOLDER pulse_lifetime_0
+    from blobmodel import DefaultBlobFactory, Geometry, Model
+
+    geometry = Geometry(Nx=100, Ny=1, Lx=10, Ly=0, dt=0.1, T=100, periodic_y=False)
+
+    # Blobs peak at their t_init and live for a time t_lifetime. Seeding them
+    # uniformly over an interval wider than the domain keeps the process
+    # homogeneous over the observed region.
+    pad = 10.0
+    blob_factory = DefaultBlobFactory(t_lifetime=1.0).set_sampler(
+        "posx", lambda rng, n: rng.uniform(-pad, geometry.Lx + pad, n)
+    )
+
+    tmp = Model(
+        geometry=geometry,
+        blob_factory=blob_factory,
+        num_blobs=100,
+        one_dimensional=True,
+    )
+    tmp.make_realization()
+    # PLACEHOLDER pulse_lifetime_1
+
+
 def test_one_dim():
     # PLACEHOLDER one_dim_0
     from blobmodel import (
