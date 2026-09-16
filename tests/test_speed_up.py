@@ -307,9 +307,7 @@ def test_compute_start_stop_is_not_wastefully_wide(blob_kwargs):
     assert support.size > 0
 
     dt = model._geometry.dt
-    margin = int(
-        np.ceil(-blob.width_p * np.log(ERROR * np.sqrt(np.pi)) / abs(blob.v_x * dt))
-    )
+    margin = int(np.ceil(-blob.width_p * np.log(ERROR) / abs(blob.v_x * dt)))
     support_width = support.max() - support.min() + 1
     assert (stop - start) <= support_width + 2 * margin + 2
 
@@ -347,3 +345,22 @@ def test_compute_start_stop_widens_as_error_decreases():
         assert stop > support.max()
         widths.append(stop - start)
     assert widths == sorted(widths)  # non-decreasing as error shrinks
+
+
+def test_speed_up_margin_assumes_unit_shape_peak():
+    """The crossing margin must not assume the Gaussian's 1/sqrt(pi) peak:
+    shapes such as `exp` peak at 1, and their tails must be kept down to
+    truncation_error."""
+    shape = BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.exp)
+    blob = Blob(blob_shape=shape, width_p=1.0, v_x=1.0, pos_x0=-30.0, t_init=0.0)
+    geometry = Geometry(Nx=16, Ny=1, Lx=8, Ly=0, dt=0.1, T=60)
+
+    def realize(**kwargs):
+        model = Model.from_blobs(
+            [blob], geometry=geometry, one_dimensional=True, verbose=False
+        )
+        return model.make_realization(**kwargs).n.values
+
+    full = realize(speed_up=False)
+    fast = realize(speed_up=True, truncation_error=1e-3)
+    assert np.abs(fast - full).max() < 1e-3

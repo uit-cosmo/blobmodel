@@ -67,6 +67,7 @@ Alternatively, you can take a look at the examples gallery at :py:mod:`blobmodel
    blob_factory
    blob_labels
    drainage_time
+   pulse_lifetime
    blob_tilt
    contributor_guide
 
