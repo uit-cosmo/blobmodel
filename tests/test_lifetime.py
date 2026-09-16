@@ -325,13 +325,33 @@ def test_lifetime_window_is_intersected_with_the_crossing_window():
     """A blob that crosses the domain long before its peak time contributes
     nothing: the two windows do not overlap and the result must collapse."""
     geometry = _geometry_1d(dt=0.05, T=60)
-    blob = _blob(pos_x0=0.0, v_x=1.0, t_init=50.0, t_lifetime=0.5)
+    blob = _blob(pos_x0=30.0, v_x=1.0, t_init=50.0, t_lifetime=0.5)
     model = Model.from_blobs([blob], geometry=geometry, one_dimensional=True)
     start, stop = model._compute_start_stop(blob, True, ERROR)
-    assert start <= stop  # never inverted
+    assert start == stop  # collapsed, never inverted
     full = _realize(blob, geometry, one_dimensional=True, speed_up=False)
     fast = _realize(blob, geometry, one_dimensional=True, truncation_error=ERROR)
     np.testing.assert_allclose(fast, full, atol=10 * ERROR)
+
+
+@pytest.mark.parametrize(
+    "blob_kwargs",
+    [
+        dict(t_lifetime=10.0, t_drain=0.5, t_init=110.0, pos_x0=100.0),
+        dict(t_lifetime=1.0, amplitude=1e6),
+    ],
+)
+def test_crossing_window_accounts_for_temporal_gain(blob_kwargs):
+    """A drain much shorter than the lifetime lifts the temporal factor far
+    above 1 before t_init (and amplitude scales the field): the crossing
+    margin must widen accordingly. Exponential tails make it visible."""
+    geometry = _geometry_1d(dt=0.1, T=40)
+    shape = BlobShapeImpl(BlobShapeEnum.exp, BlobShapeEnum.exp)
+    blob = _blob(blob_shape=shape, **blob_kwargs)
+    full = _realize(blob, geometry, one_dimensional=True, speed_up=False)
+    fast = _realize(blob, geometry, one_dimensional=True, truncation_error=1e-3)
+    assert np.isfinite(full).all() and full.max() > 1.0
+    assert np.abs(fast - full).max() < 1e-3
 
 
 @pytest.mark.parametrize("amplitude", [1e4, -1e4])

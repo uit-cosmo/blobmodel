@@ -512,8 +512,11 @@ class Model:
                 + np.abs(np.sin(blob.theta)) * blob.width_s
             )
             margin = (
-                -width_x
-                * np.log(truncation_error * np.sqrt(np.pi))
+                width_x
+                * (
+                    self._log_temporal_gain(blob)
+                    - np.log(truncation_error * np.sqrt(np.pi))
+                )
                 / np.abs(blob.v_x * dt)
             )
             start = max(start, int(np.clip(min(idx_x0, idx_Lx) - margin, 0, n_t)))
@@ -521,6 +524,37 @@ class Model:
 
         # The two windows may not overlap at all: collapse rather than invert.
         return start, max(start, stop)
+
+    @staticmethod
+    def _log_temporal_gain(blob: Blob) -> float:
+        r"""
+        Log of a bound on how much the crossing-window margin must widen.
+
+        The crossing margin assumes the blob's contribution is at most its
+        spatial shape. With a finite `t_lifetime` the temporal factor
+        ``exp(-dt / t_drain - (dt / tau_d)**2)`` peaks at
+        ``exp(tau_d**2 / (4 t_drain**2))`` (before `t_init`), and the amplitude
+        scales the field too, so the log of ``|amplitude|`` times that peak
+        is added to the margin's log-threshold. Clamped at 0 so the margin
+        never shrinks below the lifetime-free one. Without a (finite)
+        lifetime this returns 0, leaving the pre-existing window unchanged.
+
+        Parameters
+        ----------
+        blob : Blob
+            Blob object.
+
+        Returns
+        -------
+        float
+            Non-negative log-gain; `np.inf` if it is unbounded.
+        """
+        tau_d = blob.t_lifetime
+        if tau_d is None or not np.isfinite(tau_d) or blob.amplitude == 0:
+            return 0.0
+        t_drain = np.min(blob.t_drain)
+        peak_exponent = 0.0 if np.isinf(t_drain) else tau_d**2 / (4 * t_drain**2)
+        return float(max(np.log(abs(blob.amplitude)) + peak_exponent, 0.0))
 
     @staticmethod
     def _lifetime_half_width(blob: Blob, truncation_error: float) -> float:
