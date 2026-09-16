@@ -170,7 +170,9 @@ def test_seeded_realization_matches_reference(one_dimensional, reference):
         .make_realization()
         .n.values
     )
-    assert (float(n.sum()), float(n.std())) == reference
+    # Aggregates of the field differ in the last bit across numpy builds
+    # (SIMD summation order), so compare to near machine precision.
+    assert (float(n.sum()), float(n.std())) == pytest.approx(reference, rel=1e-12)
 
 
 def test_default_factory_still_seeds_blobs_at_zero():
@@ -241,6 +243,16 @@ def test_envelope_multiplies_the_drained_field(t_drain):
 
     assert drained.max() > 0.1  # guard: the blob really contributes
     np.testing.assert_allclose(both, drained * envelope, rtol=1e-12, atol=1e-15)
+
+
+def test_drain_and_lifetime_far_before_t_init_is_zero_not_nan():
+    """Far before t_init the drain alone overflows and the envelope alone
+    underflows; combined, the factor must be a finite (vanishing) value."""
+    blob = _blob(t_drain=1.0, t_lifetime=1.0, t_init=1000.0)
+    with np.errstate(over="raise"):
+        field = _realize(blob, _geometry_2d(), speed_up=False)
+    assert np.isfinite(field).all()
+    assert field.max() == 0.0
 
 
 # ---------------------------------------------------------------------------

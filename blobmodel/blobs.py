@@ -349,11 +349,44 @@ class Blob:
 
         return (
             self.amplitude
-            * self._drain(t)
-            * self._envelope(t)
+            * self._temporal_factor(t)
             * primary_axis_shape
             * secondary_axis_shape
         )
+
+    def _temporal_factor(self, t: Union[int, NDArray]) -> NDArray:
+        """
+        Combined drain and lifetime factor.
+
+        Without a lifetime this is exactly `_drain`. With one, the drain and
+        envelope exponents are summed before exponentiating: evaluated
+        separately, far from `t_init` the drain overflows while the envelope
+        underflows, giving ``inf * 0 = nan`` instead of a negligible value.
+
+        Parameters
+        ----------
+        t : NDArray
+            Time coordinates.
+
+        Returns
+        -------
+        temporal_factor : NDArray
+            ``exp(-(t - t_init)/t_drain - ((t - t_init)/t_lifetime)**2)``.
+
+        """
+        if self.t_lifetime is None:
+            return self._drain(t)
+        return np.exp(
+            self._drain_exponent(t) - ((t - self.t_init) / self.t_lifetime) ** 2
+        )
+
+    def _drain_exponent(self, t: Union[int, NDArray]) -> NDArray:
+        """
+        Exponent of the drain factor, ``-(t - t_init) / t_drain``.
+        """
+        if isinstance(self.t_drain, np.ndarray):
+            return -(t - self.t_init) / self.t_drain[np.newaxis, :, np.newaxis]
+        return -(t - self.t_init) / self.t_drain
 
     def _drain(self, t: Union[int, NDArray]) -> NDArray:
         """
@@ -370,9 +403,7 @@ class Blob:
             Drain factor.
 
         """
-        if isinstance(self.t_drain, np.ndarray):
-            return np.exp(-(t - self.t_init) / self.t_drain[np.newaxis, :, np.newaxis])
-        return np.exp(-(t - self.t_init) / self.t_drain)
+        return np.exp(self._drain_exponent(t))
 
     def _envelope(self, t: Union[int, NDArray]) -> Any:
         """
