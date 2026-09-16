@@ -120,9 +120,11 @@ CI is `.github/workflows/workflow.yml` (currently duplicated jobs on Python
   coexist and multiply. `t_drain` is a *one-sided* exponential decay from
   `t_init` (it grows without bound backwards in time); `t_lifetime` is a
   Gaussian envelope *symmetric about* `t_init`, `exp(-((t - t_init)/tau_d)^2)`,
-  scalar only, `None` by default. `None` means the blob is multiplied by the
-  Python float `1.0` — bit-for-bit unchanged — which `tests/test_lifetime.py`
-  asserts against reference values computed on the pre-2.1.0 `main`.
+  scalar only, `None` by default. `None` takes the drain-only path in
+  `Blob._temporal_factor` — bit-for-bit unchanged — which `tests/test_lifetime.py`
+  asserts against reference values computed on the pre-2.1.0 `main`. A finite
+  lifetime sums both exponents before `np.exp` (separate factors give
+  `inf * 0 = NaN` far before `t_init`).
 - **`DefaultBlobFactory` seeds blobs at `pos_x0 = 0`** unless the `posx`
   sampler is reconfigured (added in 2.1.0, default `DistributionEnum.zeros`,
   which draws nothing and so leaves the RNG stream untouched). The factory

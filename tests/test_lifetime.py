@@ -109,8 +109,8 @@ REFERENCE_FIELD_1D = (1093.2711657100344, 0.980969451352523)
 
 @pytest.mark.parametrize("one_dimensional", [False, True])
 def test_lifetime_none_is_identical_to_omitting_it(one_dimensional):
-    """`t_lifetime=None` multiplies by the float 1.0, which is exact in
-    IEEE754: the field must be bit-for-bit what it was without the argument."""
+    """`t_lifetime=None` takes the drain-only path: the field must be
+    bit-for-bit what it was without the argument."""
     geometry = _geometry_1d() if one_dimensional else _geometry_2d()
     without = _realize(_blob(), geometry, one_dimensional, speed_up=False)
     with_none = _realize(
@@ -192,25 +192,28 @@ def test_default_factory_still_seeds_blobs_at_zero():
 
 
 def test_envelope_is_one_at_t_init_and_one_over_e_at_tau_d():
-    blob = _blob(t_lifetime=2.5)
-    assert blob._envelope(blob.t_init) == pytest.approx(1.0)
-    assert blob._envelope(blob.t_init + 2.5) == pytest.approx(1 / np.e)
-    assert blob._envelope(blob.t_init - 2.5) == pytest.approx(1 / np.e)
+    blob = _blob(t_lifetime=2.5)  # t_drain = inf: the factor is the envelope
+    assert blob._temporal_factor(blob.t_init) == pytest.approx(1.0)
+    assert blob._temporal_factor(blob.t_init + 2.5) == pytest.approx(1 / np.e)
+    assert blob._temporal_factor(blob.t_init - 2.5) == pytest.approx(1 / np.e)
 
 
 def test_envelope_is_symmetric_about_t_init():
     blob = _blob(t_lifetime=1.3)
     shifts = np.linspace(0, 5, 51)
     np.testing.assert_allclose(
-        blob._envelope(blob.t_init + shifts),
-        blob._envelope(blob.t_init - shifts),
+        blob._temporal_factor(blob.t_init + shifts),
+        blob._temporal_factor(blob.t_init - shifts),
         rtol=1e-14,
         atol=0,
     )
 
 
-def test_envelope_without_lifetime_is_exactly_one():
-    assert _blob()._envelope(np.linspace(0, 10, 11)) == 1.0
+@pytest.mark.parametrize("t_drain", [np.inf, 2.0])
+def test_temporal_factor_without_lifetime_is_exactly_the_drain(t_drain):
+    blob = _blob(t_drain=t_drain)
+    t = np.linspace(0, 10, 11)
+    assert np.array_equal(blob._temporal_factor(t), blob._drain(t))
 
 
 def test_field_maximum_is_at_t_init():

@@ -405,27 +405,6 @@ class Blob:
         """
         return np.exp(self._drain_exponent(t))
 
-    def _envelope(self, t: Union[int, NDArray]) -> Any:
-        """
-        Gaussian pulse-lifetime envelope, symmetric about `t_init`.
-
-        Parameters
-        ----------
-        t : NDArray
-            Time coordinates.
-
-        Returns
-        -------
-        envelope_factor : float or NDArray
-            ``exp(-((t - t_init) / t_lifetime)**2)``, or the float 1.0 when
-            `t_lifetime` is None. Multiplying by 1.0 is exact in IEEE754, so
-            a blob without a lifetime is bit-for-bit unaffected.
-
-        """
-        if self.t_lifetime is None:
-            return 1.0
-        return np.exp(-(((t - self.t_init) / self.t_lifetime) ** 2))
-
     def _blob_trajectory_x(self, t: Union[int, NDArray]) -> Any:
         """
         Position of the blob in the x-direction at a given time t.
