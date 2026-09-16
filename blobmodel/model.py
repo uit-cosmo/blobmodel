@@ -517,10 +517,7 @@ class Model:
             )
             margin = (
                 width_x
-                * (
-                    self._log_temporal_gain(blob, peak)
-                    - np.log(truncation_error * np.sqrt(np.pi))
-                )
+                * (self._log_temporal_gain(blob, peak) - np.log(truncation_error))
                 / np.abs(blob.v_x * dt)
             )
             start = max(start, int(np.clip(min(idx_x0, idx_Lx) - margin, 0, n_t)))

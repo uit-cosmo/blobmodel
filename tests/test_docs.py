@@ -49,7 +49,10 @@ def test_pulse_lifetime():
     # homogeneous over the observed region.
     pad = 10.0
     blob_factory = DefaultBlobFactory(t_lifetime=1.0).set_sampler(
-        "posx", lambda rng, n: rng.uniform(-pad, geometry.Lx + pad, n)
+        "posx",
+        lambda rng, n: rng.uniform(
+            geometry.x0 - pad, geometry.x0 + geometry.Lx + pad, n
+        ),
     )
 
     tmp = Model(

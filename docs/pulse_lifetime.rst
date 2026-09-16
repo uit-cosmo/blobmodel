@@ -35,6 +35,6 @@ The factory does not know the geometry, so the seeding interval is supplied by t
 .. code-block:: python
 
    pad = 10.0
-   blob_factory.set_sampler("posx", lambda rng, n: rng.uniform(-pad, geometry.Lx + pad, n))
+   blob_factory.set_sampler("posx", lambda rng, n: rng.uniform(geometry.x0 - pad, geometry.x0 + geometry.Lx + pad, n))
 
 With uniform seeding, a finite lifetime and a long enough domain, the mean and variance of the resulting process are independent of the velocity distribution.
