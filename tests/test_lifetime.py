@@ -120,13 +120,15 @@ def test_lifetime_none_is_identical_to_omitting_it(one_dimensional):
 
 
 @pytest.mark.parametrize("one_dimensional", [False, True])
-def test_lifetime_inf_is_identical_to_none(one_dimensional):
+@pytest.mark.parametrize("speed_up", [False, True])
+def test_lifetime_inf_is_identical_to_none(one_dimensional, speed_up):
     """An infinite lifetime gives an envelope of exactly 1, so it must agree
-    bit-for-bit with no envelope at all (documented equivalence)."""
+    bit-for-bit with no envelope at all (documented equivalence), including
+    the speed_up truncation window."""
     geometry = _geometry_1d() if one_dimensional else _geometry_2d()
-    none = _realize(_blob(), geometry, one_dimensional, speed_up=False)
+    none = _realize(_blob(), geometry, one_dimensional, speed_up=speed_up)
     infinite = _realize(
-        _blob(t_lifetime=np.inf), geometry, one_dimensional, speed_up=False
+        _blob(t_lifetime=np.inf), geometry, one_dimensional, speed_up=speed_up
     )
     assert np.array_equal(infinite, none)
 
@@ -354,6 +356,29 @@ def test_crossing_window_accounts_for_temporal_gain(blob_kwargs):
     full = _realize(blob, geometry, one_dimensional=True, speed_up=False)
     fast = _realize(blob, geometry, one_dimensional=True, truncation_error=1e-3)
     assert np.isfinite(full).all() and full.max() > 1.0
+    assert np.abs(fast - full).max() < 1e-3
+
+
+def test_lifetime_window_accounts_for_periodic_ghost_copies():
+    """With periodic_y the field sums the blob and two ghost copies, so it can
+    exceed |amplitude|; the lifetime window must account for that."""
+    geometry = _geometry_2d(dt=0.01, periodic_y=True)
+    shape = BlobShapeImpl(BlobShapeEnum.double_exp, BlobShapeEnum.double_exp)
+    blob = _blob(
+        blob_shape=shape,
+        shape_parameters_p={"lam": 0.5},
+        shape_parameters_s={"lam": 0.5},
+        width_p=1.0,
+        width_s=50.0,
+        v_x=0.0,
+        pos_x0=4.0,
+        t_init=5.0,
+        t_lifetime=0.5,
+    )
+    with pytest.warns(UserWarning, match="mirrored blobs"):
+        full = _realize(blob, geometry, speed_up=False)
+        fast = _realize(blob, geometry, truncation_error=1e-3)
+    assert full.max() > 2.0  # guard: the copies really add up
     assert np.abs(fast - full).max() < 1e-3
 
 

@@ -490,10 +490,14 @@ class Model:
         n_t = self._geometry.t.size
         start, stop = 0, n_t
         dt, t0 = self._geometry.dt, self._geometry.t[0]
+        # Bound on |blob contribution| / (temporal factor): every shape peaks
+        # at or below 1, and periodic-y discretization sums three copies.
+        copies = 3 if self._geometry.periodic_y and not self._one_dimensional else 1
+        peak = copies * abs(blob.amplitude)
 
-        if blob.t_lifetime is not None:
+        if blob.t_lifetime is not None and np.isfinite(blob.t_lifetime):
             # The envelope is symmetric about t_init, so the window is too.
-            half_width = self._lifetime_half_width(blob, truncation_error)
+            half_width = self._lifetime_half_width(blob, truncation_error, peak)
             idx_peak = (blob.t_init - t0) / dt
             margin = half_width / dt
             start = max(start, int(np.clip(np.floor(idx_peak - margin), 0, n_t)))
@@ -514,7 +518,7 @@ class Model:
             margin = (
                 width_x
                 * (
-                    self._log_temporal_gain(blob)
+                    self._log_temporal_gain(blob, peak)
                     - np.log(truncation_error * np.sqrt(np.pi))
                 )
                 / np.abs(blob.v_x * dt)
@@ -526,7 +530,7 @@ class Model:
         return start, max(start, stop)
 
     @staticmethod
-    def _log_temporal_gain(blob: Blob) -> float:
+    def _log_temporal_gain(blob: Blob, peak: float) -> float:
         r"""
         Log of a bound on how much the crossing-window margin must widen.
 
@@ -534,8 +538,8 @@ class Model:
         spatial shape. With a finite `t_lifetime` the temporal factor
         ``exp(-dt / t_drain - (dt / tau_d)**2)`` peaks at
         ``exp(tau_d**2 / (4 t_drain**2))`` (before `t_init`), and the amplitude
-        scales the field too, so the log of ``|amplitude|`` times that peak
-        is added to the margin's log-threshold. Clamped at 0 so the margin
+        and ghost copies scale the field too, so the log of `peak` times that
+        temporal peak is added to the margin's log-threshold. Clamped at 0 so the margin
         never shrinks below the lifetime-free one. Without a (finite)
         lifetime this returns 0, leaving the pre-existing window unchanged.
 
@@ -543,21 +547,24 @@ class Model:
         ----------
         blob : Blob
             Blob object.
+        peak : float
+            Bound on the blob's contribution divided by its temporal factor
+            (``|amplitude|`` times the number of periodic-y copies).
 
         Returns
         -------
         float
-            Non-negative log-gain; `np.inf` if it is unbounded.
+            Non-negative log-gain.
         """
         tau_d = blob.t_lifetime
-        if tau_d is None or not np.isfinite(tau_d) or blob.amplitude == 0:
+        if tau_d is None or not np.isfinite(tau_d) or peak == 0:
             return 0.0
         t_drain = np.min(blob.t_drain)
         peak_exponent = 0.0 if np.isinf(t_drain) else tau_d**2 / (4 * t_drain**2)
-        return float(max(np.log(abs(blob.amplitude)) + peak_exponent, 0.0))
+        return float(max(np.log(peak) + peak_exponent, 0.0))
 
     @staticmethod
-    def _lifetime_half_width(blob: Blob, truncation_error: float) -> float:
+    def _lifetime_half_width(blob: Blob, truncation_error: float, peak: float) -> float:
         r"""
         Half-width in time of the support of a blob's lifetime envelope.
 
@@ -576,9 +583,9 @@ class Model:
         time = widest window = the conservative choice).
 
         `truncation_error` bounds the field itself, so ``epsilon`` is
-        ``truncation_error / |amplitude|``: every blob shape peaks at or below
-        1 in magnitude, hence ``|amplitude| * envelope * drain`` bounds the
-        blob's contribution.
+        ``truncation_error / peak``: every blob shape peaks at or below 1 in
+        magnitude and periodic-y discretization sums three copies, hence
+        ``peak * envelope * drain`` bounds the blob's contribution.
 
         Parameters
         ----------
@@ -586,6 +593,9 @@ class Model:
             Blob with a non-None `t_lifetime`.
         truncation_error : float
             Amplitude below which the blob is truncated.
+        peak : float
+            Bound on the blob's contribution divided by its temporal factor
+            (``|amplitude|`` times the number of periodic-y copies).
 
         Returns
         -------
@@ -595,11 +605,10 @@ class Model:
         tau_d = blob.t_lifetime
         if tau_d is None or not np.isfinite(tau_d):
             return np.inf
-        amplitude = abs(blob.amplitude)
-        if amplitude == 0:
+        if peak == 0:
             return 0.0
         # Clamped so that an error >= 1 (nothing to keep) cannot produce a nan.
-        neg_log_error = max(-np.log(truncation_error / amplitude), 0.0)
+        neg_log_error = max(-np.log(truncation_error / peak), 0.0)
         t_drain = np.min(blob.t_drain)
         b = 0.0 if np.isinf(t_drain) else tau_d**2 / (2 * t_drain)
         return float(b + np.sqrt(b**2 + tau_d**2 * neg_log_error))
