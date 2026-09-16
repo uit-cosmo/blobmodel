@@ -541,6 +541,11 @@ class Model:
         smallest element is used for an array-valued `t_drain` (smallest drain
         time = widest window = the conservative choice).
 
+        `truncation_error` bounds the field itself, so ``epsilon`` is
+        ``truncation_error / |amplitude|``: every blob shape peaks at or below
+        1 in magnitude, hence ``|amplitude| * envelope * drain`` bounds the
+        blob's contribution.
+
         Parameters
         ----------
         blob : Blob
@@ -556,8 +561,11 @@ class Model:
         tau_d = blob.t_lifetime
         if tau_d is None or not np.isfinite(tau_d):
             return np.inf
+        amplitude = abs(blob.amplitude)
+        if amplitude == 0:
+            return 0.0
         # Clamped so that an error >= 1 (nothing to keep) cannot produce a nan.
-        neg_log_error = max(-np.log(truncation_error), 0.0)
+        neg_log_error = max(-np.log(truncation_error / amplitude), 0.0)
         t_drain = np.min(blob.t_drain)
         b = 0.0 if np.isinf(t_drain) else tau_d**2 / (2 * t_drain)
         return float(b + np.sqrt(b**2 + tau_d**2 * neg_log_error))

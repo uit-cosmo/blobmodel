@@ -334,6 +334,17 @@ def test_lifetime_window_is_intersected_with_the_crossing_window():
     np.testing.assert_allclose(fast, full, atol=10 * ERROR)
 
 
+@pytest.mark.parametrize("amplitude", [1e4, -1e4])
+def test_lifetime_window_accounts_for_amplitude(amplitude):
+    """truncation_error bounds the field, not the unit envelope: a
+    high-amplitude blob must keep its tails above the threshold."""
+    geometry = _geometry_2d()
+    blob = _blob(amplitude=amplitude, v_x=0.0, pos_x0=4.0, t_lifetime=0.5)
+    fast = _realize(blob, geometry, speed_up=True, truncation_error=1e-3)
+    full = _realize(blob, geometry, speed_up=False)
+    assert np.abs(fast - full).max() < 1e-3
+
+
 def test_lifetime_window_widens_as_error_decreases():
     geometry = _geometry_1d(dt=0.05, T=60)
     blob = _blob(v_x=0.0, t_lifetime=1.0)
