@@ -380,7 +380,7 @@ class Blob:
             self._drain_exponent(t) - ((t - self.t_init) / self.t_lifetime) ** 2
         )
 
-    def _drain_exponent(self, t: Union[int, NDArray]) -> NDArray:
+    def _drain_exponent(self, t: Union[int, NDArray]) -> Any:
         """
         Exponent of the drain factor, ``-(t - t_init) / t_drain``.
         """
