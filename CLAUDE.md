@@ -118,8 +118,9 @@ GPI/APD `frames(y, x, time)` + `R`/`Z` format.
   degenerate). Item 11: `docs/create_logo.py` repaired; docs plot
   scripts now covered by headless smoke tests
   (`tests/test_docs_scripts.py`). All feedback.md items done.
-- The 2.0.0 version bump is now unblocked from the feedback.md side
-  (all breaking items have landed); it has not been done yet.
+- With all breaking items landed, 2.0.0 was released (bump in `6bdf76a`,
+  2026-07-23); 2.1.0 followed with PR #163 (pulse lifetime, `posx`
+  sampler).
 
 ## Commands
 
