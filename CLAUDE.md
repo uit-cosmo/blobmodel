@@ -14,11 +14,22 @@ All source lives in `blobmodel/` (flat, one class-cluster per file):
 
 - `model.py` — `Model`: owns the grid, sums discretized blobs into the density
   field (`make_realization`), handles `speed_up`/truncation and blob labels.
+  Also `to_imaging_dataset` (module-level): converts the output dataset to
+  the GPI/APD `frames(y, x, time)` + `R`/`Z` format, also reachable via
+  `make_realization(layout="imaging")`.
 - `blobs.py` — `Blob`: one blob's parameters + `discretize_blob` (analytic
   shape evaluated on the mesh, with periodic-y ghost copies and tilt `theta`).
 - `stochasticality.py` — `BlobFactory` (ABC) / `DefaultBlobFactory`: samples
-  blob parameters from distributions. The advertised extension point is
-  subclassing `BlobFactory` (see `examples/custom_blobfactory.py`).
+  blob parameters independently; configured via the chainable
+  `set_sampler(parameter, sampler, free_parameter=None)` with parameter keys
+  "amplitude"/"wp"/"ws"/"vx"/"vy"/"spp"/"sps"/"posx" and `sampler` either a
+  `DistributionEnum` or a `ParameterSampler` callable
+  (`(rng, num_blobs) -> np.ndarray`); ctor takes only `t_drain`,
+  `blob_alignment`, `seed`, `t_lifetime`. Also `BlobListFactory` (pre-built blob
+  list; used by `Model.from_blobs`) and `CallableBlobFactory`
+  (`blob_getter(rng) -> Blob`, the seedable path for hand-rolled sampling).
+  Subclassing `BlobFactory` remains the general extension point (see
+  `examples/custom_blobfactory.py`).
 - `distributions.py` — `DistributionEnum` → sampling functions (`DISTRIBUTIONS`
   dict of plain functions).
 - `blob_shape.py` — `AbstractBlobShape` / `BlobShapeImpl` / `BlobShapeEnum`:
@@ -30,77 +41,36 @@ All source lives in `blobmodel/` (flat, one class-cluster per file):
 
 Public API is whatever `blobmodel/__init__.py` re-exports. Downstream users
 (uit-cosmo repos `fusion_scripts`, `imaging_methods`) call `discretize_blob`
-directly and subclass `BlobFactory`, so treat those as public too.
+directly and subclass `BlobFactory`, so treat those as public too. Local
+checkouts live at `../fusion_scripts` and `../imaging-methods` (hyphenated
+directory; the package inside is `imaging_methods`) — grep them before
+changing public API.
 
-## Ongoing effort: code-quality cleanup (feedback.txt)
-
-`feedback.txt` at the repo root is the tracking document: a prioritized code
-review (P0 correctness → P3 hygiene) with stable item numbers. Working
-convention:
-
-- One branch/PR per item or small group of related items, merged to `main` via
-  GitHub PR (`gh` CLI available; remote is `uit-cosmo/blobmodel`).
-- When an item is fixed and merged, remove its entry from `feedback.txt` and
-  note it in the "Progress" header (keep remaining numbers unchanged — they are
-  stable IDs).
-- Suggested order of attack is at the bottom of feedback.txt. Item 1 (speed_up
-  math) was fixed in PR #144; item 2 (theta/blob_alignment contract) is in
-  progress on the current `theta_update` branch.
-- Behavior changes must be covered by tests (see `tests/test_speed_up.py` for
-  the property-based style used for item 1).
-
-## Ongoing effort: API-improvement work package (feedback.md)
-
-`feedback.md` at the repo root is a second tracking document (created
-2026-07-22, distinct from feedback.txt): API-usability suggestions derived from
-surveying how downstream repos actually use blobmodel. The downstream repos
-live locally at `../fusion_scripts` and `../imaging-methods` (directory has a
-hyphen; the package inside is `imaging_methods`) — grep them before changing
-public API.
-
-Key survey finding driving the package: downstream almost never uses
-`DefaultBlobFactory`; the dominant workflow is hand-built `Blob` lists wrapped
-in a trivial factory, plus boilerplate converting the output dataset to the
-GPI/APD `frames(y, x, time)` + `R`/`Z` format.
-
-- Same working convention as feedback.txt: one branch/PR per item, tests for
-  behavior changes.
-- Four open GitHub issues map onto items and should be closed by the
-  implementing PRs: #140 Geometry flexibility (→ item 1, the P0 — downstream
-  pokes `model._geometry` and that hack is half-broken since meshgrids were
-  dropped), #93 t_drain belongs in stochasticality (→ item 3), #132 dataset in
-  cmod_functions format (→ item 6), #101 rework DefaultBlobFactory config
-  (→ item 10, low priority).
-- Suggested order is at the bottom of feedback.md: 1) Geometry (x0/y0 offsets,
-  accept a user-built `Geometry` in `Model`, expose `model.geometry`);
-  2) `BlobListFactory`/`CallableBlobFactory` + `Model.from_blobs`;
-  3) Blob defaults, `t_drain=inf`, `lam` convention docs; 4) output-layout
-  helper, speed_up default.
-- No items have been started yet.
+`main` is protected: changes land via GitHub PR (`gh` CLI; remote
+`uit-cosmo/blobmodel`), one branch per change. Behavior changes must be
+covered by tests (`tests/test_speed_up.py` shows the property-based style).
 
 ## Commands
 
 ```bash
-pip install -e .            # deps currently include dev tools (feedback item 14)
+pip install -e ".[dev]"     # dev tools are the `dev` extra; docs deps are `docs`
 pytest                      # full suite, ~tests/ ; some tests are statistical
-                            #   and unseeded (item 17) — a rare flake is known
+                            #   and unseeded — a rare flake is known
 black .                     # formatting; CI runs `black --check .`
 mypy --ignore-missing-imports blobmodel   # CI runs this too
 ```
 
 No pytest/mypy/black config sections exist in pyproject.toml — defaults apply.
-CI is `.github/workflows/workflow.yml` (currently duplicated jobs on Python
-3.10; item 16). Tests currently drop `*.nc` artifacts in the repo root and
-`tests/` (item 17) — don't commit them.
+CI is `.github/workflows/workflow.yml`: one job on a Python 3.10/3.11 matrix;
+black, mypy and the Codecov upload run on the 3.10 leg only.
 
 ## Conventions and gotchas
 
 - **Formatting/typing**: black-formatted, numpydoc docstrings, type hints use
   `nptyping.NDArray` (nptyping is unmaintained and blocks newer Python; don't
   add new nptyping usage if a plain `np.ndarray` annotation works).
-- **Array axis order** is `(y, x, t)` i.e. `(Ny, Nx, Nt)` — several docstrings
-  wrongly say `(x, y, t)` (item 9). When in doubt trust the code, not the
-  docstring.
+- **Array axis order** is `(y, x, t)` i.e. `(Ny, Nx, Nt)`, although the math
+  notation in the docs writes `(x, y, t)`.
 - **theta vs blob_alignment**: explicit `theta` (not None) wins and
   `blob_alignment` is ignored; `theta=None` falls back to alignment. Both
   `Blob` and `DefaultBlobFactory` default `blob_alignment=False` (the factory
@@ -109,13 +79,23 @@ CI is `.github/workflows/workflow.yml` (currently duplicated jobs on Python
 - **Randomness**: seeding exists — `Model(seed=...)` and
   `DefaultBlobFactory(seed=...)` thread a `numpy.random.Generator` through
   (`BlobFactory.set_rng` / `self.rng`); a seed passed to `Model` overrides the
-  factory's. Custom factories are only seedable if they draw from `self.rng`
-  — downstream ones currently don't (see feedback.md item 8). Don't introduce
-  global-state `np.random.*` randomness.
+  factory's. Custom factories are only seedable if they draw from `self.rng`;
+  `CallableBlobFactory` passes its rng to the `blob_getter` for the same
+  reason — downstream `blob_getter` functions still use global `np.random`
+  until they migrate. Don't introduce global-state `np.random.*` randomness.
 - **Angles** (`theta`) are measured from the x-axis, not from the velocity
   vector.
+- **`lam` (double_exp asymmetry)**: since 2.0.0 `lam` weighs the *leading*
+  (`theta >= 0`) side of the spatial pulse — i.e. the temporal *rise*
+  fraction at a fixed probe for `v_x > 0`, matching the FPP-literature
+  convention. Pre-2.0 it weighted the trailing side (temporal fall), which
+  is why old downstream code passes `1 - lam`.
 - `t_drain` is a drain *time scale* (exponential decay), not a start time; it
-  may be a scalar or an array of length Nx.
+  may be a scalar or an array of length Nx (length checked in
+  `make_realization`). It lives on `Blob`/the factory
+  (`DefaultBlobFactory(t_drain=...)`), not on `Model`, and defaults to
+  `np.inf` = no draining (the documented replacement for the old `1e10`
+  folk convention).
 - **`t_drain` vs `t_lifetime`** (added in 2.1.0): easy to confuse, and they
   coexist and multiply. `t_drain` is a *one-sided* exponential decay from
   `t_init` (it grows without bound backwards in time); `t_lifetime` is a
@@ -133,7 +113,6 @@ CI is `.github/workflows/workflow.yml` (currently duplicated jobs on Python
   With a finite `t_lifetime` this is a prerequisite, not a nicety — otherwise
   every pulse peaks at the inflow edge.
 - Version is the static `version` in pyproject.toml (bumped manually per
-  release, see recent "Up version number" commits); setuptools-scm in
-  build-system is vestigial (item 14).
+  release, see recent "Up version number" commits).
 - Keep docstrings in sync with code when changing behavior — docstring drift is
-  a recurring problem here (item 9), and docs/RTD autodoc pulls from them.
+  a recurring problem here, and docs/RTD autodoc pulls from them.
