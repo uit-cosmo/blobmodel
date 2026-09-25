@@ -125,7 +125,7 @@ GPI/APD `frames(y, x, time)` + `R`/`Z` format.
 ## Commands
 
 ```bash
-pip install -e .            # deps currently include dev tools (feedback item 14)
+pip install -e ".[dev]"     # dev tools are the `dev` extra; docs deps are `docs`
 pytest                      # full suite, ~tests/ ; some tests are statistical
                             #   and unseeded (item 17) — a rare flake is known
 black .                     # formatting; CI runs `black --check .`
@@ -133,9 +133,8 @@ mypy --ignore-missing-imports blobmodel   # CI runs this too
 ```
 
 No pytest/mypy/black config sections exist in pyproject.toml — defaults apply.
-CI is `.github/workflows/workflow.yml` (currently duplicated jobs on Python
-3.10; item 16). Tests currently drop `*.nc` artifacts in the repo root and
-`tests/` (item 17) — don't commit them.
+CI is `.github/workflows/workflow.yml`: one job on a Python 3.10/3.11 matrix;
+black, mypy and the Codecov upload run on the 3.10 leg only.
 
 ## Conventions and gotchas
 
@@ -187,7 +186,6 @@ CI is `.github/workflows/workflow.yml` (currently duplicated jobs on Python
   With a finite `t_lifetime` this is a prerequisite, not a nicety — otherwise
   every pulse peaks at the inflow edge.
 - Version is the static `version` in pyproject.toml (bumped manually per
-  release, see recent "Up version number" commits); setuptools-scm in
-  build-system is vestigial (item 14).
+  release, see recent "Up version number" commits).
 - Keep docstrings in sync with code when changing behavior — docstring drift is
   a recurring problem here (item 9), and docs/RTD autodoc pulls from them.
