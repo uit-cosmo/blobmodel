@@ -183,6 +183,7 @@ class DefaultBlobFactory(BlobFactory):
         "ws": (DistributionEnum.deg, 1.0),
         "vx": (DistributionEnum.deg, 1.0),
         "vy": (DistributionEnum.zeros, 0.0),
+        "posx": (DistributionEnum.zeros, 0.0),
         "spp": (DistributionEnum.deg, 0.5),
         "sps": (DistributionEnum.deg, 0.5),
     }
@@ -192,6 +193,7 @@ class DefaultBlobFactory(BlobFactory):
         t_drain: Union[float, NDArray, int] = np.inf,
         blob_alignment: bool = False,
         seed: Union[int, np.random.Generator, None] = None,
+        t_lifetime: Union[float, None] = None,
     ) -> None:
         """
         Default implementation of BlobFactory.
@@ -225,14 +227,26 @@ class DefaultBlobFactory(BlobFactory):
             By default None, i.e. a freshly seeded generator (non-reproducible).
             Note that a seed passed to `Model` takes precedence: it replaces
             this factory's generator via `set_rng`.
+        t_lifetime : float, optional
+            Pulse lifetime of the blobs: every sampled blob is multiplied by
+            the Gaussian envelope ``exp(-((t - t_init) / t_lifetime)**2)``,
+            symmetric about its own `t_init`. Scalar only. By default None,
+            i.e. no envelope. Last in the signature so that positional callers
+            are unaffected.
+
+            .. versionadded:: 2.1.0
 
         Raises
         ------
         ValueError
-            If `t_drain` is not positive.
+            If `t_drain` or `t_lifetime` is not positive.
         """
         if np.any(np.asarray(t_drain) <= 0):
             raise ValueError(f"t_drain must be positive, got t_drain = {t_drain}.")
+        if t_lifetime is not None and not t_lifetime > 0:
+            raise ValueError(
+                f"t_lifetime must be positive, got t_lifetime = {t_lifetime}."
+            )
 
         # Per-parameter distribution (None for custom callables) and sampler.
         self._dists: dict = {}
@@ -242,6 +256,7 @@ class DefaultBlobFactory(BlobFactory):
             self.set_sampler(parameter, dist, free_parameter)
 
         self.t_drain = t_drain
+        self.t_lifetime = None if t_lifetime is None else float(t_lifetime)
         self.blob_alignment = blob_alignment
         self.theta_setter: Union[Callable[[], float], None] = None
         self.rng = np.random.default_rng(seed)
@@ -264,6 +279,11 @@ class DefaultBlobFactory(BlobFactory):
             - "ws": width in the secondary (perpendicular) blob direction
             - "vx": velocity in the x-direction
             - "vy": velocity in the y-direction
+            - "posx": blob position in the x-direction at ``t_init``
+              (`DistributionEnum.zeros` by default, i.e. every blob is seeded
+              at x = 0; the factory does not know the domain, so seeding
+              blobs across it means supplying a callable, e.g.
+              ``lambda rng, n: rng.uniform(-pad, Lx + pad, n)``)
             - "spp": pulse shape parameter in the principal direction
             - "sps": pulse shape parameter in the secondary direction
         sampler : DistributionEnum or Callable[[np.random.Generator, int], np.ndarray]
@@ -371,7 +391,8 @@ class DefaultBlobFactory(BlobFactory):
         Creates a list of Blobs used in the Model.
 
         Every blob is given the factory's `t_drain` (a constructor argument,
-        `np.inf` — no draining — by default).
+        `np.inf` — no draining — by default) and its `t_lifetime` (also a
+        constructor argument, None — no envelope — by default).
 
         Parameters
         ----------
@@ -407,10 +428,10 @@ class DefaultBlobFactory(BlobFactory):
         vys = self._draw_random_variables("vy", num_blobs)
         spxs = self._draw_random_variables("spp", num_blobs)
         spys = self._draw_random_variables("sps", num_blobs)
+        posxs = self._draw_random_variables("posx", num_blobs)
         # For now, only a lambda parameter is implemented
         spxs_dict = [{"lam": s} for s in spxs]
         spys_dict = [{"lam": s} for s in spys]
-        posxs = np.zeros(num_blobs)
         posys = self.rng.uniform(low=0.0, high=Ly, size=num_blobs)
         t_inits = self.rng.uniform(low=0, high=T, size=num_blobs)
 
@@ -427,6 +448,7 @@ class DefaultBlobFactory(BlobFactory):
                 pos_y0=posys[i],
                 t_init=t_inits[i],
                 t_drain=self.t_drain,
+                t_lifetime=self.t_lifetime,
                 shape_parameters_p=spxs_dict[i],
                 shape_parameters_s=spys_dict[i],
                 blob_alignment=self.blob_alignment,

@@ -22,10 +22,10 @@ All source lives in `blobmodel/` (flat, one class-cluster per file):
 - `stochasticality.py` — `BlobFactory` (ABC) / `DefaultBlobFactory`: samples
   blob parameters independently; configured via the chainable
   `set_sampler(parameter, sampler, free_parameter=None)` with parameter keys
-  "amplitude"/"wp"/"ws"/"vx"/"vy"/"spp"/"sps" and `sampler` either a
+  "amplitude"/"wp"/"ws"/"vx"/"vy"/"spp"/"sps"/"posx" and `sampler` either a
   `DistributionEnum` or a `ParameterSampler` callable
   (`(rng, num_blobs) -> np.ndarray`); ctor takes only `t_drain`,
-  `blob_alignment`, `seed`. Also `BlobListFactory` (pre-built blob
+  `blob_alignment`, `seed`, `t_lifetime`. Also `BlobListFactory` (pre-built blob
   list; used by `Model.from_blobs`) and `CallableBlobFactory`
   (`blob_getter(rng) -> Blob`, the seedable path for hand-rolled sampling).
   Subclassing `BlobFactory` remains the general extension point (see
@@ -169,6 +169,22 @@ CI is `.github/workflows/workflow.yml` (currently duplicated jobs on Python
   (`DefaultBlobFactory(t_drain=...)`), not on `Model`, and defaults to
   `np.inf` = no draining (the documented replacement for the old `1e10`
   folk convention).
+- **`t_drain` vs `t_lifetime`** (added in 2.1.0): easy to confuse, and they
+  coexist and multiply. `t_drain` is a *one-sided* exponential decay from
+  `t_init` (it grows without bound backwards in time); `t_lifetime` is a
+  Gaussian envelope *symmetric about* `t_init`, `exp(-((t - t_init)/tau_d)^2)`,
+  scalar only, `None` by default. `None` takes the drain-only path in
+  `Blob._temporal_factor` — bit-for-bit unchanged — which `tests/test_lifetime.py`
+  asserts against reference values computed on the pre-2.1.0 `main`. A finite
+  lifetime sums both exponents before `np.exp` (separate factors give
+  `inf * 0 = NaN` far before `t_init`).
+- **`DefaultBlobFactory` seeds blobs at `pos_x0 = 0`** unless the `posx`
+  sampler is reconfigured (added in 2.1.0, default `DistributionEnum.zeros`,
+  which draws nothing and so leaves the RNG stream untouched). The factory
+  cannot see `Lx` (issue #140), so seeding blobs across the domain means
+  passing a callable: `set_sampler("posx", lambda rng, n: rng.uniform(...))`.
+  With a finite `t_lifetime` this is a prerequisite, not a nicety — otherwise
+  every pulse peaks at the inflow edge.
 - Version is the static `version` in pyproject.toml (bumped manually per
   release, see recent "Up version number" commits); setuptools-scm in
   build-system is vestigial (item 14).

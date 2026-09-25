@@ -18,6 +18,7 @@ SCRIPTS = [
     "create_logo.py",
     "plot_pulses.py",
     "changing_t_drain_plot.py",
+    "pulse_lifetime_plot.py",
 ]
 
 

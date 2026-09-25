@@ -474,29 +474,141 @@ class Model:
         -------
         Tuple[int, int]
             Start and stop indices.
+
+        Notes
+        -----
+        - Two independent windows are intersected: the one derived from the
+          blob crossing the domain (only available when ``v_x != 0``) and,
+          for a blob with a finite `t_lifetime`, the one derived from the
+          support of its temporal envelope. Either may be absent, in which
+          case the other is used alone; with neither the whole time axis is
+          returned.
         """
-        if not speed_up or blob.v_x == 0:
+        if not speed_up:
             return 0, self._geometry.t.size
 
+        n_t = self._geometry.t.size
+        start, stop = 0, n_t
         dt, t0 = self._geometry.dt, self._geometry.t[0]
-        idx_x0 = (blob.t_init - t0) / dt + (self._geometry.x[0] - blob.pos_x0) / (
-            blob.v_x * dt
-        )
-        idx_Lx = idx_x0 + self._geometry.Lx / (blob.v_x * dt)
-        # Decay length of the blob along the x-axis: the blob-frame widths
-        # projected onto x through the tilt angle (width_p for an untilted
-        # blob, width_s at theta = pi/2).
-        width_x = (
-            np.abs(np.cos(blob.theta)) * blob.width_p
-            + np.abs(np.sin(blob.theta)) * blob.width_s
-        )
-        margin = (
-            -width_x * np.log(truncation_error * np.sqrt(np.pi)) / np.abs(blob.v_x * dt)
-        )
-        start = int(np.clip(min(idx_x0, idx_Lx) - margin, 0, self._geometry.t.size))
-        stop = int(np.clip(max(idx_x0, idx_Lx) + margin, 0, self._geometry.t.size))
+        # Bound on |blob contribution| / (temporal factor): every shape peaks
+        # at or below 1, and periodic-y discretization sums three copies.
+        copies = 3 if self._geometry.periodic_y and not self._one_dimensional else 1
+        peak = copies * abs(blob.amplitude)
 
-        return start, stop
+        if blob.t_lifetime is not None and np.isfinite(blob.t_lifetime):
+            # The envelope is symmetric about t_init, so the window is too.
+            half_width = self._lifetime_half_width(blob, truncation_error, peak)
+            idx_peak = (blob.t_init - t0) / dt
+            margin = half_width / dt
+            start = max(start, int(np.clip(np.floor(idx_peak - margin), 0, n_t)))
+            stop = min(stop, int(np.clip(np.ceil(idx_peak + margin), 0, n_t)))
+
+        if blob.v_x != 0:
+            idx_x0 = (blob.t_init - t0) / dt + (self._geometry.x[0] - blob.pos_x0) / (
+                blob.v_x * dt
+            )
+            idx_Lx = idx_x0 + self._geometry.Lx / (blob.v_x * dt)
+            # Decay length of the blob along the x-axis: the blob-frame widths
+            # projected onto x through the tilt angle (width_p for an untilted
+            # blob, width_s at theta = pi/2).
+            width_x = (
+                np.abs(np.cos(blob.theta)) * blob.width_p
+                + np.abs(np.sin(blob.theta)) * blob.width_s
+            )
+            margin = (
+                width_x
+                * (self._log_temporal_gain(blob, peak) - np.log(truncation_error))
+                / np.abs(blob.v_x * dt)
+            )
+            start = max(start, int(np.clip(min(idx_x0, idx_Lx) - margin, 0, n_t)))
+            stop = min(stop, int(np.clip(max(idx_x0, idx_Lx) + margin, 0, n_t)))
+
+        # The two windows may not overlap at all: collapse rather than invert.
+        return start, max(start, stop)
+
+    @staticmethod
+    def _log_temporal_gain(blob: Blob, peak: float) -> float:
+        r"""
+        Log of a bound on how much the crossing-window margin must widen.
+
+        The crossing margin assumes the blob's contribution is at most its
+        spatial shape. With a finite `t_lifetime` the temporal factor
+        ``exp(-dt / t_drain - (dt / tau_d)**2)`` peaks at
+        ``exp(tau_d**2 / (4 t_drain**2))`` (before `t_init`), and the amplitude
+        and ghost copies scale the field too, so the log of `peak` times that
+        temporal peak is added to the margin's log-threshold. Clamped at 0 so the margin
+        never shrinks below the lifetime-free one. Without a (finite)
+        lifetime this returns 0, leaving the pre-existing window unchanged.
+
+        Parameters
+        ----------
+        blob : Blob
+            Blob object.
+        peak : float
+            Bound on the blob's contribution divided by its temporal factor
+            (``|amplitude|`` times the number of periodic-y copies).
+
+        Returns
+        -------
+        float
+            Non-negative log-gain.
+        """
+        tau_d = blob.t_lifetime
+        if tau_d is None or not np.isfinite(tau_d) or peak == 0:
+            return 0.0
+        t_drain = np.min(blob.t_drain)
+        peak_exponent = 0.0 if np.isinf(t_drain) else tau_d**2 / (4 * t_drain**2)
+        return float(max(np.log(peak) + peak_exponent, 0.0))
+
+    @staticmethod
+    def _lifetime_half_width(blob: Blob, truncation_error: float, peak: float) -> float:
+        r"""
+        Half-width in time of the support of a blob's lifetime envelope.
+
+        The envelope ``exp(-(dt / tau_d)**2)`` alone drops below
+        `truncation_error` for ``|dt| >= tau_d * sqrt(-log(error))``. A finite
+        `t_drain` makes the drain factor *grow* backwards in time, so the
+        product ``exp(-(dt / tau_d)**2 + dt / t_drain)`` is the binding
+        constraint; it falls below `truncation_error` for
+
+        .. math::
+            \Delta \geq b + \sqrt{b^2 - \tau_d^2 \log \varepsilon},
+            \quad b = \tau_d^2 / (2 \tau_\text{drain}),
+
+        which reduces to the envelope-only bound at ``t_drain = inf``. The
+        smallest element is used for an array-valued `t_drain` (smallest drain
+        time = widest window = the conservative choice).
+
+        `truncation_error` bounds the field itself, so ``epsilon`` is
+        ``truncation_error / peak``: every blob shape peaks at or below 1 in
+        magnitude and periodic-y discretization sums three copies, hence
+        ``peak * envelope * drain`` bounds the blob's contribution.
+
+        Parameters
+        ----------
+        blob : Blob
+            Blob with a non-None `t_lifetime`.
+        truncation_error : float
+            Amplitude below which the blob is truncated.
+        peak : float
+            Bound on the blob's contribution divided by its temporal factor
+            (``|amplitude|`` times the number of periodic-y copies).
+
+        Returns
+        -------
+        float
+            Half-width in time units; `np.inf` for an infinite `t_lifetime`.
+        """
+        tau_d = blob.t_lifetime
+        if tau_d is None or not np.isfinite(tau_d):
+            return np.inf
+        if peak == 0:
+            return 0.0
+        # Clamped so that an error >= 1 (nothing to keep) cannot produce a nan.
+        neg_log_error = max(-np.log(truncation_error / peak), 0.0)
+        t_drain = np.min(blob.t_drain)
+        b = 0.0 if np.isinf(t_drain) else tau_d**2 / (2 * t_drain)
+        return float(b + np.sqrt(b**2 + tau_d**2 * neg_log_error))
 
     def _reset_fields(self):
         """Reset the density and labels fields."""

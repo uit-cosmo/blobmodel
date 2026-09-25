@@ -85,6 +85,8 @@ bm = Model(
 ```
 Alternatively, you can specify all blob parameters exactly as you want by writing your own class which inherits from BlobFactory. See `examples/custom_blobfactory.py` as an example or take a look at the [blobmodel documentation](https://blobmodel.readthedocs.io/en/latest/?badge=latest).
 
+Blobs can decay exponentially from their initial time with a drainage time `t_drain`, and/or be given a finite pulse lifetime `t_lifetime`, a Gaussian envelope symmetric about the blob's `t_init` so that the blob grows, peaks and decays. Both are arguments of `DefaultBlobFactory` and are applied to every sampled blob; see the [drainage time](https://blobmodel.readthedocs.io/en/latest/drainage_time.html) and [pulse lifetime](https://blobmodel.readthedocs.io/en/latest/pulse_lifetime.html) sections of the documentation.
+
 ## Contributing
 
 Feel free to raise issues about anything. Contributions through pull requests are also very welcome. Please take a look at our [Contributor guide](https://blobmodel.readthedocs.io/en/latest/contributor_guide.html) for further details.
